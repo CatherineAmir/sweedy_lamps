@@ -1,0 +1,49 @@
+<odoo>
+    <data>
+        <!-- Purchase Manager Approval Email template -->
+        <record id="po_approval_email_template" model="mail.template">
+            <field name="name">PO Manager Approval - Send by Email</field>
+            <field name="subject">PO Approval(Ref ${object.name or '' })(Waiting For Approval)</field>
+            <field name="email_from">${object.company_id.partner_id.email}</field>
+            <field name="model_id" ref="purchase.model_purchase_order"/>
+            <field name="partner_to">${object.partner_id.id}</field>
+            <field name="auto_delete" eval="False"/>
+            <field name="lang">{user.lang}</field>
+            <field name="body_html"><![CDATA[
+                <p style="margin: 0px 0 9px 0"><b>Dear ${object.partner_id.name},</b>
+                </p>
+                <p style="margin: 0px 0 9px 0">&nbsp;&nbsp;&nbsp;&nbsp; Your approval request for Ref.- <b>${object.name} </b>is waiting for approval,</p>
+                <p style="margin: 0px 0 9px 0">&nbsp;&nbsp;&nbsp;&nbsp; Please Approve PO request to proceed further.</p>
+                <br>
+                    <table width="100%" style="background-color:#ededed">
+                    </table>
+                </br>
+                <p>Thank you,</p>
+            ]]>
+            </field>
+        </record>
+
+        <!-- Purchase Manager Refuse Email template -->
+        <record id="po_refuse_email_template" model="mail.template">
+            <field name="name">PO Refuse Template - Send by Email</field>
+            <field name="subject">PO Refuse(Ref ${object.name})(Refused)</field>
+            <field name="email_from">${object.company_id.partner_id.email}</field>
+            <field name="model_id" ref="purchase.model_purchase_order"/>
+           	<field name="partner_to">${object.partner_id.id}</field>
+            <field name="auto_delete" eval="False"/>
+            <field name="lang">{user.lang}</field>
+            <field name="body_html"><![CDATA[
+                <p style="margin: 0px 0 9px 0"><b>Dear ${object.partner_id.name},</b>
+                <p style="margin: 0px 0 9px 0">&nbsp;&nbsp;&nbsp;&nbsp; Your PO approval request.- <b>${object.name} </b>is refused,</p>
+                <p style="margin: 0px 0 9px 0">&nbsp;&nbsp;&nbsp;&nbsp; Please Contact your Administrator for process further.</p>
+                <br>
+                    <table width="100%" style="background-color:#ededed">
+                    </table>
+                </br>
+                <p>Thank you,</p>
+            ]]>
+            </field>
+        </record>
+
+    </data>
+</odoo>
