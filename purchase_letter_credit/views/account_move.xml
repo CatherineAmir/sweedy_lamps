@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+
+        <record id="view_account_move_form_inherit" model="ir.ui.view">
+            <field name="name">account.move.form.inherit</field>
+            <field name="model">account.move</field>
+            <field name="inherit_id" ref="account.view_move_form"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//header" position="inside">
+                    <button name="action_register_payment_lc" id="account_invoice_payment_lc_btn" type="object"
+                            class="oe_highlight"
+                            attrs="{'invisible': ['|', '|', ('state', '!=', 'posted'), ('invoice_payment_state', '!=', 'not_paid'), ('type', 'not in', ('in_invoice', 'in_refund', 'in_receipt'))]}"
+                            context="{'show_lc':True}"
+                            string="Pay From Lc" groups="account.group_account_invoice"/>
+
+                </xpath>
+
+            </field>
+        </record>
+
+    </data>
+</odoo>

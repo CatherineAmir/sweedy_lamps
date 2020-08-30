@@ -1,0 +1,43 @@
+<odoo>
+  <data>
+
+    <record id="discount_cycle_customer_form" model="ir.ui.view">
+            <field name="name">discount_cycle_customer_form</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//page[@name='sales_purchases']" position="attributes">
+                    <attribute name="groups">account.group_account_manager, sales_team.group_sale_manager</attribute>
+                </xpath>
+                <xpath expr="//page[@name='sales_purchases']/group" position="after">
+                    <group string="Discount">
+                        <group string="َQuarter">
+                           <label for="disc_valu_quar"/>
+                            <div class="o_row" name="disc_valu_quar"  >
+                                <field name="disc_valu_quar" />
+                                <span>%</span>
+                            </div>
+                            <field name="disc_available_quar"/>
+                            <field name="quarter_balance"/>
+                            <button name="get_quareter_balance" type="object" string="get quarter Balance"/>
+                            <button name="set_quar_discount" type="object" string="Calculate Discount"/>
+                        </group>
+                        <group string="Annual">
+                            <label for="disc_valu_annu"/>
+                            <div class="o_row" name="disc_valu_annu"  >
+                                <field name="disc_valu_annu" />
+                                <span>%</span>
+                            </div>
+                            <field name="disc_available_annu"/>
+                            <field name="partner_balance"/>
+                            <button name="get_balance" type="object" string="get Balance"/>
+                            <button name="set_annu_discount" type="object" string="Calculate Discount"/>
+                        </group>
+                    </group>
+                </xpath>
+            </field>
+        </record>
+
+  </data>
+</odoo>

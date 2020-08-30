@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_purchase_letter_credit_type_user,access_purchase_letter_credit_type_user,model_purchase_letter_credit_type,,1,1,1,1
+access_purchase_letter_credit_user,access_purchase_letter_credit_user,model_purchase_letter_credit,,1,1,1,1
+access_lc_amount_extend_user,access_lc_amount_extend_user,model_lc_amount_extend,,1,1,1,1
+access_lc_period_extend_user,access_lc_period_extend_user,model_lc_period_extend,,1,1,1,1

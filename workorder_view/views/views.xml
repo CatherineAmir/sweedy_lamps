@@ -1,0 +1,9 @@
+<odoo>
+  <data>
+      <template id="workorder_view" name="mf.workerorder.view" inherit_id="web.assets_backend">
+          <xpath expr="." position="inside">
+              <link rel="stylesheet" type="text/scss" href="/workorder_view/static/src/mf_tablet_view.scss"/>
+          </xpath>
+      </template>
+  </data>
+</odoo>

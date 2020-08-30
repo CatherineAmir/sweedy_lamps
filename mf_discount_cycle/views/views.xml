@@ -1,0 +1,25 @@
+<odoo>
+  <data>
+
+    <record id="discount_cycle_oreder_line" model="ir.ui.view">
+            <field name="name">discount_cycle_oreder_line</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_form"/>
+            <field name="arch" type="xml">
+              <xpath expr="//field[@name='order_line']/tree/field[@name='price_subtotal']" position="before">
+                   <field name="discount_mount"/>
+                </xpath>
+<!--                <xpath expr="//field[@name='partner_id']" position="after">-->
+<!--                    <field name="total_discount"/>-->
+<!--                </xpath>-->
+                <xpath expr="//field[@name='amount_untaxed']" position="after">
+                    <field name="total_discount" invisible="1" />
+                </xpath>
+                <xpath expr="//field[@name='partner_id']" position="after">
+                    <field name="discount_role" />
+                </xpath>
+            </field>
+        </record>
+
+  </data>
+</odoo>
