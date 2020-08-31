@@ -11,6 +11,15 @@ For Module Support : devintelle@gmail.com  or Skype : devintelle
             <field name="model">res.partner</field>
             <field name="inherit_id" ref="base.view_partner_form"/>
             <field name="arch" type="xml">
+
+<!--                <xpath expr="/form/*" position="before">-->
+<!--                    <header>-->
+<!--                        <button name="action_sale_manager_approve" string="Sale Manager Approve" attrs="{'invisible':[('partner_state','!=','draft')]}" type="object" class="oe_highlight" groups="approval_groups.group_sales_manager"/>-->
+<!--                        <button name="action_financial_manager_approval" string="Financial Manager Approve" attrs="{'invisible':[('partner_state','!=','sale_approval')]}" type="object" class="oe_highlight" groups="approval_groups.group_cfo"/>-->
+<!--                        <field name="partner_state" widget="statusbar" />-->
+<!--                    </header>-->
+<!--                </xpath>-->
+
                 <xpath expr="//group[@name='purchase']" position="after">
                     <group string="Credit" name="credit">
                             <field name="check_credit" readonly="1"/>

@@ -17,7 +17,7 @@ class customer_limit_wizard(models.TransientModel):
     
     def set_credit_limit_state(self):
         order_id = self.env['sale.order'].browse(self._context.get('active_id'))
-        order_id.state = 'credit_limit'
+        order_id.state = 'sale_manager_approve'
         order_id.exceeded_amount = self.exceeded_amount
         order_id.send_mail_approve_credit_limit()
         partner_id = self.partner_id
