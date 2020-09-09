@@ -92,7 +92,7 @@
 
 
         <record id="view_purchase_letter_credit_action" model="ir.actions.act_window">
-            <field name="name">Letter Credit</field>
+            <field name="name">Letter Of Credit</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">purchase.letter.credit</field>
             <field name="view_mode">tree,form</field>

@@ -96,7 +96,7 @@ Odoo Credit sale Order
     'author': 'Devintelle Consulting Service Pvt.Ltd',
     'website': 'http://www.devintellecs.com',
     'images': ['images/main_screenshot.png'],
-    'depends': ['sale_management', 'account'],
+    'depends': ['sale_management', 'account','approval_groups'],
     'data': [
         'security/security.xml',
         'wizard/customer_limit_wizard_view.xml',

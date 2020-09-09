@@ -10,5 +10,7 @@
 
 from . import partner
 from . import sale
+# from . import account_move
+# from . import purchase_order
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

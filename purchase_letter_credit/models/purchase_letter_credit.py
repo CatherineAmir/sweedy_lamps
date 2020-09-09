@@ -279,6 +279,13 @@ class PurchaseLetterCredit(models.Model):
         if self.currency_id:
             self.currency_rate = self.currency_id.with_context(date=self.date).rate
 
+    def unlink(self):
+        for rec in self:
+            if rec.state == 'cancel':
+                super(PurchaseLetterCredit,rec).unlink()
+            else:
+                raise ValidationError(_('You can only delete canceled letter of credits'))
+
 
 class LcPeriodExtend(models.Model):
     _name = 'lc.period.extend'
