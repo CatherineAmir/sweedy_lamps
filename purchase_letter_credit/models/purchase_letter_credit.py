@@ -113,7 +113,7 @@ class PurchaseLetterCredit(models.Model):
 
     def create_start_journal_entries(self,lc_amount):
         if lc_amount:
-            company_amount = self.currency_rate * lc_amount
+            company_amount =  lc_amount / self.currency_rate
             move_vals_1 = {
                 'type': 'entry',
                 'date': self.date,
@@ -215,7 +215,7 @@ class PurchaseLetterCredit(models.Model):
 
     def create_end_journal_entries(self,lc_amount):
         if lc_amount:
-            company_amount = self.currency_rate * lc_amount
+            company_amount =  lc_amount / self.currency_rate
             move_vals_1 = {
                 'type': 'entry',
                 'date': self.date,
