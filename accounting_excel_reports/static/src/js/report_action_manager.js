@@ -5,7 +5,7 @@ odoo.define("report_xlsx.report", function (require) {
 
     var core = require("web.core");
     var ActionManager = require("web.ActionManager");
-    var CrashManager = require("web.CrashManager");
+    var CrashManager = require("web.CrashManager").CrashManager;
     var framework = require("web.framework");
     var session = require("web.session");
     var _t = core._t;
