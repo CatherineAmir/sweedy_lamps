@@ -37,9 +37,9 @@ class AccountPrintJournal(models.TransientModel):
                                        'account.journal'].search(
                                        [('type', 'in', ['sale', 'purchase'])]))
 
-    def _print_report(self, data):
-        data = self.pre_print_report(data)
-        data['form'].update({'sort_selection': self.sort_selection})
-        return self.env.ref(
-            'base_accounting_kit.action_report_journal').with_context(
-            landscape=True).report_action(self, data=data)
+    # def _print_report(self, data):
+    #     data = self.pre_print_report(data)
+    #     data['form'].update({'sort_selection': self.sort_selection})
+    #     return self.env.ref(
+    #         'base_accounting_kit.action_report_journal').with_context(
+    #         landscape=True).report_action(self, data=data)

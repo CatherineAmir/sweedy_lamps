@@ -43,13 +43,13 @@ class AccountReportGeneralLedger(models.TransientModel):
                                    'account_id', 'journal_id',
                                    string='Journals', required=True)
 
-    def _print_report(self, data):
-        data = self.pre_print_report(data)
-        data['form'].update(self.read(['initial_balance', 'sortby'])[0])
-        if data['form'].get('initial_balance') and not data['form'].get(
-                'date_from'):
-            raise UserError(_("You must define a Start Date"))
-        records = self.env[data['model']].browse(data.get('ids', []))
-        return self.env.ref(
-            'base_accounting_kit.action_report_general_ledger').with_context(
-            landscape=True).report_action(records, data=data)
+    # def _print_report(self, data):
+    #     data = self.pre_print_report(data)
+    #     data['form'].update(self.read(['initial_balance', 'sortby'])[0])
+    #     if data['form'].get('initial_balance') and not data['form'].get(
+    #             'date_from'):
+    #         raise UserError(_("You must define a Start Date"))
+    #     records = self.env[data['model']].browse(data.get('ids', []))
+    #     return self.env.ref(
+    #         'base_accounting_kit.action_report_general_ledger').with_context(
+    #         landscape=True).report_action(records, data=data)
