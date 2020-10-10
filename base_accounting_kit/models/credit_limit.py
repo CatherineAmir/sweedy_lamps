@@ -45,6 +45,9 @@ class ResPartner(models.Model):
     enable_credit_limit = fields.Boolean(string="Credit Limit Enabled",
                                          compute="_compute_enable_credit_limit")
 
+    vendor_tax_id = fields.Char(string="Tax ID", required=False, )
+    tax_regestration_num  = fields.Char()
+
     def compute_due_amount(self):
         for rec in self:
             if not rec.id:

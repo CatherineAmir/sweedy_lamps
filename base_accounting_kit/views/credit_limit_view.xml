@@ -16,6 +16,11 @@
                         </group>
                     </group>
                 </xpath>
+
+                <xpath expr="//field[@name='industry_id']" position="after">
+                    <field name="vendor_tax_id" />
+                    <field name="tax_regestration_num" />
+                </xpath>
             </field>
         </record>
 
