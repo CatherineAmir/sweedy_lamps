@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        
+        <record id="view_mrp_routing_workcenter_tree_inherit" model="ir.ui.view">
+            <field name="name">mrp.routing.workcenter.tree.inherit</field>
+            <field name="model">mrp.routing.workcenter</field>
+            <field name="inherit_id" ref="mrp.mrp_routing_workcenter_tree_view"/>
+            <field name="arch" type="xml">
+                
+                <xpath expr="//field[@name='workcenter_id']" position="after">
+                     <field name="labour_cost_per_hour" />
+<!--                     <field name="labour_account_id" />-->
+<!--                     <field name="labour_analytic_account_id" />-->
+                     <field name="overhead_cost_per_hour" />
+<!--                     <field name="overhead_account_id" />-->
+<!--                     <field name="overhead_analytic_account_id" />-->
+                </xpath>
+                
+            </field>
+        </record>
+        
+         
+         <record id="view_mrp_routing_workcenter_form_inherit" model="ir.ui.view">
+             <field name="name">mrp.routing.workcenter.form.inherit</field>
+             <field name="model">mrp.routing.workcenter</field>
+             <field name="inherit_id" ref="mrp.mrp_routing_workcenter_form_view"/>
+             <field name="arch" type="xml">
+                 
+                 <xpath expr="//notebook" position="inside">
+                     <page name="additional_costs" string="Additional Costs">
+                         <group>
+                             <group string="Labour">
+                                 <field name="labour_cost_per_hour" />
+                                 <field name="labour_account_id" />
+                                 <field name="labour_analytic_account_id" />
+                             </group>
+                             <group string="Overhead">
+                                 <field name="overhead_cost_per_hour" />
+                                 <field name="overhead_account_id" />
+                                 <field name="overhead_analytic_account_id" />
+                             </group>
+                         </group>
+                     </page>
+                 </xpath>
+                 
+             </field>
+         </record>
+    
+    </data>
+</odoo>
