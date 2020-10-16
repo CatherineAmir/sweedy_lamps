@@ -19,7 +19,7 @@ class ReportBomStructure(models.AbstractModel):
             labour_costs = (duration_expected / 60.0) * operation.labour_cost_per_hour
             overhead_costs = (duration_expected / 60.0) * operation.overhead_cost_per_hour
 
-            total += (duration_expected / 60.0) * operation.costs_hour + labour_costs + overhead_costs
+            total += (duration_expected / 60.0) * operation.workcenter_id.costs_hour + labour_costs + overhead_costs
             # total = ((duration_expected / 60.0) * operation.workcenter_id.costs_hour)
             # End Change
             operations.append({

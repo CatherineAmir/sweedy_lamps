@@ -126,7 +126,7 @@
                                     <th class="text-right o_mrp_report_line_header"><span>Standard Time</span></th>
                                     <th class="text-right o_mrp_report_line_header"><span>Labour Cost/hour</span></th>
                                     <th class="text-right o_mrp_report_line_header"><span>Planned Cost</span></th>
-                                    <th class="text-right o_mrp_report_line_header"><span>Total Cost</span></th>
+                                    <th class="text-right o_mrp_report_line_header"><span>Actual Labour Cost</span></th>
                                     <th class="text-right o_mrp_report_line_header"><span>Variant</span></th>
                                 </tr>
                             </thead>
@@ -182,7 +182,7 @@
                                     <th class="text-right o_mrp_report_line_header"><span>Standard Time</span></th>
                                     <th class="text-right o_mrp_report_line_header"><span>Overhead Cost/hour</span></th>
                                     <th class="text-right o_mrp_report_line_header"><span>Planned Cost</span></th>
-                                    <th class="text-right o_mrp_report_line_header"><span>Total Cost</span></th>
+                                    <th class="text-right o_mrp_report_line_header"><span>Actual Overhead Cost</span></th>
                                     <th class="text-right o_mrp_report_line_header"><span>Variant</span></th>
                                 </tr>
                             </thead>
