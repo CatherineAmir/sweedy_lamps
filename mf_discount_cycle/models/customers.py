@@ -137,4 +137,3 @@ class discount_cycle_customer(models.Model):
                     rec.disc_available_quar = rec.quarter_balance * (rec.disc_valu_quar / 100) + current_discount
                     print(rec.disc_available_quar)
         pass
-

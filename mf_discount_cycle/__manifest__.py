@@ -24,9 +24,11 @@
     # always loaded
     'data': [
         # 'security/ir.model.access.csv',
+        'security/groups.xml',
         'views/views.xml',
         'views/customers.xml',
         'views/templates.xml',
+        'views/res_config_view.xml',
         'views/crons.xml',
     ],
     # only loaded in demonstration mode
