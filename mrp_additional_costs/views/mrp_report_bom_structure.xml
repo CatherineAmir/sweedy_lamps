@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <template id="report_mrp_labour_operation_line">
+            <t t-set="currency" t-value="data['currency']"/>
+            <t t-foreach="data['operations']" t-as="op">
+                <t t-set="space_td" t-value="'margin-left: '+ str(op['level'] * 20) + 'px;'"/>
+                <tr class="o_mrp_bom_report_line o_mrp_bom_cost" t-att-parent_id="'labour-operation-' + str(data['bom_id'])">
+                    <td name="td_opr_line">
+                        <span t-att-style="space_td"/>
+                        <a href="#" t-att-data-res-id="op['operation'].id" t-att-data-model="'mrp.routing.workcenter'"
+                           class="o_mrp_bom_action">
+                            <t t-esc="op['name']"/>
+                        </a>
+                    </td>
+                    <td/>
+                    <td class="text-right">
+                        <span t-esc="op['duration_expected']" t-options='{"widget": "float_time"}'/>
+                    </td>
+                    <td groups="uom.group_uom">
+                        <span>Minutes</span>
+                    </td>
+                    <td class="o_mrp_prod_cost"></td>
+                    <td class="o_mrp_bom_cost text-right">
+                        <span t-esc="op['total']" t-options='{"widget": "monetary", "display_currency": currency}'/>
+                    </td>
+                    <td/>
+                </tr>
+            </t>
+        </template>
+        <template id="report_mrp_overhead_operation_line">
+            <t t-set="currency" t-value="data['currency']"/>
+            <t t-foreach="data['operations']" t-as="op">
+                <t t-set="space_td" t-value="'margin-left: '+ str(op['level'] * 20) + 'px;'"/>
+                <tr class="o_mrp_bom_report_line o_mrp_bom_cost" t-att-parent_id="'overhead-operation-' + str(data['bom_id'])">
+                    <td name="td_opr_line">
+                        <span t-att-style="space_td"/>
+                        <a href="#" t-att-data-res-id="op['operation'].id" t-att-data-model="'mrp.routing.workcenter'"
+                           class="o_mrp_bom_action">
+                            <t t-esc="op['name']"/>
+                        </a>
+                    </td>
+                    <td/>
+                    <td class="text-right">
+                        <span t-esc="op['duration_expected']" t-options='{"widget": "float_time"}'/>
+                    </td>
+                    <td groups="uom.group_uom">
+                        <span>Minutes</span>
+                    </td>
+                    <td class="o_mrp_prod_cost"></td>
+                    <td class="o_mrp_bom_cost text-right">
+                        <span t-esc="op['total']" t-options='{"widget": "monetary", "display_currency": currency}'/>
+                    </td>
+                    <td/>
+                </tr>
+            </t>
+        </template>
+
+        <template id="report_mrp_bom_line" inherit_id="mrp.report_mrp_bom_line">
+            <xpath expr="//t[3]" position="after">
+                <t t-if="data['labour_operations']">
+                    <t t-set="space_td" t-value="'margin-left: '+ str(data['level'] * 20) + 'px;'"/>
+                    <tr class="o_mrp_bom_report_line o_mrp_bom_cost" t-att-data-id="'labour-operation-' + str(data['bom'].id)"
+                        t-att-data-bom-id="data['bom'].id" t-att-parent_id="data['bom'].id"
+                        t-att-data-qty="data['bom_qty']" t-att-data-level="data['level']">
+                        <td name="td_opr">
+                            <span t-att-style="space_td"/>
+                            <span class="o_mrp_bom_unfoldable fa fa-fw fa-caret-right"
+                                  t-att-data-function="'get_labour_operations'" role="img" aria-label="Unfold"
+                                  title="Unfold"/>
+                            Labour Operations
+                        </td>
+                        <td/>
+                        <td class="text-right">
+                            <span t-esc="data['operations_time']" t-options='{"widget": "float_time"}'/>
+                        </td>
+                        <td groups="uom.group_uom">
+                            <span>Minutes</span>
+                        </td>
+                        <td class="o_mrp_prod_cost">
+                        </td>
+                        <td class="o_mrp_bom_cost text-right">
+                            <span t-esc="data['labour_cost']"
+                                  t-options='{"widget": "monetary", "display_currency": currency}'/>
+                        </td>
+                        <td/>
+                    </tr>
+                </t>
+                <t t-if="data['overhead_operations']">
+                    <t t-set="space_td" t-value="'margin-left: '+ str(data['level'] * 20) + 'px;'"/>
+                    <tr class="o_mrp_bom_report_line o_mrp_bom_cost" t-att-data-id="'overhead-operation-' + str(data['bom'].id)"
+                        t-att-data-bom-id="data['bom'].id" t-att-parent_id="data['bom'].id"
+                        t-att-data-qty="data['bom_qty']" t-att-data-level="data['level']">
+                        <td name="td_opr">
+                            <span t-att-style="space_td"/>
+                            <span class="o_mrp_bom_unfoldable fa fa-fw fa-caret-right"
+                                  t-att-data-function="'get_overhead_operations'" role="img" aria-label="Unfold"
+                                  title="Unfold"/>
+                            Overhead Operations
+                        </td>
+                        <td/>
+                        <td class="text-right">
+                            <span t-esc="data['operations_time']" t-options='{"widget": "float_time"}'/>
+                        </td>
+                        <td groups="uom.group_uom">
+                            <span>Minutes</span>
+                        </td>
+                        <td class="o_mrp_prod_cost">
+                        </td>
+                        <td class="o_mrp_bom_cost text-right">
+                            <span t-esc="data['overhead_cost']"
+                                  t-options='{"widget": "monetary", "display_currency": currency}'/>
+                        </td>
+                        <td/>
+                    </tr>
+                </t>
+            </xpath>
+        </template>
+
+    </data>
+</odoo>

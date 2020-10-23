@@ -14,7 +14,11 @@
                     <t t-set="currency" t-value="line['currency']"/>
                     <t t-set="opcost" t-value="0.0"/>
                     <t t-set="labour_cost" t-value="0.0"/>
+                    <t t-set="planned_labour_cost" t-value="0.0"/>
+                    <t t-set="variant_labour_cost" t-value="0.0"/>
                     <t t-set="overhead_cost" t-value="0.0"/>
+                    <t t-set="planned_overhead_cost" t-value="0.0"/>
+                    <t t-set="variant_overhead_cost" t-value="0.0"/>
                     <t t-set="tot_scrap_cost" t-value="0.0"/>
 
                     <!-- Title -->
@@ -125,6 +129,7 @@
                                     <th class="text-right o_mrp_report_line_header"><span>Working Time</span></th>
                                     <th class="text-right o_mrp_report_line_header"><span>Standard Time</span></th>
                                     <th class="text-right o_mrp_report_line_header"><span>Labour Cost/hour</span></th>
+                                    <th class="text-right o_mrp_report_line_header"><span>Number Of Labours</span></th>
                                     <th class="text-right o_mrp_report_line_header"><span>Planned Cost</span></th>
                                     <th class="text-right o_mrp_report_line_header"><span>Actual Labour Cost</span></th>
                                     <th class="text-right o_mrp_report_line_header"><span>Variant</span></th>
@@ -149,19 +154,35 @@
                                         <span t-esc="row[5]" t-options='{"widget": "monetary", "display_currency": currency}'/>
                                     </td>
                                     <td class="text-right">
-                                        <span t-esc="row[4] * row[5]" t-options='{"widget": "monetary", "display_currency": currency}'/>
+                                        <span t-esc="row[6]" />
                                     </td>
                                     <td class="text-right">
-                                        <span t-esc="row[3] * row[5]" t-options='{"widget": "monetary", "display_currency": currency}'/>
+                                        <span t-esc="row[4] * row[5] * row[6]" t-options='{"widget": "monetary", "display_currency": currency}'/>
                                     </td>
                                     <td class="text-right">
-                                        <span t-esc="(row[3] - row[4] )* row[5]" t-options='{"widget": "monetary", "display_currency": currency}'/>
+                                        <span t-esc="row[3] * row[5] * row[6]" t-options='{"widget": "monetary", "display_currency": currency}'/>
+                                    </td>
+                                    <td class="text-right">
+                                        <span t-esc="(row[3] - row[4] )* row[5] * row[6]" t-options='{"widget": "monetary", "display_currency": currency}'/>
                                     </td>
 
-                                    <t t-set="labour_cost" t-value="labour_cost + row[3] * row[5]"/>
+                                    <t t-set="labour_cost" t-value="labour_cost + row[3] * row[5] * row[6]"/>
+                                    <t t-set="planned_labour_cost" t-value="planned_labour_cost + row[4] * row[5] * row[6]"/>
+                                    <t t-set="variant_labour_cost" t-value="variant_labour_cost + (row[3] - row[4] ) * row[5] * row[6]"/>
+                                </tr>
+                                <tr class="font-weight-bold">
+                                    <td>Total</td>
+                                    <td/>
+                                    <td/>
+                                    <td/>
+                                    <td/>
+                                    <td/>
+                                    <td class="text-right"><t t-esc="planned_labour_cost" t-options='{"widget": "monetary", "display_currency": currency}'/></td>
+                                    <td class="text-right"><t t-esc="labour_cost" t-options='{"widget": "monetary", "display_currency": currency}'/></td>
+                                    <td class="text-right"><t t-esc="variant_labour_cost" t-options='{"widget": "monetary", "display_currency": currency}'/></td>
                                 </tr>
                                 <tr>
-                                    <td colspan="7" class="text-right">
+                                    <td colspan="8" class="text-right">
                                         <strong>Total Cost of Labour Operations</strong>
                                     </td>
                                     <td class="text-right">
@@ -215,6 +236,18 @@
                                     </td>
 
                                     <t t-set="overhead_cost" t-value="overhead_cost + row[3] * row[5]"/>
+                                    <t t-set="planned_overhead_cost" t-value="planned_overhead_cost + row[4] * row[5]"/>
+                                    <t t-set="variant_overhead_cost" t-value="variant_overhead_cost + (row[3] - row[4] )* row[5]"/>
+                                </tr>
+                                <tr class="font-weight-bold">
+                                    <td>Total</td>
+                                    <td/>
+                                    <td/>
+                                    <td/>
+                                    <td/>
+                                    <td class="text-right"><t t-esc="planned_overhead_cost" t-options='{"widget": "monetary", "display_currency": currency}'/></td>
+                                    <td class="text-right"><t t-esc="overhead_cost" t-options='{"widget": "monetary", "display_currency": currency}'/></td>
+                                    <td class="text-right"><t t-esc="variant_overhead_cost" t-options='{"widget": "monetary", "display_currency": currency}'/></td>
                                 </tr>
                                 <tr>
                                     <td colspan="7" class="text-right">

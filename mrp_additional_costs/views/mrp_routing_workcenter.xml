@@ -31,6 +31,7 @@
                      <page name="additional_costs" string="Additional Costs">
                          <group>
                              <group string="Labour">
+                                 <field name="number_labours" />
                                  <field name="labour_cost_per_hour" />
                                  <field name="labour_account_id" />
                                  <field name="labour_analytic_account_id" />

@@ -11,6 +11,8 @@ LOGGER = logging.getLogger(__name__)
 class MRPRoutingWorkcenter(models.Model):
     _inherit = 'mrp.routing.workcenter'
 
+    number_labours = fields.Integer(default=1, required=True, )
+
     labour_cost_per_hour = fields.Float(default=0)
     overhead_cost_per_hour = fields.Float(default=0)
 

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <template id="assets_backend" name="mrp assets" inherit_id="web.assets_backend">
+            <xpath expr="." position="inside">
+                <script type="text/javascript" src="/mrp_additional_costs/static/src/js/mrp_bom_report.js"></script>
+            </xpath>
+        </template>
+
+    </data>
+</odoo>

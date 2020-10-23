@@ -22,7 +22,7 @@ class MRPProduction(models.Model):
                 duration = sum(time_lines.mapped('duration'))
                 time_lines.write({'cost_already_recorded': True})
                 # New Change to add additional costs
-                labour_costs = (duration / 60.0) * work_order.operation_id.labour_cost_per_hour
+                labour_costs = (duration / 60.0) * work_order.operation_id.labour_cost_per_hour * work_order.operation_id.number_labours
                 overhead_costs = (duration / 60.0) * work_order.operation_id.overhead_cost_per_hour
 
                 work_center_cost += (duration / 60.0) * work_order.workcenter_id.costs_hour + labour_costs + overhead_costs
