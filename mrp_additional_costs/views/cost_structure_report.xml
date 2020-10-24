@@ -251,7 +251,7 @@
                                 </tr>
                                 <tr>
                                     <td colspan="7" class="text-right">
-                                        <strong>Total Cost of Labour Operations</strong>
+                                        <strong>Total Cost of Overhead Operations</strong>
                                     </td>
                                     <td class="text-right">
                                         <span t-esc="overhead_cost" t-options='{"widget": "monetary", "display_currency": currency}'/>

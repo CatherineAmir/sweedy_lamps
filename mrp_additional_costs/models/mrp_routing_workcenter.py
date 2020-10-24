@@ -19,7 +19,7 @@ class MRPRoutingWorkcenter(models.Model):
     labour_account_id = fields.Many2one(comodel_name="account.account", required=True, )
     overhead_account_id = fields.Many2one(comodel_name="account.account", required=True, )
 
-    labour_analytic_account_id = fields.Many2one(comodel_name="account.analytic.account", required=True, )
-    overhead_analytic_account_id = fields.Many2one(comodel_name="account.analytic.account", required=True, )
+    labour_analytic_account_id = fields.Many2one(comodel_name="account.analytic.account", required=False, )
+    overhead_analytic_account_id = fields.Many2one(comodel_name="account.analytic.account", required=False, )
     
     

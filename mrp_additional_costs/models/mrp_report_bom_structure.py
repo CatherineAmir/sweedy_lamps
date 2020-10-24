@@ -56,6 +56,8 @@ class ReportBomStructure(models.AbstractModel):
             labour_operations = self._get_labour_operation_line(bom.routing_id, float_round(bom_quantity / bom.product_qty, precision_rounding=1, rounding_method='UP'), 0)
             overhead_operations = self._get_overhead_operation_line(bom.routing_id, float_round(bom_quantity / bom.product_qty, precision_rounding=1, rounding_method='UP'), 0)
         company = bom.company_id or self.env.company
+        labour_cost = sum([op['total'] for op in labour_operations])
+        overhead_cost = sum([op['total'] for op in overhead_operations])
         lines = {
             'bom': bom,
             'bom_qty': bom_quantity,
@@ -70,14 +72,14 @@ class ReportBomStructure(models.AbstractModel):
             'labour_operations': labour_operations,
             'overhead_operations': overhead_operations,
             'operations_cost': sum([op['total'] for op in operations]),
-            'labour_cost': sum([op['total'] for op in labour_operations]),
-            'overhead_cost': sum([op['total'] for op in overhead_operations]),
+            'labour_cost': labour_cost,
+            'overhead_cost': overhead_cost,
             'attachments': attachments,
             'operations_time': sum([op['duration_expected'] for op in operations])
         }
         components, total = self._get_bom_lines(bom, bom_quantity, product, line_id, level)
         lines['components'] = components
-        lines['total'] += total
+        lines['total'] += total + labour_cost + overhead_cost
         return lines
 
     def _get_operation_line(self, routing, qty, level):
