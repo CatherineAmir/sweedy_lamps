@@ -17,7 +17,8 @@ class StockMove(models.Model):
         if self._context.get('mo_id'):
             operation_costs = 0
             mo = self.env['mrp.production'].browse( self._context.get('mo_id') )
-            new_debit_value = self.product_id.standard_price
+            material_credit = round(abs(sum(mo.move_raw_ids.stock_valuation_layer_ids.mapped('value'))),2)
+            new_debit_value = debit_value
             debit_line_vals = {
                 'name': description,
                 'product_id': self.product_id.id,
@@ -60,7 +61,7 @@ class StockMove(models.Model):
                 operation_costs += labour_costs + overhead_costs
                 count += 1
 
-            new_credit_value = credit_value - operation_costs
+            new_credit_value = material_credit + operation_costs
             credit_line_vals = {
                 'name': description,
                 'product_id': self.product_id.id,
@@ -68,18 +69,18 @@ class StockMove(models.Model):
                 'product_uom_id': self.product_id.uom_id.id,
                 'ref': description,
                 'partner_id': partner_id,
-                'credit': new_credit_value if new_credit_value > 0 else 0,
-                'debit': -new_credit_value if new_credit_value < 0 else 0,
+                'credit': material_credit if material_credit > 0 else 0,
+                'debit': -material_credit if material_credit < 0 else 0,
                 'account_id': credit_account_id,
             }
 
             rslt['credit_line_vals'] = credit_line_vals
 
             # if credit_value != debit_value:
-            if credit_value != new_debit_value:
+            if new_credit_value != new_debit_value:
                 # for supplier returns of product in average costing method, in anglo saxon mode
-                diff_amount = debit_value - credit_value
-                diff_amount = new_debit_value - credit_value
+                # diff_amount = debit_value - credit_value
+                diff_amount = new_debit_value - new_credit_value
                 price_diff_account = self.product_id.property_account_creditor_price_difference
 
                 if not price_diff_account:
