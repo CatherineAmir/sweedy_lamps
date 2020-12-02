@@ -9,24 +9,26 @@
                 <attribute name="states">draft,to approve,sent,purchase,refuse</attribute>
             </button>
             <button name="print_quotation" position="after">
-                <button name="btn_finance_approve" type="object" states='finance_approve' string="Finance Approval" class="oe_highlight" groups="account.group_account_manager"/>
+<!--                <button name="btn_finance_approve" type="object" states='finance_approve' string="Finance Approval" class="oe_highlight" groups="account.group_account_manager"/>-->
+                <button name="button_department_approve" type="object" states='department_approve' string="Department Approval" class="oe_highlight" groups="po_three_levels_approval.group_department_approver"/>
+                <button name="btn_finance_approve" type="object" states='finance_approve' string="Finance Approval" class="oe_highlight" groups="account.group_account_manager,approval_groups.group_cfo"/>
                 <button name="btn_po_director_approve" type="object" states='director_approve' string="Director Approval" class="oe_highlight" groups="po_three_levels_approval.group_po_director_approver"/>
-                <button name="button_refused_reason" type="object" states='to approve,finance_approve,director_approve' string="Refuse" groups="account.group_account_manager,po_three_levels_approval.group_po_director_approver,po_three_levels_approval.group_department_approver"/>
+                <button name="button_refused_reason" type="object" states='to approve,department_approve,finance_approve,director_approve' string="Refuse" groups="account.group_account_manager,po_three_levels_approval.group_po_director_approver,po_three_levels_approval.group_department_approver,approval_groups.group_cfo"/>
             </button>
             <notebook position="inside">
                 <page string="Approve Details">
-                    <group>
-                        <group>
-                            <field name="depart_approval_id" options="{'no_open': True,'no_edit': True}" attrs="{'readonly': [('state', 'not in', ('draft', 'sent'))]}"/>
-                            <field name="finance_approval_id" options="{'no_open': True,'no_edit': True}" attrs="{'readonly': [('state', 'not in', ('draft', 'sent'))]}"/>
-                            <field name="director_approval_id" options="{'no_open': True,'no_edit': True}" attrs="{'readonly': [('state', 'not in', ('draft', 'sent'))]}"/>
-                        </group>
-                        <group>
-                            <field name="department_approve_date" attrs="{'readonly': [('state', 'in', ('done', 'purchase', 'refuse', 'cancel'))]}"/>
-                            <field name="finance_approve_date" attrs="{'readonly': [('state', 'in', ('done', 'purchase', 'refuse', 'cancel'))]}"/>
-                            <field name="director_approve_date" attrs="{'readonly': [('state', 'in', ('done', 'purchase', 'refuse', 'cancel'))]}"/>
-                        </group>
-                    </group>
+<!--                    <group>-->
+<!--                        <group>-->
+<!--                            <field name="depart_approval_id" options="{'no_open': True,'no_edit': True}" attrs="{'readonly': [('state', 'not in', ('draft', 'sent'))]}"/>-->
+<!--                            <field name="finance_approval_id" options="{'no_open': True,'no_edit': True}" attrs="{'readonly': [('state', 'not in', ('draft', 'sent'))]}"/>-->
+<!--                            <field name="director_approval_id" options="{'no_open': True,'no_edit': True}" attrs="{'readonly': [('state', 'not in', ('draft', 'sent'))]}"/>-->
+<!--                        </group>-->
+<!--                        <group>-->
+<!--                            <field name="department_approve_date" attrs="{'readonly': [('state', 'in', ('done', 'purchase', 'refuse', 'cancel'))]}"/>-->
+<!--                            <field name="finance_approve_date" attrs="{'readonly': [('state', 'in', ('done', 'purchase', 'refuse', 'cancel'))]}"/>-->
+<!--                            <field name="director_approve_date" attrs="{'readonly': [('state', 'in', ('done', 'purchase', 'refuse', 'cancel'))]}"/>-->
+<!--                        </group>-->
+<!--                    </group>-->
                     <group>
                         <group>
                             <field name="department_id" options="{'no_open': True,'no_edit': True}" attrs="{'readonly': [('state', 'not in', ('draft', 'sent'))]}"/>
@@ -37,12 +39,24 @@
                     </group>
                     <group>
                         <group>
-                            <field name="refused_uid" options="{'no_open': True,'no_edit': True}" attrs="{'readonly': [('state', 'in', ('done', 'purchase', 'refuse', 'cancel'))]}"/>
+                            <field name="depart_approval_id" options="{'no_open': True,'no_edit': True}" readonly="True"/>
+                            <field name="finance_approval_id" options="{'no_open': True,'no_edit': True}" readonly="True"/>
+                            <field name="director_approval_id" options="{'no_open': True,'no_edit': True}" readonly="True"/>
+                        </group>
+                        <group>
+                            <field name="department_approve_date" readonly="True"/>
+                            <field name="finance_approve_date" readonly="True"/>
+                            <field name="director_approve_date" readonly="True"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group>
+                            <field name="refused_uid" options="{'no_open': True,'no_edit': True}" readonly="True"/>
                          </group>
                          <group>
-                             <field name="refused_date" attrs="{'readonly': [('state', 'in', ('done', 'purchase', 'refuse', 'cancel'))]}"/>
+                             <field name="refused_date" readonly="True"/>
                          </group>
-                        <field name="refused_reason" attrs="{'readonly': [('state', 'in', ('done', 'purchase', 'refuse', 'cancel'))]}"/>
+                        <field name="refused_reason" readonly="True"/>
                     </group>
                 </page>
             </notebook>
@@ -101,7 +115,7 @@
     <menuitem id="menu_finance_form_action"
         action="purchase_finance_approve_form_action"
         parent="account.menu_finance_payables"
-        groups="po_three_levels_approval.group_po_director_approver,account.group_account_manager"
+        groups="po_three_levels_approval.group_po_director_approver,account.group_account_manager,approval_groups.group_cfo"
         sequence="7"/>
 
     <menuitem id="menu_director_form_action"

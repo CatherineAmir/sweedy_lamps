@@ -14,8 +14,8 @@ class PurchaseOrder(models.Model):
         return department_manager
 
     def _get_po_finance_domain(self):
-        po_finance_ids = self.env.ref(
-            'account.group_account_manager').users.ids
+        # po_finance_ids = self.env.ref('account.group_account_manager').users.ids
+        po_finance_ids = self.env.ref('approval_groups.group_cfo').users.ids
         finance_manager = [('id', 'in', po_finance_ids)]
         return finance_manager
 
@@ -34,7 +34,8 @@ class PurchaseOrder(models.Model):
         ('cancel', 'Cancelled')
     ], string='Status', readonly=True, index=True, copy=False,
         default='draft', track_visibility='onchange')
-    state = fields.Selection(selection_add=[('finance_approve', 'Waiting For Finance Approval'),
+    state = fields.Selection(selection_add=[('department_approve', 'Waiting For Department Approval'),
+        ('finance_approve', 'Waiting For Finance Approval'),
         ('director_approve', 'Waiting For Director Approval'),
         ('refuse', 'Refuse'),],string='Status')
 
@@ -69,7 +70,7 @@ class PurchaseOrder(models.Model):
         mail_mail and self.env['mail.mail'].browse(mail_mail).send()
 
     # @api.multi
-    def button_approve(self, force=False):
+    def button_department_approve(self, force=False):
         if self.env.user != self.department_id:
             raise UserError("Only selected Approver can approve this.")
         if self.amount_total < self.env.user.company_id.currency_id._convert(self.company_id.finanace_validation_amt, self.currency_id, self.company_id, self.date_order or fields.Date.today()):
@@ -115,7 +116,7 @@ class PurchaseOrder(models.Model):
         if self.env.user != self.director_id:
             raise UserError("Only selected Approver can approve this PO.")
         self.send_po_aprroval_mail()
-        self.write({'state': 'purchase',
+        self.write({'state': 'to approve',
                     'director_approval_id': self.env.uid,
                     'director_approve_date': fields.Date.context_today(self),
                     'date_approve': fields.Date.context_today(self)})
@@ -155,10 +156,11 @@ class PurchaseOrder(models.Model):
             #     order.button_approve()
 
             # Deal with three level validation
-            if not order.company_id.is_three_steps == True or \
-                    order.amount_total < \
-                    self.env.user.company_id.currency_id._convert(order.company_id.double_validation_amt, order.currency_id, order.company_id, order.date_order or fields.Date.today()):
-                order.button_approve()
-            else:
-                order.write({'state': 'to approve'})
+            # if not order.company_id.is_three_steps == True or \
+            #         order.amount_total < \
+            #         self.env.user.company_id.currency_id._convert(order.company_id.double_validation_amt, order.currency_id, order.company_id, order.date_order or fields.Date.today()):
+            #     order.button_approve()
+            # else:
+            #     order.write({'state': 'to approve'})
+            order.write({'state': 'department_approve'})
         return True
