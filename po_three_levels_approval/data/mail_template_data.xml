@@ -5,12 +5,13 @@
             <field name="name">PO Manager Approval - Send by Email</field>
             <field name="subject">PO Approval(Ref ${object.name or '' })(Waiting For Approval)</field>
             <field name="email_from">${object.company_id.partner_id.email}</field>
+            <field name="email_to">${ctx['email_to']|safe}</field>
             <field name="model_id" ref="purchase.model_purchase_order"/>
-            <field name="partner_to">${object.partner_id.id}</field>
+            <field name="partner_to">${ctx['partner_id']|safe}</field>
             <field name="auto_delete" eval="False"/>
             <field name="lang">{user.lang}</field>
             <field name="body_html"><![CDATA[
-                <p style="margin: 0px 0 9px 0"><b>Dear ${object.partner_id.name},</b>
+                <p style="margin: 0px 0 9px 0"><b>Dear ${ctx['partner_name']|safe},</b>
                 </p>
                 <p style="margin: 0px 0 9px 0">&nbsp;&nbsp;&nbsp;&nbsp; Your approval request for Ref.- <b>${object.name} </b>is waiting for approval,</p>
                 <p style="margin: 0px 0 9px 0">&nbsp;&nbsp;&nbsp;&nbsp; Please Approve PO request to proceed further.</p>

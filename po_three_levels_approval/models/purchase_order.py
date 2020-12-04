@@ -63,9 +63,12 @@ class PurchaseOrder(models.Model):
 
     # @api.multi
     def send_po_aprroval_mail(self):
+        mail_to = self._context.get('mail_to')
+        partner_id = self._context.get('partner_id')
+        partner_name = self._context.get('partner_name')
         email_template = self.env.ref(
             'po_three_levels_approval.po_approval_email_template')
-        mail_mail = email_template and email_template.send_mail(
+        mail_mail = email_template and email_template.with_context(mail_to=mail_to,partner_id=partner_id,partner_name=partner_name).send_mail(
             self.id) or False
         mail_mail and self.env['mail.mail'].browse(mail_mail).send()
 
@@ -83,7 +86,8 @@ class PurchaseOrder(models.Model):
                 lambda p: p.company_id.po_lock == 'lock').write(
                 {'state': 'done'})
         else:
-            self.send_po_aprroval_mail()
+            finance_manager = self.finance_id.partner_id
+            self.with_context(mail_to=finance_manager.email,partner_id=finance_manager.id,partner_name=finance_manager.name).send_po_aprroval_mail()
             self.write({'state': 'finance_approve',
                         'depart_approval_id': self.env.uid,
                         'department_approve_date':
@@ -104,7 +108,8 @@ class PurchaseOrder(models.Model):
                 lambda p: p.company_id.po_lock == 'lock').write(
                 {'state': 'done'})
         else:
-            self.send_po_aprroval_mail()
+            director_manager = self.director_id.partner_id
+            self.with_context(mail_to=director_manager.email,partner_id=director_manager.id,partner_name=director_manager.name).send_po_aprroval_mail()
             self.write({'state': 'director_approve',
                         'finance_approval_id': self.env.uid,
                         'finance_approve_date':
@@ -115,7 +120,9 @@ class PurchaseOrder(models.Model):
     def btn_po_director_approve(self, force=False):
         if self.env.user != self.director_id:
             raise UserError("Only selected Approver can approve this PO.")
-        self.send_po_aprroval_mail()
+        po_managers = self.env.ref('purchase.group_purchase_manager').mapped('users.partner_id')
+        for po_mng in po_managers:
+            self.with_context(mail_to=po_mng.email,partner_id=po_mng.id,partner_name=po_mng.name).send_po_aprroval_mail()
         self.write({'state': 'to approve',
                     'director_approval_id': self.env.uid,
                     'director_approve_date': fields.Date.context_today(self),
@@ -162,5 +169,7 @@ class PurchaseOrder(models.Model):
             #     order.button_approve()
             # else:
             #     order.write({'state': 'to approve'})
+            department_manager = self.department_id.partner_id
+            self.with_context(mail_to=department_manager.email,partner_id=department_manager.id,partner_name=department_manager.name)
             order.write({'state': 'department_approve'})
         return True

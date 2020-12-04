@@ -14,7 +14,7 @@ Three level approval of Purchase Order
     'author': 'ERP Labz',
     'maintainer': 'ERP Labz',
     'website': 'http://erplabz.com/',
-    'depends': ['purchase', 'account', 'approval_groups'],
+    'depends': ['purchase', 'account', 'approval_groups','purchase_stock'],
     'data': [
         'security/security.xml',
         'data/mail_template_data.xml',
