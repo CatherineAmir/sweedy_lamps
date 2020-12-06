@@ -9,4 +9,8 @@ For Module Support : devintelle@gmail.com  or Skype : devintelle
         <field name="name">Config Credit Limit On partners</field>
         <field name="users" eval="[(4, ref('base.user_root'))]"/>
     </record>
+
+    <record id="group_confirm_sale_order" model="res.groups">
+        <field name="name">Can Confirm Sale Order</field>
+    </record>
 </odoo>

@@ -16,11 +16,12 @@ For Module Support : devintelle@gmail.com  or Skype : devintelle
                 </xpath>
                 
                 <xpath expr="//button[@name='action_confirm']" position="replace">
-                     <button name="action_sale_ok" states="sent" string="Confirm Sale" class="btn-primary" type="object" context="{'show_sale': True}"/>
+                     <button name="action_sale_ok" states="sent" string="Confirm Sale" class="btn-primary" type="object" context="{'show_sale': True}" groups="dev_customer_credit_limit.group_confirm_sale_order"/>
                 </xpath>
                 
                 <xpath expr="//button[@name='action_confirm']" position="attributes">
                      <attribute name="name">action_sale_ok</attribute>
+                     <attribute name="groups">dev_customer_credit_limit.group_confirm_sale_order</attribute>
                 </xpath>
                 
                 <xpath expr="//button[@name='action_sale_ok']" position="after">

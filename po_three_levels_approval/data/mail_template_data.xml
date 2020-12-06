@@ -13,7 +13,8 @@
             <field name="body_html"><![CDATA[
                 <p style="margin: 0px 0 9px 0"><b>Dear ${ctx['partner_name']|safe},</b>
                 </p>
-                <p style="margin: 0px 0 9px 0">&nbsp;&nbsp;&nbsp;&nbsp; Your approval request for Ref.- <b>${object.name} </b>is waiting for approval,</p>
+                <p style="margin: 0px 0 9px 0">&nbsp;&nbsp;&nbsp;&nbsp; Your approval request for Ref.- <b><a href="/web#id=${object.id}&amp;model=purchase.order&amp;view_type=form" style="background-color:#875A7B; padding: 10px; text-decoration: none; color: #fff; border-radius: 5px;">
+${object.name}</a> </b>is waiting for approval,</p>
                 <p style="margin: 0px 0 9px 0">&nbsp;&nbsp;&nbsp;&nbsp; Please Approve PO request to proceed further.</p>
                 <br>
                     <table width="100%" style="background-color:#ededed">
