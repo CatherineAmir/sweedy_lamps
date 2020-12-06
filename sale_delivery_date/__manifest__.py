@@ -7,6 +7,7 @@
     "category": "sale",
     "depends": ["sale",'mrp_mps'],
     "data": [
+        # 'security/security.xml',
         'views/sale_order.xml',
     ],
     "license": 'AGPL-3',
