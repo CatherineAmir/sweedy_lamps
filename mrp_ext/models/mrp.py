@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from odoo import models, fields, api
+from odoo import models, fields, api, _
 from odoo.exceptions import UserError, AccessError, ValidationError
+from odoo.tools import float_compare
 
 
 class MrpRoutingWorkcenter(models.Model):
@@ -82,3 +83,13 @@ class MrpProduction(models.Model):
                         picking.action_confirm()
                         picking.action_assign()
         return res
+
+    def check_reserved_qty(self):
+        for move in self.move_raw_ids:
+            if float_compare( move.quantity_done, move.reserved_availability, precision_rounding=move.product_uom.rounding) != 0:
+                raise ValidationError(_('Some raw materials is not reserved. \n please complete stock transfers to complete the supply of materials. \n after that make check availability'))
+
+    def button_mark_done(self):
+        for rec in self:
+            rec.check_reserved_qty()
+        return super(MrpProduction,self).button_mark_done()
