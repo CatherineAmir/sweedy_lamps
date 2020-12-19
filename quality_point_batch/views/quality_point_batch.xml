@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="view_quality_point_batch_form" model="ir.ui.view">
+            <field name="name">quality.point.batch.form</field>
+            <field name="model">quality.point.batch</field>
+            <field name="arch" type="xml">
+                <form string="MODEL">
+                    <header>
+                        <button name="update_action" string="Update Points" type="object"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                            <button class="oe_stat_button" name="view_quality_points"
+                                    string="Quality Points" type="object"
+                                    icon="fa-book" />
+                        </div>
+                        <group>
+                            <field name="name"/>
+                            <field name="product_category_ids" widget="many2many_tags"/>
+                            <field name="stock_picking_type_ids" widget="many2many_tags"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_quality_point_batch_tree" model="ir.ui.view">
+            <field name="name">quality.point.batch.tree</field>
+            <field name="model">quality.point.batch</field>
+            <field name="arch" type="xml">
+                <tree string="MODEL">
+                    <field name="name"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="view_quality_point_batch_action" model="ir.actions.act_window">
+            <field name="name">Quality Point Batch</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">quality.point.batch</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <!-- This Menu Item must have a parent and an action -->
+        <menuitem id="menu_quality_point_batch" name="Quality Point Batch" parent="quality_control.menu_quality_control"
+                  action="view_quality_point_batch_action" sequence="1"/>
+
+    </data>
+</odoo>
