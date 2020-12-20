@@ -123,12 +123,12 @@ class PurchaseOrder(models.Model):
         po_managers = self.env.ref('purchase.group_purchase_manager').mapped('users.partner_id')
         for po_mng in po_managers:
             self.with_context(mail_to=po_mng.email,partner_id=po_mng.id,partner_name=po_mng.name).send_po_aprroval_mail()
-        self.write({'state': 'to approve',
+        self.write({
                     'director_approval_id': self.env.uid,
                     'director_approve_date': fields.Date.context_today(self),
                     'date_approve': fields.Date.context_today(self)})
-        self.filtered(
-            lambda p: p.company_id.po_lock == 'lock').write({'state': 'done'})
+        self.button_approve()
+
         return {}
 
     def button_refused_reason(self):

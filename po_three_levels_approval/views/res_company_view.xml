@@ -20,6 +20,11 @@
                     </group>
                 </page>
             </xpath>
+
+            <xpath expr="//field[@name='currency_id']" position="after">
+                <field name="anglo_saxon_accounting" />
+                <field name="transfer_account_id" />
+            </xpath>
         </field>
     </record>
 </odoo>
