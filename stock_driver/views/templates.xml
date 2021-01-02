@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <template id="report_delivery_document" inherit_id="stock.report_delivery_document">
+            <xpath expr="//div[hasclass('row')]" position="after">
+                <div class="row mt32 mb32">
+                    <div t-if="o.state" class="col-auto" >
+                        <strong>Driver: </strong>
+                        <p t-field="o.driver_id"/>
+                    </div>
+                    <div t-if="o.state" class="col-auto" >
+                        <strong>Sale Person: </strong>
+                        <p t-field="o.sale_person_id"/>
+                    </div>
+                </div>
+            </xpath>
+        </template>
+
+    </data>
+</odoo>
