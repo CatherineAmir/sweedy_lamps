@@ -375,13 +375,7 @@
 				
 						</group>
 					</sheet>
-					<script type="text/javascript">
-					$("select[name='theme_style']").change(function() {
-$("button[name='action_change_theme_style']").trigger( "click" );
-
-});
-
-					</script>
+					
 				</form>
 			</field>
 		</record>

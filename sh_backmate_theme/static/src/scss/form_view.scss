@@ -1,7 +1,7 @@
     // Form views
     .o_form_view {
         .o_form_sheet {
-            max-width: calc(100% - 32px);
+            /*max-width: calc(100% - 32px);*/
         }
 
         @include media-breakpoint-down(sm) {
@@ -77,7 +77,7 @@
 
     
    
-.modal-body .o_content .o_form_view .o_form_statusbar, .modal-content .o_form_view .o_form_statusbar{position: unset;}
+    
     
     
     

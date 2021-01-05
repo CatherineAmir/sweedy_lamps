@@ -10,7 +10,7 @@
                 """,
     "summary": "Backmate Backend Theme Basics is a fully functional, flexible, fast, lightweight, animated and modern multipurpose theme.",
     "category": "Theme/Backend",
-    "version": "13.0.8",
+    "version": "13.0.12",
     "depends":
     [
         "web",
@@ -20,6 +20,11 @@
     
     "data":
     [
+        "security/base_security.xml",
+        "security/ir.model.access.csv",
+        "data/pwa_configuraion_data.xml",
+        "views/views.xml",
+        "views/pwa_configuration_view.xml",
         "views/assets.xml",
         "views/login_layout.xml",
     ],
@@ -31,16 +36,17 @@
         "static/src/xml/navbar.xml",    
         "static/src/xml/form_view.xml",
          "static/src/xml/widget.xml",
-         "static/src/xml/global_search.xml"
+         "static/src/xml/global_search.xml",
+        "static/src/xml/web_quick_menu.xml"
     ], 
     'images': [
-        'static/description/splash-screen.gif',
+        'static/description/splash-screen.png',
         'static/description/splash-screen_screenshot.gif'
     ],
     "live_test_url": "https://softhealer.com/contact_us",   
     "installable": True,
     "application": True,
-    "price": 80,
+    "price": 85,
     "currency": "EUR",
     "bootstrap": True  
 }    

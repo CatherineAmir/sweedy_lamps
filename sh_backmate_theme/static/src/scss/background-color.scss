@@ -17,7 +17,7 @@
 .o_main_navbar>button:focus {background-color: $header_active_color !important;}
 .o_form_statusbar .o_statusbar_status .btn-secondary.disabled,
 .btn-secondary:disabled {
-	background-color: #e8e8e8;
+	background-color: transparent;
 	border-color: #e8e8e8;
 	color: #212529 !important;
 }
@@ -57,8 +57,8 @@
 
   .o_cp_buttons .btn.btn-primary{border: 1.5px solid $primaryColor !important;}
   .o_cp_buttons .btn.btn-primary:hover{background-color: $primary_hover !important;border-color: $primary_hover !important;box-shadow: none !important;}
-  .o_control_panel{background-color: #fff !important;} 
-  .o_control_panel .breadcrumb{background-color: #ffffff !important;}
+  .o_control_panel{background-color: #fff;} 
+  .o_control_panel .breadcrumb{background-color: #ffffff ;}
   .o_calendar_view .o_calendar_widget .fc-month-view .fc-content-skeleton .fc-today .fc-day-number{background-color: #FC3D39 !important;} 
   .o_view_controller .o_form_view .o_form_statusbar{border-bottom: 1px solid #ced4da !important;} 
   .o_statusbar_buttons .btn-secondary{border: 1.5px solid transparent !important;}
@@ -85,4 +85,46 @@
   
   
 }
+
+/* 05-10-2020 */
+
+
+.o_main_navbar .o_mail_systray_item .o_notification_counter.badge{background: $primary_hover !important;}
+.o_required_modifier.o_input, .o_required_modifier .o_input {border-bottom: 2px solid $primaryColor;}
+.o_searchview .o_searchview_autocomplete li.o-selection-focus {background: $primaryColor !important;}
+.o_searchview .o_searchview_autocomplete li.o-selection-focus {background: $primaryColor!important;}
+
+/* 19-11-2020 */
+
+.o_statusbar_buttons_dropdown.btn.btn-secondary.dropdown-toggle{background: $primaryColor !important;color: #ffffff !important;text-transform: uppercase;font-weight: 500;}
+
+/* 24-11-2020 */
+@if $checkbox_style == 'custom'{
+	.o_list_view [type='checkbox']:checked + label:not(.lever):before {border-top: 2px solid transparent !important;border-right: 2px solid $primaryColor !important;border-bottom: 2px solid $primaryColor !important;border-left: 2px solid transparent !important;}
+}
+
+@if $theme_style == 'style_6'{
+	.o_form_statusbar .o_statusbar_status .btn-secondary.disabled, .btn-secondary:disabled{background: #fff !important;}
+}
+
+@media only screen and (max-width: 576px){
+	  button.o_calendar_button_month.btn.btn-secondary,
+      button.o_calendar_button_day.btn.btn-secondary,
+      button.o_calendar_button_week.btn.btn-secondary{color: $primaryColor !important;opacity: 1;}
+}
+
+/* 9-12-2020 */
+
+.o_user_bookmark_menu a.active{color: #212121 !important;}
+
+
+
+
+
+
+
+
+
+
+
 
