@@ -65,7 +65,7 @@ class ReportPartnerLedgerExcel(models.Model):
         col = 0
 
         for o in result['docs']:
-            sheet.merge_range(row, col, row, col+3, o.ref or '' + '-' + o.name, format4)
+            sheet.merge_range(row, col, row, col+3, (o.ref or '') + '-' + o.name, format4)
             sheet.write(row, col+4, result['sum_partner'](result['data'], o, 'debit'), format5)
             sheet.write(row, col+5, result['sum_partner'](result['data'], o, 'credit'), format5)
             sheet.write(row, col+6, result['sum_partner'](result['data'], o, 'debit - credit'), format5)
