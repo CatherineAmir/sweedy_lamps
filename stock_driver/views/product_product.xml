@@ -32,9 +32,33 @@
                 <xpath expr="//field[@name='price']" position="attributes">
                     <attribute name="invisible">context.get('hide_in_search',False)</attribute>
                 </xpath>
+                <xpath expr="//field[@name='standard_price']" position="attributes">
+                    <attribute name="invisible">context.get('hide_in_search',False)</attribute>
+                </xpath>
+                <xpath expr="//field[@name='lst_price']" position="attributes">
+                    <attribute name="invisible">context.get('hide_in_search',False)</attribute>
+                </xpath>
 
             </field>
         </record>
+
+
+         <record id="view_product_product_form_inherit" model="ir.ui.view">
+             <field name="name">product.product.form.inherit</field>
+             <field name="model">product.product</field>
+             <field name="inherit_id" ref="stock.view_stock_product_tree"/>
+             <field name="arch" type="xml">
+
+                <xpath expr="//field[@name='qty_available']" position="attributes">
+                    <attribute name="invisible">context.get('hide_in_search',False)</attribute>
+                </xpath>
+
+                <xpath expr="//field[@name='virtual_available']" position="attributes">
+                    <attribute name="invisible">context.get('hide_in_search',False)</attribute>
+                </xpath>
+
+             </field>
+         </record>
     
     </data>
 </odoo>
