@@ -75,6 +75,7 @@ class ReportPartnerLedger(models.AbstractModel):
 
         obj_partner = self.env['res.partner']
         query_get_data = self.env['account.move.line'].with_context(data['form'].get('used_context', {}))._query_get()
+        form_partner_ids = data['form'].get('partner_ids',[])
         data['computed']['move_state'] = ['draft', 'posted']
         if data['form'].get('target_move', 'all') == 'posted':
             data['computed']['move_state'] = ['posted']
@@ -106,6 +107,8 @@ class ReportPartnerLedger(models.AbstractModel):
                 AND """ + query_get_data[1] + reconcile_clause
         self.env.cr.execute(query, tuple(params))
         partner_ids = [res['partner_id'] for res in self.env.cr.dictfetchall()]
+        if form_partner_ids:
+            partner_ids = list(set(partner_ids) & set(form_partner_ids))
         partners = obj_partner.browse(partner_ids)
         partners = sorted(partners, key=lambda x: (x.ref or '', x.name or ''))
 

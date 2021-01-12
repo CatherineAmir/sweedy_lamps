@@ -9,6 +9,7 @@
         <data>
         <xpath expr="//field[@name='target_move']" position="after">
                 <field name="result_selection"/>
+                <field name="partner_ids" widget="many2many_tags"/>
                 <field name="amount_currency" groups="base.group_multi_currency"/>
                 <newline/>
                 <field name="reconciled"/>
