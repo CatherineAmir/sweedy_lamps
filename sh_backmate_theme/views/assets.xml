@@ -49,7 +49,11 @@
 			<script type="text/javascript" src="/sh_backmate_theme/static/src/js/status_bar.js"></script>	
 					
 			<script type="text/javascript" src="/sh_backmate_theme/static/src/js/customize_user.js"></script>		
-			 <script type="text/javascript" src="/sh_backmate_theme/static/src/js/night_mode.js"></script>					
+			 <script type="text/javascript" src="/sh_backmate_theme/static/src/js/night_mode.js"></script>		
+			 
+			 	 <link rel="stylesheet" type="text/css" href="/sh_backmate_theme/static/src/scss/quick_menu.scss" />        
+        	<script type="text/javascript" src="/sh_backmate_theme/static/src/js/quick_menu.js"></script>			   
+        				
         </xpath>
     </template>
     

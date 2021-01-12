@@ -10,7 +10,7 @@
 // Sticky Header & Footer in List View
 .o_list_view {
     .table-responsive  {
-        overflow-x: initial;
+        overflow-x: initial !important;
 
         .o_list_table {
             // th & td are here for compatibility with chrome
@@ -31,7 +31,7 @@
 // Sticky Header & Footer in List View
 .o_list_view {
     .table-responsive  {
-        overflow-x: initial;
+        overflow-x: initial !important;
         .o_list_table {
             tfoot, tfoot tr:nth-child(1) td {
                 position: sticky;
@@ -47,18 +47,6 @@
 
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
 
 /*
 =======================================================================

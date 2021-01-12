@@ -44,8 +44,13 @@ odoo.define('sh_backmate_theme.GlobalSearch', function (require) {
             this.show_company = show_company
         },
         _onclick_search_top_bar: function(event){
+        	if($(".usermenu_search_input").css("display")=="block"){
+        	$(".usermenu_search_input").css("display","none");
+        	}else{
         	$(".usermenu_search_input").css("display","block");
-        },
+        	}
+
+        	},
         _linkInfo: function (key) {
             var original = this._searchableMenus[key];
             return original;
@@ -67,25 +72,14 @@ odoo.define('sh_backmate_theme.GlobalSearch', function (require) {
             }
             
         },
-        _searchReset: function () {
-            this.$search_container.removeClass("has-results");
-            this.$search_results.empty();
-            this.$search_input.val("");
-        },
-       
-       
-        _searchMenusSchedule: function () {
-            this._search_def.reject();
-            this._search_def = $.Deferred();
-            setTimeout(this._search_def.resolve.bind(this._search_def), 50);
-            this._search_def.done(this._searchMenus.bind(this));
-        },
-        _searchMenus: function () {
+
+
+        _searchData: function () {
             var query = this.$search_input.val();
             if (query === "") {
-                this.$search_container.removeClass("has-results");
+                this.$(".sh_search_container").removeClass("has-results");
                 $(".sh_backmate_theme_appmenu_div").css("opacity","1");
-                this.$search_results.empty();
+                this.$(".sh_search_results").empty();
                 return;
             }
             var self = this;
@@ -99,16 +93,14 @@ odoo.define('sh_backmate_theme.GlobalSearch', function (require) {
                    self._searchableMenus = data
                    
                    var results = fuzzy.filter(query, _.keys(self._searchableMenus), {
-//                       pre: "<b>",
-//                       post: "</b>",
                    });
                    
                    var results=_.keys(self._searchableMenus)
-                   self.$search_container.toggleClass("has-results", Boolean(results.length));
+                   self.$(".sh_search_container").toggleClass("has-results", Boolean(results.length));
                    console.log("&*",results)
                    if(results.length > 0){
                 	   $(".sh_search_results").css("display","block");
-                	   self.$search_results.html(QWeb.render("sh_backmate_theme.MenuSearchResults", {
+                	   self.$(".sh_search_results").html(QWeb.render("sh_backmate_theme.MenuSearchResults", {
                            results: results,
                            widget: self,
                        }));
@@ -126,42 +118,11 @@ odoo.define('sh_backmate_theme.GlobalSearch', function (require) {
         _onSearchResultsNavigate: function (event) {
         	
         	$(".sh_search_container").css("display","block");
-            if (this.$search_results.html().trim() === "") {
-                this._searchMenusSchedule();
-                return;
-            }
-            var all = this.$search_results.find(".sh_menu_search_result");
-            var key = event.key || String.fromCharCode(event.which);
-            var pre_focused = all.filter(".active") || $(all[0]);
-            var offset = all.index(pre_focused);
-            if (key === "Tab") {
-                event.preventDefault();
-                key = event.shiftKey ? "ArrowUp" : "ArrowDown";
-            }
-            switch (key) {
-    	        case "ArrowUp":
-    	            offset--;
-    	            break;
-    	        case "ArrowDown":
-    	            offset++;
-    	            break;
-    	        default:
-    	        	this._searchMenusSchedule();
-                return;
-            }
-            if (offset < 0) {
-                offset = all.length + offset;
-            } else if (offset >= all.length) {
-                offset -= all.length;
-            }
-            var new_focused = $(all[offset]);
-            pre_focused.removeClass("active");
-            new_focused.addClass("active");
-            this.$search_results.scrollTo(new_focused, {
-                offset: {
-                    top: this.$search_results.height() * -0.5,
-                },
-            });
+        	this._search_def.reject();
+            this._search_def = $.Deferred();
+            setTimeout(this._search_def.resolve.bind(this._search_def), 50);
+            this._search_def.done(this._searchData.bind(this));
+             return;
         },
         start: function () {
         	var self = this;
@@ -176,8 +137,6 @@ odoo.define('sh_backmate_theme.GlobalSearch', function (require) {
                 	 self.$search_input = self.$(".sh_search_input input.usermenu_search_input");
                  }
              });
-        	  this.$search_container = this.$(".sh_search_container");
-              this.$search_results = this.$(".sh_search_results");
             return this._super();
           
         },

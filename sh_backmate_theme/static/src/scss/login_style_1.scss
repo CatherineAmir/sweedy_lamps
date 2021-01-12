@@ -497,9 +497,19 @@ body.bg-100 .o_database_list .card-body{background: transparent !important;color
 }
 
 
+/* 11-11-2020 */
 
 
-
+@if $login_page_style == 'style_1' {
+	@media only screen and (max-width: 768px) and (min-width: 577px){
+		body.bg-100 .o_database_list{top: 28%;}
+	}
+}
+@if $login_page_style == 'style_2' {
+	@media only screen and (max-width: 768px) and (min-width: 577px){
+		body.bg-100 .card-body{top: 28%;}
+	}
+}
 
 
 
