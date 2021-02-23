@@ -128,7 +128,9 @@
                                     <th class="o_mrp_report_line_header"><span>Operation</span></th>
                                     <th class="text-right o_mrp_report_line_header"><span>Working Time</span></th>
                                     <th class="text-right o_mrp_report_line_header"><span>Standard Time</span></th>
+                                    <th class="text-right o_mrp_report_line_header"><span>Type of Cost</span></th>
                                     <th class="text-right o_mrp_report_line_header"><span>Labour Cost/hour</span></th>
+                                    <th class="text-right o_mrp_report_line_header"><span>Labour Cost/Unit</span></th>
                                     <th class="text-right o_mrp_report_line_header"><span>Number Of Labours</span></th>
                                     <th class="text-right o_mrp_report_line_header"><span>Planned Cost</span></th>
                                     <th class="text-right o_mrp_report_line_header"><span>Actual Labour Cost</span></th>
@@ -137,6 +139,21 @@
                             </thead>
                             <tbody>
                                 <tr t-foreach="line['labour_operations']" t-as="row" class="o_mrp_data">
+                                    <t t-if="row[7] == 'time'" >
+                                        <t t-set="actual" t-value="row[3] * row[5] * row[6]" />
+                                        <t t-set="planned" t-value="row[4] * row[5] * row[6]" />
+                                        <t t-set="variant" t-value="actual - planned" />
+                                        <t t-set="labour_cost" t-value="labour_cost + row[3] * row[5] * row[6]"/>
+                                        <t t-set="planned_labour_cost" t-value="planned_labour_cost + row[4] * row[5] * row[6]"/>
+                                        <t t-set="variant_labour_cost" t-value="variant_labour_cost + (row[3] - row[4] ) * row[5] * row[6]"/>
+                                    </t>
+                                    <t t-if="row[7] == 'qty'" >
+                                        <t t-set="actual" t-value="line['mo_qty'] * row[8] * row[6]" />
+                                        <t t-set="planned" t-value="line['mo_qty'] * row[8] * row[6]" />
+                                        <t t-set="variant" t-value="actual - planned" />
+                                        <t t-set="labour_cost" t-value="labour_cost + actual"/>
+                                        <t t-set="planned_labour_cost" t-value="planned_labour_cost + planned"/>
+                                    </t>
                                     <td>
                                         <span t-esc="row[0]"/>
                                     </td>
@@ -151,27 +168,32 @@
 <!--                                        <span t-esc="row[4]" />-->
                                     </td>
                                     <td class="text-right">
+                                        <span t-esc="row[7]" />
+                                    </td>
+                                    <td class="text-right">
                                         <span t-esc="row[5]" t-options='{"widget": "monetary", "display_currency": currency}'/>
+                                    </td>
+                                    <td class="text-right">
+                                        <span t-esc="row[8]" t-options='{"widget": "monetary", "display_currency": currency}'/>
                                     </td>
                                     <td class="text-right">
                                         <span t-esc="row[6]" />
                                     </td>
                                     <td class="text-right">
-                                        <span t-esc="row[4] * row[5] * row[6]" t-options='{"widget": "monetary", "display_currency": currency}'/>
+                                        <span t-esc="planned" t-options='{"widget": "monetary", "display_currency": currency}'/>
                                     </td>
                                     <td class="text-right">
-                                        <span t-esc="row[3] * row[5] * row[6]" t-options='{"widget": "monetary", "display_currency": currency}'/>
+                                        <span t-esc="actual" t-options='{"widget": "monetary", "display_currency": currency}'/>
                                     </td>
                                     <td class="text-right">
-                                        <span t-esc="(row[3] - row[4] )* row[5] * row[6]" t-options='{"widget": "monetary", "display_currency": currency}'/>
+                                        <span t-esc="variant" t-options='{"widget": "monetary", "display_currency": currency}'/>
                                     </td>
 
-                                    <t t-set="labour_cost" t-value="labour_cost + row[3] * row[5] * row[6]"/>
-                                    <t t-set="planned_labour_cost" t-value="planned_labour_cost + row[4] * row[5] * row[6]"/>
-                                    <t t-set="variant_labour_cost" t-value="variant_labour_cost + (row[3] - row[4] ) * row[5] * row[6]"/>
                                 </tr>
                                 <tr class="font-weight-bold">
                                     <td>Total</td>
+                                    <td/>
+                                    <td/>
                                     <td/>
                                     <td/>
                                     <td/>
@@ -182,7 +204,7 @@
                                     <td class="text-right"><t t-esc="variant_labour_cost" t-options='{"widget": "monetary", "display_currency": currency}'/></td>
                                 </tr>
                                 <tr>
-                                    <td colspan="8" class="text-right">
+                                    <td colspan="10" class="text-right">
                                         <strong>Total Cost of Labour Operations</strong>
                                     </td>
                                     <td class="text-right">
@@ -201,14 +223,30 @@
                                     <th class="o_mrp_report_line_header"><span>Operation</span></th>
                                     <th class="text-right o_mrp_report_line_header"><span>Working Time</span></th>
                                     <th class="text-right o_mrp_report_line_header"><span>Standard Time</span></th>
+                                    <th class="text-right o_mrp_report_line_header"><span>Type of Cost</span></th>
                                     <th class="text-right o_mrp_report_line_header"><span>Overhead Cost/hour</span></th>
-                                    <th class="text-right o_mrp_report_line_header"><span>Planned Cost</span></th>
+                                    <th class="text-right o_mrp_report_line_header"><span>Overhead Cost/Unit</span></th>                                    <th class="text-right o_mrp_report_line_header"><span>Planned Cost</span></th>
                                     <th class="text-right o_mrp_report_line_header"><span>Actual Overhead Cost</span></th>
                                     <th class="text-right o_mrp_report_line_header"><span>Variant</span></th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr t-foreach="line['overhead_operations']" t-as="row" class="o_mrp_data">
+                                    <t t-if="row[6] == 'time'" >
+                                        <t t-set="actual" t-value="row[3] * row[5] " />
+                                        <t t-set="planned" t-value="row[4] * row[5] " />
+                                        <t t-set="variant" t-value="actual - planned" />
+                                        <t t-set="overhead_cost" t-value="overhead_cost + actual"/>
+                                        <t t-set="planned_overhead_cost" t-value="planned_overhead_cost + planned"/>
+                                        <t t-set="variant_overhead_cost" t-value="variant_overhead_cost + actual - planned"/>
+                                    </t>
+                                    <t t-if="row[6] == 'qty'" >
+                                        <t t-set="actual" t-value="line['mo_qty'] * row[7] " />
+                                        <t t-set="planned" t-value="line['mo_qty'] * row[7] " />
+                                        <t t-set="variant" t-value="actual - planned" />
+                                        <t t-set="overhead_cost" t-value="overhead_cost + actual"/>
+                                        <t t-set="planned_overhead_cost" t-value="planned_overhead_cost + planned"/>
+                                    </t>
                                     <td>
                                         <span t-esc="row[0]"/>
                                     </td>
@@ -223,24 +261,29 @@
 <!--                                        <span t-esc="row[4]" />-->
                                     </td>
                                     <td class="text-right">
+                                        <span t-esc="row[6]" />
+                                    </td>
+                                    <td class="text-right">
                                         <span t-esc="row[5]" t-options='{"widget": "monetary", "display_currency": currency}'/>
                                     </td>
                                     <td class="text-right">
-                                        <span t-esc="row[4] * row[5]" t-options='{"widget": "monetary", "display_currency": currency}'/>
+                                        <span t-esc="row[7]" t-options='{"widget": "monetary", "display_currency": currency}'/>
                                     </td>
                                     <td class="text-right">
-                                        <span t-esc="row[3] * row[5]" t-options='{"widget": "monetary", "display_currency": currency}'/>
+                                        <span t-esc="planned" t-options='{"widget": "monetary", "display_currency": currency}'/>
                                     </td>
                                     <td class="text-right">
-                                        <span t-esc="(row[3] - row[4] )* row[5]" t-options='{"widget": "monetary", "display_currency": currency}'/>
+                                        <span t-esc="actual" t-options='{"widget": "monetary", "display_currency": currency}'/>
+                                    </td>
+                                    <td class="text-right">
+                                        <span t-esc="variant" t-options='{"widget": "monetary", "display_currency": currency}'/>
                                     </td>
 
-                                    <t t-set="overhead_cost" t-value="overhead_cost + row[3] * row[5]"/>
-                                    <t t-set="planned_overhead_cost" t-value="planned_overhead_cost + row[4] * row[5]"/>
-                                    <t t-set="variant_overhead_cost" t-value="variant_overhead_cost + (row[3] - row[4] )* row[5]"/>
                                 </tr>
                                 <tr class="font-weight-bold">
                                     <td>Total</td>
+                                    <td/>
+                                    <td/>
                                     <td/>
                                     <td/>
                                     <td/>
@@ -250,7 +293,7 @@
                                     <td class="text-right"><t t-esc="variant_overhead_cost" t-options='{"widget": "monetary", "display_currency": currency}'/></td>
                                 </tr>
                                 <tr>
-                                    <td colspan="7" class="text-right">
+                                    <td colspan="9" class="text-right">
                                         <strong>Total Cost of Overhead Operations</strong>
                                     </td>
                                     <td class="text-right">

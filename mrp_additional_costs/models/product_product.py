@@ -24,8 +24,17 @@ class ProductProduct(models.Model):
                 opt.workcenter_id.time_stop +
                 opt.time_cycle)
             # New Change to add additional costs
-            labour_costs = (duration_expected / 60.0) * opt.labour_cost_per_hour * opt.number_labours
-            overhead_costs = (duration_expected / 60.0) * opt.overhead_cost_per_hour
+            labour_costs = 0
+            overhead_costs = 0
+            if opt.labour_cost_by == 'time':
+                labour_costs = (duration_expected / 60.0) * opt.labour_cost_per_hour * opt.number_labours
+            elif opt.labour_cost_by == 'qty':
+                labour_costs = 1 * opt.labour_cost_by_unit * opt.number_labours
+
+            if opt.overhead_cost_by == 'time':
+                overhead_costs = (duration_expected / 60.0) * opt.overhead_cost_per_hour
+            elif opt.overhead_cost_by == 'qty':
+                overhead_costs = 1 * opt.overhead_cost_by_unit
 
             total += (duration_expected / 60) * opt.workcenter_id.costs_hour + labour_costs + overhead_costs
             # total += (duration_expected / 60) * opt.workcenter_id.costs_hour

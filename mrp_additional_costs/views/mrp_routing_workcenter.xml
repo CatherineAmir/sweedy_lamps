@@ -31,13 +31,17 @@
                      <page name="additional_costs" string="Additional Costs">
                          <group>
                              <group string="Labour">
+                                 <field name="labour_cost_by" widget="radio" />
                                  <field name="number_labours" />
-                                 <field name="labour_cost_per_hour" />
+                                 <field name="labour_cost_per_hour" attrs="{'invisible':[('labour_cost_by','!=','time')],'required':[('labour_cost_by','=','time')]}"/>
+                                 <field name="labour_cost_by_unit" attrs="{'invisible':[('labour_cost_by','!=','qty')],'required':[('labour_cost_by','=','qty')]}"/>
                                  <field name="labour_account_id" />
                                  <field name="labour_analytic_account_id" />
                              </group>
                              <group string="Overhead">
-                                 <field name="overhead_cost_per_hour" />
+                                 <field name="overhead_cost_by" widget="radio" />
+                                 <field name="overhead_cost_per_hour" attrs="{'invisible':[('overhead_cost_by','!=','time')],'required':[('overhead_cost_by','=','time')]}"/>
+                                 <field name="overhead_cost_by_unit" attrs="{'invisible':[('overhead_cost_by','!=','qty')],'required':[('overhead_cost_by','=','qty')]}"/>
                                  <field name="overhead_account_id" />
                                  <field name="overhead_analytic_account_id" />
                              </group>
