@@ -21,5 +21,13 @@ class MRPRoutingWorkcenter(models.Model):
 
     labour_analytic_account_id = fields.Many2one(comodel_name="account.analytic.account", required=False, )
     overhead_analytic_account_id = fields.Many2one(comodel_name="account.analytic.account", required=False, )
+
+    labour_cost_by = fields.Selection(selection=[('qty', 'Quantity'), ('time', 'Working Time'), ], required=True,default='time' )
+    overhead_cost_by = fields.Selection(selection=[('qty', 'Quantity'), ('time', 'Working Time'), ], required=True,default='time' )
+
+    labour_cost_by_unit = fields.Float( )
+    overhead_cost_by_unit = fields.Float( )
+
+
     
     
