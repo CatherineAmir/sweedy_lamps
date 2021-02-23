@@ -26,12 +26,12 @@ class MRPProduction(models.Model):
                 overhead_costs = 0
                 if work_order.operation_id.labour_cost_by == 'time':
                     labour_costs = (duration / 60.0) * work_order.operation_id.labour_cost_per_hour * work_order.operation_id.number_labours
-                elif work_order.operation_id.labour_cost_by == 'qyt':
+                elif work_order.operation_id.labour_cost_by == 'qty':
                     labour_costs = work_order.production_id.qty_produced * work_order.operation_id.labour_cost_by_unit * work_order.operation_id.number_labours
 
                 if work_order.operation_id.overhead_cost_by == 'time':
                     overhead_costs = (duration / 60.0) * work_order.operation_id.overhead_cost_per_hour
-                elif work_order.operation_id.overhead_cost_by == 'qyt':
+                elif work_order.operation_id.overhead_cost_by == 'qty':
                     overhead_costs = work_order.production_id.qty_produced * work_order.operation_id.overhead_cost_by_unit
 
 

@@ -40,13 +40,13 @@ class StockMove(models.Model):
 
                 if work_order.operation_id.labour_cost_by == 'time':
                     labour_costs = (duration / 60.0) * work_order.operation_id.labour_cost_per_hour * work_order.operation_id.number_labours
-                elif work_order.operation_id.labour_cost_by == 'qyt':
+                elif work_order.operation_id.labour_cost_by == 'qty':
                     labour_costs = work_order.production_id.qty_produced * work_order.operation_id.labour_cost_by_unit * work_order.operation_id.number_labours
                 labour_costs = round(labour_costs , self.company_id.currency_id.decimal_places )
 
                 if work_order.operation_id.overhead_cost_by == 'time':
                     overhead_costs = (duration / 60.0) * work_order.operation_id.overhead_cost_per_hour
-                elif work_order.operation_id.overhead_cost_by == 'qyt':
+                elif work_order.operation_id.overhead_cost_by == 'qty':
                     overhead_costs = work_order.production_id.qty_produced * work_order.operation_id.overhead_cost_by_unit
                 overhead_costs = round( overhead_costs, self.company_id.currency_id.decimal_places )
 
