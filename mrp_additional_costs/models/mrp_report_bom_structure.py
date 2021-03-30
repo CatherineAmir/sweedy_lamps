@@ -79,6 +79,8 @@ class ReportBomStructure(models.AbstractModel):
         }
         components, total = self._get_bom_lines(bom, bom_quantity, product, line_id, level)
         lines['components'] = components
+        lines['labour_operations'] = labour_operations
+        lines['overhead_operations'] = overhead_operations
         lines['total'] += total + labour_cost + overhead_cost
         return lines
 
@@ -104,12 +106,16 @@ class ReportBomStructure(models.AbstractModel):
         for operation in routing.operation_ids:
             operation_cycle = float_round(qty / operation.workcenter_id.capacity, precision_rounding=1, rounding_method='UP')
             duration_expected = operation_cycle * operation.time_cycle + operation.workcenter_id.time_stop + operation.workcenter_id.time_start
-            total = ((duration_expected / 60.0) * operation.labour_cost_per_hour * operation.number_labours )
+            if operation.labour_cost_by == 'time':
+                total = ((duration_expected / 60.0) * operation.labour_cost_per_hour * operation.number_labours )
+            elif operation.labour_cost_by == 'qty':
+                total = (qty * operation.labour_cost_by_unit * operation.number_labours)
             labour_operations.append({
                 'level': level or 0,
                 'operation': operation,
                 'name': operation.name + ' - ' + ' Labours Cost ',
                 'duration_expected': duration_expected,
+                'type': operation.labour_cost_by,
                 'total': self.env.company.currency_id.round(total),
             })
         return labour_operations
@@ -120,12 +126,17 @@ class ReportBomStructure(models.AbstractModel):
         for operation in routing.operation_ids:
             operation_cycle = float_round(qty / operation.workcenter_id.capacity, precision_rounding=1, rounding_method='UP')
             duration_expected = operation_cycle * operation.time_cycle + operation.workcenter_id.time_stop + operation.workcenter_id.time_start
-            total = ((duration_expected / 60.0) * operation.overhead_cost_per_hour)
+            if operation.overhead_cost_by == 'time':
+                total = ((duration_expected / 60.0) * operation.overhead_cost_per_hour)
+            elif operation.overhead_cost_by == 'qty':
+                total = (qty * operation.overhead_cost_by_unit)
+
             overhead_operations.append({
                 'level': level or 0,
                 'operation': operation,
                 'name': operation.name + ' - ' + ' Overhead Cost ',
                 'duration_expected': duration_expected,
+                'type': operation.overhead_cost_by,
                 'total': self.env.company.currency_id.round(total),
             })
         return overhead_operations
@@ -246,12 +257,16 @@ class ReportBomStructure(models.AbstractModel):
                             'level': level + 1,
                         })
 
+            return lines
+
         bom = self.env['mrp.bom'].browse(bom_id)
         product = product_id or bom.product_id or bom.product_tmpl_id.product_variant_id
         data = self._get_bom(bom_id=bom_id, product_id=product.id, line_qty=qty)
         pdf_lines = get_sub_lines(bom, product, qty, False, 1)
         data['components'] = []
         data['lines'] = pdf_lines
+        if 'mrp.eco' in self.env:
+            self._add_version_and_ecos(data['lines'])
         return data
 
     @api.model
