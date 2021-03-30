@@ -360,7 +360,7 @@ class AccountAssetAsset(models.Model):
                 if posted_depreciation_line_ids and \
                         posted_depreciation_line_ids[-1].depreciation_date:
                     last_depreciation_date = datetime.strptime(
-                        posted_depreciation_line_ids[-1].depreciation_date,
+                        str(posted_depreciation_line_ids[-1].depreciation_date),
                         DF).date()
                     depreciation_date = last_depreciation_date + relativedelta(
                         months=+self.method_period)
