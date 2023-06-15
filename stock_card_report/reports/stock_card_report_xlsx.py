@@ -90,7 +90,7 @@ class ReportStockCardReportXlsx(models.AbstractModel):
                 "header": {"value": "Balance"},
                 "data": {"value": self._render("balance")},
                 "width": 25,
-            },
+            }
         }
 
         ws_params = {

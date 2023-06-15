@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+
+    <template id="general_ledger" inherit_id="account_dynamic_reports.general_ledger">
+        <xpath expr="//table/thead/t[2]/tr/th[5]" position="replace">
+            <th style="text-align:left;">Reference</th>
+            <th style="text-align:left;">Entry Label</th>
+        </xpath>
+        <xpath expr="//table/t[@t-foreach='Ledger_data']/tr[hasclass('pims_report_line_main_tr')]/td[1]"
+               position="attributes">
+            <attribute name="colspan">6</attribute>
+        </xpath>
+        <xpath expr="//table/t[@t-foreach='Ledger_data']/t[@t-as='sub_line']/t[1]/tr/td[1]" position="attributes">
+            <attribute name="colspan">6</attribute>
+        </xpath>
+        <xpath expr="//table/t[@t-foreach='Ledger_data']/t[@t-as='sub_line']/t[2]/t/tr/td[4]" position="after">
+            <td>
+                <t t-esc="sub_line.get('move_ref')"/>
+            </td>
+        </xpath>
+        <xpath expr="//table/t[@t-foreach='Ledger_data']/t[@t-as='sub_line']/t[3]/tr/td[1]" position="attributes">
+            <attribute name="colspan">6</attribute>
+        </xpath>
+    </template>
+
+</odoo>

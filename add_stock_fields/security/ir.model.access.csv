@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_rece_rece,rece.rece,model_reci_reci,,1,1,1,1
+access_sec_sec,sec.sec,model_sec_sec,,1,1,1,1
+access_store_keeper,store.keeper,model_store_keeper,,1,1,1,1

@@ -13,7 +13,8 @@ class ReportGeneralLedgerExcel(models.Model):
         report_obj = self.env['report.accounting_pdf_reports.report_general_ledger']
         results = report_obj._get_report_values(obj, data)
         sheet = workbook.add_worksheet()
-
+        format0 = workbook.add_format({'font_size': 14, 'bottom': True, 'right': True, 'left': True, 'top': True,
+                                       'align': 'center', 'bold': True, 'valign': 'vcenter'})
         format1 = workbook.add_format({'font_size': 14, 'bottom': True, 'right': True, 'left': True, 'top': True,
                                        'align': 'center', 'bold': True, 'bg_color': '#bfbfbf', 'valign': 'vcenter'})
         format2 = workbook.add_format({'font_size': 12, 'align': 'left', 'right': True, 'left': True,
@@ -37,7 +38,7 @@ class ReportGeneralLedgerExcel(models.Model):
         sheet.set_column(2, 5, 25)
         sheet.set_column(6, 8, 15)
 
-        sheet.merge_range('A1:I1', "General Ledger Report", format1)
+        sheet.merge_range('A1:J1', "General Ledger Report", format1)
 
         sheet.merge_range('A3:B3', "Journals", format4)
         sheet.write('C3', ', '.join([lt or '' for lt in results['print_journal']]), format6)
@@ -66,23 +67,25 @@ class ReportGeneralLedgerExcel(models.Model):
         if data['form']['date_to']:
             sheet.write('G5', "Date To", format4)
             sheet.merge_range('H5:I5', data['form']['date_to'], format6)
-
-        sheet.write('A7', "Date ", format2)
-        sheet.write('B7', "JRNL", format2)
-        sheet.write('C7', "Partner", format2)
-        sheet.write('D7', "Ref", format2)
-        sheet.write('E7', "Move", format2)
-        sheet.write('F7', "Entry Label", format2)
-        sheet.write('G7', "Debit", format3)
-        sheet.write('H7', "Credit", format3)
-        sheet.write('I7', "Balance", format3)
+        sheet.merge_range('A7:B7', "Date ", format2)
+        # sheet.write('A7', "Date ", format2)
+        # sheet.write('A7', "Date ", format2)
+        sheet.write('C7', "JRNL", format2)
+        sheet.write('D7', "Partner", format2)
+        sheet.write('E7', "Ref", format2)
+        sheet.write('F7', "Move", format2)
+        sheet.write('G7', "Entry Label", format2)
+        sheet.write('H7', "Debit", format3)
+        sheet.write('I7', "Credit", format3)
+        sheet.write('J7', "Balance", format3)
         row = 7
         col = 0
         for account in results['Accounts']:
-            sheet.merge_range(row, col, row, col + 5, account['code'] + account['name'], format4)
-            sheet.write(row, col + 6, account['debit'], format5)
-            sheet.write(row, col + 7, account['credit'], format5)
-            sheet.write(row, col + 8, account['balance'], format5)
+            sheet.merge_range(row, col, row, col + 6, account['code'] + "              "+account['name'] , format0)
+            # sheet.merge_range(row, col+4, row, col + 6, account['name'], format4)
+            sheet.write(row, col + 7, account['debit'], format5)
+            sheet.write(row, col + 8, account['credit'], format5)
+            sheet.write(row, col + 9, account['balance'], format5)
             for line in account['move_lines']:
                 col = 0
                 row += 1

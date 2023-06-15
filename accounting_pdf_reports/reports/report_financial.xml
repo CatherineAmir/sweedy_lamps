@@ -59,7 +59,8 @@
                         <table class="table table-sm table-reports" t-if="not data['enable_filter'] and not data['debit_credit']">
                             <thead>
                                 <tr>
-                                    <th>Name</th>
+                                    <th>Code</th>
+
                                     <th class="text-right">Balance</th>
                                 </tr>
                             </thead>
@@ -82,14 +83,14 @@
                         <table class="table table-sm table-reports" t-if="data['enable_filter'] == 1 and not data['debit_credit']">
                             <thead>
                                 <tr>
-                                    <th>Name</th>
+                                    <th>Code</th>
                                     <th class="text-right">Balance</th>
                                     <th class="text-right"><span t-esc="data['label_filter']"/></th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr t-foreach="get_account_lines" t-as="a">
-                                    <t t-if="a['level'] != 0">
+                                    <t t-if="a['level'] != 0"><th>Code</th>
                                         <t t-if="int(a.get('level')) &gt; 3"><t t-set="style" t-value="'font-weight: normal;'"/></t>
                                         <t t-if="not int(a.get('level')) &gt; 3"><t t-set="style" t-value="'font-weight: bold;'"/></t>
                                         <td>
@@ -99,6 +100,7 @@
                                         <td class="text-right"><span t-att-style="style" t-esc="a.get('balance')" t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/></td>
                                         <td class="text-right"><span t-att-style="style" t-esc="a.get('balance_cmp')"/></td>
                                     </t>
+
                                 </tr>
                             </tbody>
                         </table>

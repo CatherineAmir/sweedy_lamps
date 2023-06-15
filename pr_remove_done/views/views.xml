@@ -1,0 +1,16 @@
+<odoo>
+    <data>
+        <record id="purchase_request_form_inherit" model="ir.ui.view">
+            <field name="name">Purchase.Request.Form</field>
+            <field name="model">purchase.request</field>
+            <field name="inherit_id" ref="purchase_request.view_purchase_request_form"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//button[@name='button_done']" position="attributes">
+                  <attribute name="groups">pr_remove_done.group_for_done_button</attribute>
+                </xpath>
+
+            </field>
+        </record>
+    </data>
+</odoo>

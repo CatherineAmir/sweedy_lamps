@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+	<data>
+
+		<template id="sita_stock_card_pdf_inherit_header" inherit_id="stock_card_report.report_stock_card_lines_header" name="sita_stock_card_pdf_inherit_header">
+
+			<xpath expr="//div[hasclass('act_as_row')]" postion="inside">
+				<div class="act_as_cell">Cost</div>
+				<div class="act_as_cell">Sales Price</div>
+
+			</xpath>
+		</template>
+
+
+		<template id="sita_stock_card_pdf_inherit_lines" inherit_id="stock_card_report.report_stock_card_lines" name="sita_stock_card_pdf_inherit_lines">
+
+			<xpath expr="//div[hasclass('act_as_row')]" postion="inside">
+				<div class="act_as_cell right">
+                <t t-esc="'{0:,.3f}'.format(product_line.product_id.standard_price)"/>
+            </div>
+            <div class="act_as_cell right">
+                <t t-esc="'{0:,.3f}'.format(product_line.product_id.list_price)"/>
+            </div>
+
+			</xpath>
+		</template>
+
+
+	</data>
+</odoo>

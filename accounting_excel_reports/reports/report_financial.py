@@ -10,6 +10,7 @@ class ReportFinancialExcel(models.Model):
     _inherit = 'report.report_xlsx.abstract'
 
     def generate_xlsx_report(self, workbook, data, obj):
+        print('pl and balance sheet')
         report_obj = self.env['report.accounting_pdf_reports.report_financial']
         report_lines = report_obj.get_account_lines(data.get('form'))
         sheet = workbook.add_worksheet()

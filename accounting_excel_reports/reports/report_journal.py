@@ -62,31 +62,34 @@ class ReportJournalExcel(models.Model):
 
             sheet.write('A6', "Move ", format2)
             sheet.write('B6', "Date", format2)
-            sheet.write('C6', "Account", format2)
-            sheet.write('D6', "Partner", format2)
-            sheet.write('E6', "Label", format2)
-            sheet.write('F6', "Debit", format3)
-            sheet.write('G6', "Credit", format3)
+            sheet.write('C6', "Account Code", format2)
+            sheet.write('D6', "Account Name", format2)
+            sheet.write('E6', "Partner", format2)
+            sheet.write('F6', "Label", format2)
+            sheet.write('G6', "Debit", format3)
+            sheet.write('H6', "Credit", format3)
             if data['form']['amount_currency']:
-                sheet.write('H6', "Currency", format2)
+                sheet.write('I6', "Currency", format2)
             row = 7
             col = 0
             for aml in result['lines'][o.id]:
                 sheet.write(row, col, aml.move_id.name != '/' and aml.move_id.name or ('*'+str(aml.move_id.id)), format6)
                 sheet.write(row, col+1, aml.date, format6)
                 sheet.write(row, col+2, aml.account_id.code, format6)
-                sheet.write(row, col+3, aml.sudo().partner_id and aml.sudo().partner_id.name and aml.sudo().partner_id.name[:23] or '', format6)
-                sheet.write(row, col+4, aml.name and aml.name[:35], format6)
-                sheet.write(row, col+5, aml.debit, format7)
-                sheet.write(row, col+6, aml.credit, format7)
+                sheet.write(row, col+3, aml.account_id.name, format6)
+
+                sheet.write(row, col+4, aml.sudo().partner_id and aml.sudo().partner_id.name and aml.sudo().partner_id.name[:23] or '', format6)
+                sheet.write(row, col+5, aml.name and aml.name[:35], format6)
+                sheet.write(row, col+6, aml.debit, format7)
+                sheet.write(row, col+7, aml.credit, format7)
                 if data['form']['amount_currency']:
-                    sheet.write(row, col+7, aml.amount_currency or 0.0, format6)
+                    sheet.write(row, col+8, aml.amount_currency or 0.0, format6)
                 row += 1
-            sheet.merge_range(row, col, row, col+4, "Total", format4)
-            sheet.write(row, col+5, result['sum_debit'](data, o), format5)
-            sheet.write(row, col+6, result['sum_credit'](data, o), format5)
+            sheet.merge_range(row, col, row, col+5, "Total", format4)
+            sheet.write(row, col+6, result['sum_debit'](data, o), format5)
+            sheet.write(row, col+7, result['sum_credit'](data, o), format5)
             row += 3
-            sheet.merge_range(row, col, row, col+2, "Tax Declaration", format8)
+            sheet.merge_range(row, col, row, col+3, "Tax Declaration", format8)
             row += 1
             sheet.write(row, col, "Name", format4)
             sheet.write(row, col+1, "Base Amount", format4)

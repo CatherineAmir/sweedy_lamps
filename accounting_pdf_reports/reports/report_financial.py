@@ -119,7 +119,7 @@ class ReportFinancial(models.AbstractModel):
                     flag = False
                     account = self.env['account.account'].browse(account_id)
                     vals = {
-                        'name': account.code + ' ' + account.name,
+                        'name': account.code + '             ' + account.name,
                         'balance': value['balance'] * float(report.sign) or 0.0,
                         'type': 'account',
                         'level': report.display_detail == 'detail_with_hierarchy' and 4,
@@ -150,6 +150,7 @@ class ReportFinancial(models.AbstractModel):
         self.model = self.env.context.get('active_model')
         docs = self.env[self.model].browse(self.env.context.get('active_id'))
         report_lines = self.get_account_lines(data.get('form'))
+        print('report_lines',report_lines)
         return {
             'doc_ids': self.ids,
             'doc_model': self.model,

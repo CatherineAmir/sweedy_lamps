@@ -55,27 +55,31 @@ class ReportPartnerLedgerExcel(models.Model):
 
         sheet.write('A6', "Date ", format2)
         sheet.write('B6', "JRNL", format2)
-        sheet.write('C6', "Account", format2)
-        sheet.write('D6', "Ref", format2)
-        sheet.write('E6', "Debit", format3)
-        sheet.write('F6', "Credit", format3)
-        sheet.write('G6', "Balance", format3)
+        sheet.write('C6', "Account Code", format2)
+        sheet.write('D6', "Account Name", format2)
+        sheet.write('E6', "Ref", format2)
+        sheet.write('F6', "Debit", format3)
+        sheet.write('G6', "Credit", format3)
+        sheet.write('H6', "Balance", format3)
 
         row = 6
         col = 0
 
         for o in result['docs']:
-            sheet.merge_range(row, col, row, col+3, (o.ref or '') + '-' + o.name, format4)
-            sheet.write(row, col+4, result['sum_partner'](result['data'], o, 'debit'), format5)
-            sheet.write(row, col+5, result['sum_partner'](result['data'], o, 'credit'), format5)
-            sheet.write(row, col+6, result['sum_partner'](result['data'], o, 'debit - credit'), format5)
+            sheet.merge_range(row, col, row, col+4, (o.ref or '') + '-' + o.name, format4)
+            sheet.write(row, col+5, result['sum_partner'](result['data'], o, 'debit'), format5)
+            sheet.write(row, col+6, result['sum_partner'](result['data'], o, 'credit'), format5)
+            sheet.write(row, col+7, result['sum_partner'](result['data'], o, 'debit - credit'), format5)
             row += 1
             for line in result['lines'](result['data'], o):
                 sheet.write(row, col, line['date'], format8)
                 sheet.write(row, col + 1, line['code'], format6)
                 sheet.write(row, col + 2, line['a_code'], format6)
-                sheet.write(row, col + 3, line['displayed_name'] or '', format6)
-                sheet.write(row, col + 4, line['debit'], format7)
-                sheet.write(row, col + 5, line['credit'], format7)
-                sheet.write(row, col + 6, line['progress'], format7)
+
+                sheet.write(row, col + 3, line['a_name'], format6)
+
+                sheet.write(row, col + 4, line['displayed_name'] or '', format6)
+                sheet.write(row, col + 5, line['debit'], format7)
+                sheet.write(row, col + 6, line['credit'], format7)
+                sheet.write(row, col + 7, line['progress'], format7)
                 row += 1

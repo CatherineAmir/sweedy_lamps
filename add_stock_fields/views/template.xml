@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <template id="delivery_slip_template_inherit" inherit_id="stock.report_delivery_document">
+            <xpath expr="//table[@name='stock_move_line_table']" position="after">
+                <div class="col-auto" name="div_new_fields">
+                    <strong>Recipient Name:</strong>
+                    <t t-if="o.recipient_name_id">
+                        <span t-field="o.recipient_name_id.name"/>
+                        <br />
+                    </t>
+                    <t t-else="">
+                        <span>----</span>
+                        <br />
+                    </t>
+                    <strong>Security : </strong>
+                    <t t-if="o.security_id">
+                        <span t-field="o.security_id.name"/>
+                        <br />
+                    </t>
+                    <t t-else="">
+                        <span>----</span>
+                        <br />
+                    </t>
+                    <strong>Store Keepers :</strong>
+                    <t t-if="o.store_keeper_id">
+                        <span t-field="o.store_keeper_id.name"/>
+                    </t>
+                    <t t-else="">
+                        <span>----</span>
+                    </t>
+                </div>
+            </xpath>
+        </template>
+
+    </data>
+</odoo>
