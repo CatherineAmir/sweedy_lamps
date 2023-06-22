@@ -341,6 +341,7 @@ class InsFinancialReport(models.TransientModel):
         data['form'].update({'analytics_list': [(j.id, j.name) for j in analytics]})
         data['form'].update({'analytic_tag_list': [(j.id, j.name) for j in analytic_tags]})
 
+
         if self.enable_filter:
             data['form']['debit_credit'] = False
 
@@ -492,9 +493,12 @@ class InsFinancialReport(models.TransientModel):
     def action_pdf(self):
         ''' Button function for Pdf '''
         data = self.get_report_values()
+
+        my_data={'data':data}
+
+        # my_data=data
         return self.env.ref(
-            'account_dynamic_reports.ins_financial_report_pdf').report_action(self,
-                                                                     data)
+            'account_dynamic_reports.ins_financial_report_pdf').report_action(self,data= my_data)
 
     def action_xlsx(self):
         ''' Button function for Xlsx '''

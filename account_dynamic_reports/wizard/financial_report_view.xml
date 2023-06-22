@@ -130,7 +130,7 @@
             <field name="name">Balance Sheet</field>
             <field name="tag">dynamic.fr</field>
             <field name="context"
-                       eval="{'account_report_id':ref('account_dynamic_reports.ins_account_financial_report_balancesheet0')}"/>
+                           eval="{'account_report_id':ref('account_dynamic_reports.ins_account_financial_report_balancesheet0')}"/>
         </record>
 
         <record id="action_dynamic_allinone_cf_report" model="ir.actions.client">
