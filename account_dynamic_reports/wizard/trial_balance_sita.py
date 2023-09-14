@@ -8,6 +8,27 @@ from odoo.tools import DEFAULT_SERVER_DATE_FORMAT
 from operator import itemgetter
 
 
+def last_day_of_month(any_day):
+    next_month = any_day.replace(day = 28) + timedelta(days = 4)  # this will never fail
+    return next_month - timedelta(days = next_month.day)
+
+
+def monthlist(begin, end):
+
+    result = []
+    while True:
+        if begin.month == 12:
+            next_month = begin.replace(year = begin.year + 1, month = 1, day = 1)
+        else:
+            next_month = begin.replace(month = begin.month + 1, day = 1)
+        if next_month > end:
+            break
+        result.append([begin.strftime("%Y-%m-%d"), last_day_of_month(begin).strftime("%Y-%m-%d")])
+        begin = next_month
+    result.append([begin.strftime("%Y-%m-%d"), end.strftime("%Y-%m-%d")])
+    return result
+
+
 class InsTrialBalance(models.TransientModel):
     _name = "ins.trial.balance"
 
@@ -105,6 +126,8 @@ class InsTrialBalance(models.TransientModel):
                     else:
                         self.date_from = datetime(date.year, 7, 1).strftime("%Y-%m-%d")
                         self.date_to = datetime(date.year + 1, 6, 30).strftime("%Y-%m-%d")
+
+
 
     @api.model
     def _get_default_date_range(self):
@@ -327,7 +350,12 @@ class InsTrialBalance(models.TransientModel):
                         l['ending_credit'] += q['ending_credit']
                         l['ending_balance'] += q['ending_balance']
 
+            # print('in prepare hirerachy')
+            # print('hirarchy_list',hirarchy_list)
+            # print("itemgetter('code')",itemgetter('code'))
+
             return sorted(hirarchy_list, key=itemgetter('code'))
+
         return []
 
     def process_data(self, data):
@@ -355,20 +383,25 @@ class InsTrialBalance(models.TransientModel):
                                  'debit':0.0, 'credit':0.0, 'balance':0.0,
                                  'ending_credit':0.0, 'ending_debit':0.0, 'ending_balance':0.0,
                                  'company_currency_id': company_currency_id.id} for x in account_ids} # base for accounts to display
+
+            date_list = monthlist(data.get('date_from'), data.get('date_to'))
+
             retained = {}
             retained_earnings = 0.0
             retained_credit = 0.0
             retained_debit = 0.0
-            total_deb = 0.0
-            total_cre = 0.0
-            total_bln = 0.0
+            total_deb = [0.0 for _ in range(0,len(date_list))]
+            total_cre = [0.0 for _ in range(0,len(date_list))]
+            total_bln = [0.0 for _ in range(0,len(date_list))]
             total_init_deb = 0.0
             total_init_cre = 0.0
             total_init_bal = 0.0
             total_end_deb = 0.0
             total_end_cre = 0.0
             total_end_bal = 0.0
+
             for account in account_ids:
+                print('account_code initally',account.code)
                 currency = account.company_id.currency_id or self.env.company.currency_id
                 WHERE_INIT = WHERE + " AND l.date < '%s'" % data.get('date_from')
                 WHERE_INIT += " AND l.account_id = %s" % account.id
@@ -378,6 +411,7 @@ class InsTrialBalance(models.TransientModel):
                 end_blns = 0.0
                 end_cr = 0.0
                 end_dr = 0.0
+                # sql for initial balance
                 sql = ('''
                     SELECT 
                         COALESCE(SUM(l.debit),0) AS initial_debit,
@@ -395,9 +429,11 @@ class InsTrialBalance(models.TransientModel):
                 cr.execute(sql)
                 init_blns = cr.dictfetchone()
 
+
                 move_lines[account.code]['initial_balance'] = init_blns['initial_balance']
                 move_lines[account.code]['initial_debit'] = init_blns['initial_debit']
                 move_lines[account.code]['initial_credit'] = init_blns['initial_credit']
+                print('move_line')
 
                 if account.user_type_id.include_initial_balance and self.strict_range:
                     move_lines[account.code]['initial_balance'] = 0.0
@@ -410,53 +446,93 @@ class InsTrialBalance(models.TransientModel):
                 total_init_deb += init_blns['initial_debit']
                 total_init_cre += init_blns['initial_credit']
                 total_init_bal += init_blns['initial_balance']
-                WHERE_CURRENT = WHERE + " AND l.date >= '%s'" % data.get('date_from') + " AND l.date <= '%s'" % data.get('date_to')
-                WHERE_CURRENT += " AND a.id = %s" % account.id
-                sql = ('''
-                    SELECT
-                        COALESCE(SUM(l.debit),0) AS debit,
-                        COALESCE(SUM(l.credit),0) AS credit,
-                        COALESCE(SUM(l.debit),0) - COALESCE(SUM(l.credit),0) AS balance
-                    FROM account_move_line l
-                    JOIN account_move m ON (l.move_id=m.id)
-                    JOIN account_account a ON (l.account_id=a.id)
-                    LEFT JOIN account_analytic_account anl ON (l.analytic_account_id=anl.id)
-                    LEFT JOIN res_currency c ON (l.currency_id=c.id)
-                    LEFT JOIN res_partner p ON (l.partner_id=p.id)
-                    JOIN account_journal j ON (l.journal_id=j.id)
-                    WHERE %s
-                ''') % WHERE_CURRENT
-                cr.execute(sql)
-                op = cr.dictfetchone()
-                deb = op['debit']
-                cre = op['credit']
-                bln = op['balance']
-                move_lines[account.code]['debit'] = deb
-                move_lines[account.code]['credit'] = cre
-                move_lines[account.code]['balance'] = bln
 
-                end_blns = init_blns['initial_balance'] + bln
-                end_cr = init_blns['initial_credit'] + cre
-                end_dr = init_blns['initial_debit'] + deb
+
+                move_lines[account.code]['debit'] = []
+                move_lines[account.code]['credit'] = []
+                move_lines[account.code]['balance'] = []
+                end_blns = init_blns['initial_balance']
+                end_cr = init_blns['initial_credit']
+                end_dr = init_blns['initial_debit']
+                # for loop
+                i=-1
+                for dr in date_list:
+                    i=i+1
+                    # WHERE_CURRENT = WHERE + " AND l.date >= '%s'" % data.get('date_from') + " AND l.date <= '%s'" % data.get('date_to')
+                    WHERE_CURRENT = WHERE + " AND l.date >= '%s'" % dr[0] + " AND l.date <= '%s'" % dr[1]
+
+                    WHERE_CURRENT += " AND a.id = %s" % account.id
+
+
+                    sql = ('''
+                        SELECT
+                            COALESCE(SUM(l.debit),0) AS debit,
+                            COALESCE(SUM(l.credit),0) AS credit,
+                            COALESCE(SUM(l.debit),0) - COALESCE(SUM(l.credit),0) AS balance
+                        FROM account_move_line l
+                        JOIN account_move m ON (l.move_id=m.id)
+                        JOIN account_account a ON (l.account_id=a.id)
+                        LEFT JOIN account_analytic_account anl ON (l.analytic_account_id=anl.id)
+                        LEFT JOIN res_currency c ON (l.currency_id=c.id)
+                        LEFT JOIN res_partner p ON (l.partner_id=p.id)
+                        JOIN account_journal j ON (l.journal_id=j.id)
+                        WHERE %s
+                    ''') % WHERE_CURRENT
+
+                    cr.execute(sql)
+                    op = cr.dictfetchone()
+
+                    deb = op['debit']
+                    cre = op['credit']
+                    bln = op['balance']
+                    # print('account.code',account.code)
+                    # print('account.code',type(account.code))
+                    # print("move_lines",move_lines)
+
+                    print("move_lines[code]",move_lines[account.code])
+                    # print("move_lines['account.code']['debit']",move_lines[str(account.code)]['debit'])
+                    (move_lines[account.code]['debit']).append(deb)
+                    move_lines[account.code]['credit'].append(cre)
+                    move_lines[account.code]['balance'].append(bln)
+                    end_blns += bln
+                    end_cr += cre
+                    end_dr += deb
+                    # TODO FIX THIS subtotal
+                    #
+                    # end of TODO
+                    #
+                    if data.get('display_accounts') == 'balance_not_zero':
+                        if end_blns:  # debit or credit exist
+                            total_deb[i] += deb
+                            total_cre[i] += cre
+                            total_bln[i] += bln
+                        elif sum(move_lines[account.code]['balance']):
+                            continue
+                        else:
+                            pass
+                            # move_lines.pop(account.code)
+                    else:
+                        total_deb[i] += deb
+                        total_cre[i] += cre
+                        total_bln[i] += bln
+
+
+
+
 
                 move_lines[account.code]['ending_balance'] = end_blns
                 move_lines[account.code]['ending_credit'] = end_cr
                 move_lines[account.code]['ending_debit'] = end_dr
 
                 if data.get('display_accounts') == 'balance_not_zero':
-                    if end_blns: # debit or credit exist
-                        total_deb += deb
-                        total_cre += cre
-                        total_bln += bln
-                    elif bln:
+                    if end_blns:  # debit or credit exist
+                      pass
+                    elif sum(move_lines[account.code]['balance']):
                         continue
                     else:
                         move_lines.pop(account.code)
                 else:
-                    total_deb += deb
-                    total_cre += cre
-                    total_bln += bln
-
+                    pass
             if self.strict_range:
                 retained = {'RETAINED': {'name':'Retained Earnings','code':'','id':'RET',
                                         'initial_credit':company_currency_id.round(retained_credit),
@@ -474,18 +550,21 @@ class InsTrialBalance(models.TransientModel):
                 'initial_credit': company_currency_id.round(total_init_cre),
                 'initial_debit':company_currency_id.round(total_init_deb),
                 'initial_balance':company_currency_id.round(total_init_bal),
-                'credit': company_currency_id.round(total_cre),
-                'debit':company_currency_id.round(total_deb),
-                'balance':company_currency_id.round(total_bln),
-                'ending_credit': company_currency_id.round(total_init_cre + total_cre),
-                'ending_debit': company_currency_id.round(total_init_deb + total_deb),
-                'ending_balance': company_currency_id.round(total_init_bal + total_bln),
+                # 'credit': company_currency_id.round(total_cre),
+                # 'debit':company_currency_id.round(total_deb),
+                # 'balance':company_currency_id.round(total_bln),
+                'credit':[company_currency_id.round(i)for i in  total_cre],
+                'debit':[ company_currency_id.round(i)for i in  total_deb],
+                'balance':[company_currency_id.round(i)for i in  total_bln],
+                'ending_credit': company_currency_id.round(total_init_cre + sum(total_cre)),
+                'ending_debit': company_currency_id.round(total_init_deb + sum(total_deb)),
+                'ending_balance': company_currency_id.round(total_init_bal + sum(total_bln)),
                 'company_currency_id': company_currency_id.id}}
 
             if self.show_hierarchy:
 
                 move_lines = self.prepare_hierarchy(move_lines)
-            return [move_lines, retained, subtotal]
+            return [move_lines, retained, subtotal,date_list]
 
     def get_filters(self, default_filters={}):
 
@@ -522,18 +601,17 @@ class InsTrialBalance(models.TransientModel):
         '''
         if self.validate_data():
             data = self.get_filters(default_filters)
-            print('data',data)
+            # print('data',data)
             filters = self.process_filters(data)
-            print('filters', filters)
-            account_lines, retained, subtotal = self.process_data(data)
-            print('account_lines', account_lines)
-            print('retained', retained)
-            print('subtotal', subtotal)
-            return filters, account_lines, retained, subtotal
+            # print('filters', filters)
+            account_lines, retained, subtotal,date_range = self.process_data(data)
+
+            # print('date_range', date_range)
+            return filters, account_lines, retained, subtotal,date_range
 
     def action_pdf(self):
         filters, account_lines, retained, subtotal = self.get_report_datas()
-        print('account_lines',account_lines)
+        # print('account_lines',account_lines)
 
         return self.env.ref(
             'account_dynamic_reports'
