@@ -8,6 +8,7 @@ class InsGeneralLedgerXlsx(models.AbstractModel):
     _inherit = 'report.dynamic_xlsx.ins_general_ledger_xlsx'
 
     def prepare_report_contents(self, data, acc_lines, filter):
+        print('dynamic_report  extends xlsx',data)
         data = data[0]
         self.row_pos += 3
 
@@ -45,8 +46,15 @@ class InsGeneralLedgerXlsx(models.AbstractModel):
         if acc_lines:
             for line in acc_lines:
                 self.row_pos += 1
-                self.sheet.merge_range(self.row_pos, 0, self.row_pos, 5,
-                                       '            ' + acc_lines[line].get('code') + ' - ' + acc_lines[line].get(
+                # before
+                # self.sheet.merge_range(self.row_pos, 0, self.row_pos, 5,
+                #                        '            ' + acc_lines[line].get('code') + ' - ' + acc_lines[line].get(
+                #                            'name'), self.line_header_left)
+
+
+                self.sheet.merge_range(self.row_pos, 0, self.row_pos, 3,
+                                   acc_lines[line].get('code') , self.line_header_left)
+                self.sheet.merge_range(self.row_pos, 4, self.row_pos, 5,acc_lines[line].get(
                                            'name'), self.line_header_left)
                 self.sheet.write_number(self.row_pos, 6, float(acc_lines[line].get('debit')), self.line_header)
                 self.sheet.write_number(self.row_pos, 7, float(acc_lines[line].get('credit')), self.line_header)

@@ -59,7 +59,7 @@
                             <t t-foreach="Accounts" t-as="account">
                                 <tr style="font-weight: bold;">
                                     <td colspan="6">
-                                        <span style="color: white;" t-esc="'..'"/>
+                                        <span style="color: white;"/>
                                         <span t-esc="account['code']"/>
                                         <span t-esc="account['name']"/>
                                     </td>

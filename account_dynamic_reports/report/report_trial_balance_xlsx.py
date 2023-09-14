@@ -185,7 +185,7 @@ class InsTrialBalanceXlsx(models.AbstractModel):
             #                           self.content_header)
 
     def prepare_report_contents(self, acc_lines, retained, subtotal, filter):
-
+        print('report_content trial balance',)
         self.row_pos += 3
         self.sheet.merge_range(self.row_pos, 1, self.row_pos, 3, 'Initial Balance', self.format_merged_header)
 

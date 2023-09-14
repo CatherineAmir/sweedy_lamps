@@ -528,6 +528,7 @@ class InsTrialBalance(models.TransientModel):
 
     def action_pdf(self):
         filters, account_lines, retained, subtotal = self.get_report_datas()
+        print('account_lines',account_lines)
         return self.env.ref(
             'account_dynamic_reports'
             '.action_print_trial_balance').with_context(landscape=True).report_action(

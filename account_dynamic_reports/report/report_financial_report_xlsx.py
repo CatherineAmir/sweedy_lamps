@@ -138,6 +138,7 @@ class InsFinancialReportXlsx(models.AbstractModel):
                                                 self.content_header_date)
 
     def prepare_report_contents(self, data):
+        # print('dynamic_report xlsx'.data)
         self.row_pos += 3
 
         if data['form']['debit_credit'] == 1:
@@ -157,6 +158,7 @@ class InsFinancialReportXlsx(models.AbstractModel):
                                     self.format_header)
 
             for a in data['report_lines']:
+                print('a......',a)
                 if a['level'] == 2:
                     self.row_pos += 1
                 self.row_pos += 1
@@ -224,7 +226,7 @@ class InsFinancialReportXlsx(models.AbstractModel):
             return False
 
     def generate_xlsx_report(self, workbook, data, record):
-
+        # print('general ledger report')
         self._define_formats(workbook)
         self.row_pos = 0
         self.row_pos_2 = 0

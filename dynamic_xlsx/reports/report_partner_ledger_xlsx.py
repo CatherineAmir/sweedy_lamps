@@ -322,6 +322,7 @@ class InsPartnerLedgerXlsx(models.AbstractModel):
             self.sheet.merge_range(0, 0, 0, 8, 'Partner Ledger'+' - '+data[0]['company_id'][1], self.format_title)
             self.dateformat = self.env.user.lang
             filters, account_lines = record.get_report_datas()
+            print('account_lines',account_lines)
             # Filter section
             self.prepare_report_filters(filters)
             # Content section

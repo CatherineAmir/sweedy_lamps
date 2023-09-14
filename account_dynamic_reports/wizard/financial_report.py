@@ -493,8 +493,11 @@ class InsFinancialReport(models.TransientModel):
     def action_pdf(self):
         ''' Button function for Pdf '''
         data = self.get_report_values()
+        print('data',data)
 
         my_data={'data':data}
+        print('my_data', my_data)
+
 
         # my_data=data
         return self.env.ref(

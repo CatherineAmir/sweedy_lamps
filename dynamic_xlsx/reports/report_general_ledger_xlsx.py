@@ -33,6 +33,7 @@ class InsGeneralLedgerXlsx(models.AbstractModel):
     _name = 'report.dynamic_xlsx.ins_general_ledger_xlsx'
     _inherit = 'report.report_xlsx.abstract'
 
+
     def _define_formats(self, workbook):
         """ Add cell formats to current workbook.
         Available formats:
@@ -206,6 +207,7 @@ class InsGeneralLedgerXlsx(models.AbstractModel):
                                       self.content_header)
 
     def prepare_report_contents(self, data, acc_lines, filter):
+        print('in prepare context',data[0])
         data = data[0]
         self.row_pos += 3
 
@@ -241,7 +243,11 @@ class InsGeneralLedgerXlsx(models.AbstractModel):
         if acc_lines:
             for line in acc_lines:
                 self.row_pos += 1
-                self.sheet.merge_range(self.row_pos, 0, self.row_pos, 4, '            ' + acc_lines[line].get('code') + ' - ' + acc_lines[line].get('name'), self.line_header_left)
+                # before
+                # self.sheet.merge_range(self.row_pos, 0, self.row_pos, 4, '            ' + acc_lines[line].get('code') + ' - ' + acc_lines[line].get('name'), self.line_header_left)
+                # after cathy
+                self.sheet.merge_range(self.row_pos, 0, self.row_pos, 2, acc_lines[line].get('code') , self.line_header_left)
+                self.sheet.merge_range(self.row_pos, 3, self.row_pos, 4,  acc_lines[line].get('name'), self.line_header_left)
                 self.sheet.write_number(self.row_pos, 5, float(acc_lines[line].get('debit')), self.line_header)
                 self.sheet.write_number(self.row_pos, 6, float(acc_lines[line].get('credit')), self.line_header)
                 self.sheet.write_number(self.row_pos, 7, float(acc_lines[line].get('balance')), self.line_header)
@@ -312,7 +318,7 @@ class InsGeneralLedgerXlsx(models.AbstractModel):
             return False
 
     def generate_xlsx_report(self, workbook, data, record):
-
+        print('report data xlsx general ledger',workbook,data,record)
         self._define_formats(workbook)
         self.row_pos = 0
         self.row_pos_2 = 0
@@ -329,6 +335,7 @@ class InsGeneralLedgerXlsx(models.AbstractModel):
         self.sheet.set_column(5, 5, 10)
         self.sheet.set_column(6, 6, 10)
         self.sheet.set_column(7, 7, 10)
+        # self.sheet.set_column(8, 8, 10)
 
         self.sheet_2.set_column(0, 0, 35)
         self.sheet_2.set_column(1, 1, 25)
@@ -354,6 +361,7 @@ class InsGeneralLedgerXlsx(models.AbstractModel):
             self.sheet.merge_range(0, 0, 0, 8, 'General Ledger'+' - '+data[0]['company_id'][1], self.format_title)
             self.dateformat = self.env.user.lang
             filters, account_lines = record.get_report_datas()
+            # print('account_lines',account_lines)
             # Filter section
             self.prepare_report_filters(filters)
             # Content section

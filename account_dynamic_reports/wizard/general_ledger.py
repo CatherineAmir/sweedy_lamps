@@ -560,6 +560,7 @@ class InsGeneralLedger(models.TransientModel):
                 'lines': []
             } for x in sorted(account_ids, key=lambda a:a.code)
         }
+        print('move_lines',move_lines)
         for account in account_ids:
 
             currency = account.company_id.currency_id or self.env.company.currency_id
@@ -678,6 +679,7 @@ class InsGeneralLedger(models.TransientModel):
                     move_lines[account.code]['count'] = len(current_lines)
                     move_lines[account.code]['pages'] = self.get_page_list(len(current_lines))
                     move_lines[account.code]['single_page'] = True if len(current_lines) <= FETCH_RANGE else False
+        print('move_lines',move_lines)
         return move_lines
 
     def get_page_list(self, total_count):
@@ -752,6 +754,7 @@ class InsGeneralLedger(models.TransientModel):
 
     def action_pdf(self):
         filters, account_lines = self.get_report_datas()
+        print('ledger_data',account_lines)
         return self.env.ref(
             'account_dynamic_reports'
             '.action_print_general_ledger').with_context(landscape=True).report_action(

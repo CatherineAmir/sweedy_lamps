@@ -97,9 +97,10 @@
                                         <th style="text-align:left;">Partner</th>
                                         <th style="text-align:left;">Move</th>
                                         <th style="text-align:left;">Reference</th>
-                                        <th style="text-align:right;padding-bottom:10px;">Debit</th>
-                                        <th style="text-align:right">Credit</th>
-                                        <th style="text-align:right">Balance</th>
+
+                                        <th style="text-align:left;padding-bottom:10px;">Debit</th>
+                                        <th style="text-align:left">Credit</th>
+                                        <th style="text-align:left">Balance</th>
                                     </tr>
                                 </t>
                             </thead>
@@ -108,7 +109,12 @@
                                     <td colspan="5">
                                         <span style="color: white;" t-esc="'..'"/>
                                         <span t-esc="Ledger_data[line]['name']"/>
+                                        <!--                                        catherine-->
+                                        <span style="color: white;" t-esc="'.....'"/>
+
+                                          <span t-esc="Ledger_data[line]['code']"/>
                                     </td>
+
                                     <td class="text-right">
                                         <span t-esc="Ledger_data[line]['debit']" t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
                                     </td>
@@ -144,7 +150,7 @@
                                                 <td><t t-esc="sub_line.get('lcode')"/></td>
                                                 <td><t t-esc="sub_line.get('partner_name')"/></td>
                                                 <td><t t-esc="sub_line.get('move_name')"/></td>
-                                                <td style="width:30%;"><t t-esc="sub_line.get('lname')"/></td>
+<!--                                                <td style="width:30%;"><t t-esc="sub_line.get('lname')"/></td>-->
                                                 <td class="text-right"><t t-esc="sub_line.get('debit')" t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/></td>
                                                 <td class="text-right"><t t-esc="sub_line.get('credit')" t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/></td>
                                                 <td class="text-right"><t t-esc="sub_line.get('balance')" t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/></td>

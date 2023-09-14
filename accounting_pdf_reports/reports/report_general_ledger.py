@@ -123,6 +123,7 @@ class ReportGeneralLedger(models.AbstractModel):
 
         accounts = docs if self.model == 'account.account' else self.env['account.account'].search([])
         accounts_res = self.with_context(data['form'].get('used_context',{}))._get_account_move_entry(accounts, init_balance, sortby, display_account)
+        print('in reports')
         return {
             'doc_ids': docids,
             'doc_model': self.model,

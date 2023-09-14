@@ -7,7 +7,13 @@ try:
     from xlsxwriter.utility import xl_rowcol_to_cell
 except ImportError:
     ReportXlsx = object
+def mysplit(s):
+    code = s.split(' ')[0]
 
+    len(code)
+    name=s[len(code):]
+
+    return name, code
 DATE_DICT = {
     '%m/%d/%Y' : 'mm/dd/yyyy',
     '%Y/%m/%d' : 'yyyy/mm/dd',
@@ -138,25 +144,30 @@ class InsFinancialReportXlsx(models.AbstractModel):
                                                 self.content_header_date)
 
     def prepare_report_contents(self, data):
+        print('finaicail report dynamic xlsx')
         self.row_pos += 3
 
         if data['form']['debit_credit'] == 1:
 
-            self.sheet.set_column(0, 0, 90)
-            self.sheet.set_column(1, 1, 15)
-            self.sheet.set_column(2, 3, 15)
-            self.sheet.set_column(3, 3, 15)
+            self.sheet.set_column(0, 0, 45)
+            self.sheet.set_column(1, 1, 45)
+            self.sheet.set_column(1, 1, 25)
+            self.sheet.set_column(2, 3,25 )
+            self.sheet.set_column(3, 3, 25)
 
-            self.sheet.write_string(self.row_pos, 0, _('Name'),
+            self.sheet.write_string(self.row_pos, 0, _('Code'),
                                     self.format_header)
-            self.sheet.write_string(self.row_pos, 1, _('Debit'),
+            self.sheet.write_string(self.row_pos, 1, _('Name'),
                                     self.format_header)
-            self.sheet.write_string(self.row_pos, 2, _('Credit'),
+            self.sheet.write_string(self.row_pos, 2, _('Debit'),
                                     self.format_header)
-            self.sheet.write_string(self.row_pos, 3, _('Balance'),
+            self.sheet.write_string(self.row_pos, 3, _('Credit'),
                                     self.format_header)
-
+            self.sheet.write_string(self.row_pos, 4, _('Balance'),
+                                    self.format_header)
+            # print("data['report_lines']", data['report_lines'][0])
             for a in data['report_lines']:
+
                 if a['level'] == 2:
                     self.row_pos += 1
                 self.row_pos += 1
@@ -166,11 +177,19 @@ class InsFinancialReportXlsx(models.AbstractModel):
                 else:
                     tmp_style_str = self.line_header_string_bold
                     tmp_style_num = self.line_header_bold
-                self.sheet.write_string(self.row_pos, 0, '   ' * len(a.get('list_len', [])) + a.get('name'),
-                                        tmp_style_str)
-                self.sheet.write_number(self.row_pos, 1, float(a.get('debit')), tmp_style_num)
-                self.sheet.write_number(self.row_pos, 2, float(a.get('credit')), tmp_style_num)
-                self.sheet.write_number(self.row_pos, 3, float(a.get('balance')), tmp_style_num)
+
+                name,code=mysplit( a.get('name'))
+
+
+
+                self.sheet.write_string(self.row_pos, 0,code,
+                                    tmp_style_str)
+
+                self.sheet.write_string(self.row_pos, 1, name,tmp_style_str)
+
+                self.sheet.write_number(self.row_pos, 2, float(a.get('debit')), tmp_style_num)
+                self.sheet.write_number(self.row_pos, 3, float(a.get('credit')), tmp_style_num)
+                self.sheet.write_number(self.row_pos, 4, float(a.get('balance')), tmp_style_num)
 
         if data['form']['debit_credit'] != 1:
 
@@ -178,15 +197,19 @@ class InsFinancialReportXlsx(models.AbstractModel):
             self.sheet.set_column(1, 1, 15)
             self.sheet.set_column(2, 2, 15)
 
-            self.sheet.write_string(self.row_pos, 0, _('Name'),
+            self.sheet.write_string(self.row_pos, 0, _('Code'),
+                                    self.format_header)
+            self.sheet.write_string(self.row_pos, 1, _('Name'),
                                     self.format_header)
             if data['form']['enable_filter']:
-                self.sheet.write_string(self.row_pos, 1, data['form']['label_filter'],
+                # print("data['form']['enable_filter']",data['form']['enable_filter'])
+                self.sheet.write_string(self.row_pos, 2, data['form']['label_filter'],
                                         self.format_header)
-                self.sheet.write_string(self.row_pos, 2, _('Balance'),
+                self.sheet.write_string(self.row_pos, 3, _('Balance'),
                                         self.format_header)
             else:
-                self.sheet.write_string(self.row_pos, 1, _('Balance'),
+                print("data['form']['enable_filter']", data['form']['enable_filter'])
+                self.sheet.write_string(self.row_pos, 2, _('Balance'),
                                         self.format_header)
 
             for a in data['report_lines']:
@@ -199,27 +222,30 @@ class InsFinancialReportXlsx(models.AbstractModel):
                 else:
                     tmp_style_str = self.line_header_string_bold
                     tmp_style_num = self.line_header_bold
-                self.sheet.write_string(self.row_pos, 0, '   ' * len(a.get('list_len', [])) + a.get('name'),
+
+                self.sheet.write_string(self.row_pos, 0, '   ' * len(a.get('list_len', [])) + a.get('code'),
+                                        tmp_style_str)
+                self.sheet.write_string(self.row_pos, 1, '   ' * len(a.get('list_len', [])) + a.get('name'),
                                         tmp_style_str)
                 if data['form']['enable_filter']:
-                    self.sheet.write_number(self.row_pos, 1, float(a.get('balance_cmp')), tmp_style_num)
-                    self.sheet.write_number(self.row_pos, 2, float(a.get('balance')), tmp_style_num)
+                    self.sheet.write_number(self.row_pos, 2, float(a.get('balance_cmp')), tmp_style_num)
+                    self.sheet.write_number(self.row_pos, 3, float(a.get('balance')), tmp_style_num)
                 else:
-                    self.sheet.write_number(self.row_pos, 1, float(a.get('balance')), tmp_style_num)
+                    self.sheet.write_number(self.row_pos, 2, float(a.get('balance')), tmp_style_num)
 
         if data.get('initial_balance') or data.get('current_balance') or data.get('ending_balance'):
             self.row_pos += 2
-            self.sheet.merge_range(self.row_pos, 1, self.row_pos, 2, 'Initial Cash Balance',
+            self.sheet.merge_range(self.row_pos, 2, self.row_pos, 3, 'Initial Cash Balance',
                                     tmp_style_num)
-            self.sheet.write_number(self.row_pos, 3, float(data.get('initial_balance')), tmp_style_num)
+            self.sheet.write_number(self.row_pos, 4, float(data.get('initial_balance')), tmp_style_num)
             self.row_pos += 1
-            self.sheet.merge_range(self.row_pos, 1, self.row_pos, 2, 'Current Cash Balance',
+            self.sheet.merge_range(self.row_pos, 2, self.row_pos, 3, 'Current Cash Balance',
                                    tmp_style_num)
-            self.sheet.write_number(self.row_pos, 3, float(data.get('current_balance')), tmp_style_num)
+            self.sheet.write_number(self.row_pos, 4, float(data.get('current_balance')), tmp_style_num)
             self.row_pos += 1
-            self.sheet.merge_range(self.row_pos, 1, self.row_pos, 2, 'Net Cash Balance',
+            self.sheet.merge_range(self.row_pos, 2, self.row_pos, 3, 'Net Cash Balance',
                                    tmp_style_num)
-            self.sheet.write_number(self.row_pos, 3, float(data.get('ending_balance')), tmp_style_num)
+            self.sheet.write_number(self.row_pos, 4, float(data.get('ending_balance')), tmp_style_num)
 
     def _format_float_and_dates(self, currency_id, lang_id):
 
