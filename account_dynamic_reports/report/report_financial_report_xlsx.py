@@ -226,7 +226,7 @@ class InsFinancialReportXlsx(models.AbstractModel):
             return False
 
     def generate_xlsx_report(self, workbook, data, record):
-        # print('general ledger report')
+
         self._define_formats(workbook)
         self.row_pos = 0
         self.row_pos_2 = 0

@@ -144,7 +144,7 @@ class InsFinancialReportXlsx(models.AbstractModel):
                                                 self.content_header_date)
 
     def prepare_report_contents(self, data):
-        print('finaicail report dynamic xlsx')
+
         self.row_pos += 3
 
         if data['form']['debit_credit'] == 1:
@@ -167,6 +167,7 @@ class InsFinancialReportXlsx(models.AbstractModel):
                                     self.format_header)
             # print("data['report_lines']", data['report_lines'][0])
             for a in data['report_lines']:
+                name, code = mysplit(a.get('name'))
 
                 if a['level'] == 2:
                     self.row_pos += 1
@@ -178,7 +179,7 @@ class InsFinancialReportXlsx(models.AbstractModel):
                     tmp_style_str = self.line_header_string_bold
                     tmp_style_num = self.line_header_bold
 
-                name,code=mysplit( a.get('name'))
+
 
 
 
@@ -193,9 +194,10 @@ class InsFinancialReportXlsx(models.AbstractModel):
 
         if data['form']['debit_credit'] != 1:
 
-            self.sheet.set_column(0, 0, 105)
-            self.sheet.set_column(1, 1, 15)
-            self.sheet.set_column(2, 2, 15)
+            self.sheet.set_column(0, 0, 50)
+            self.sheet.set_column(1, 1, 25)
+            self.sheet.set_column(2, 2, 25)
+            self.sheet.set_column(3, 3, 25)
 
             self.sheet.write_string(self.row_pos, 0, _('Code'),
                                     self.format_header)
@@ -208,11 +210,12 @@ class InsFinancialReportXlsx(models.AbstractModel):
                 self.sheet.write_string(self.row_pos, 3, _('Balance'),
                                         self.format_header)
             else:
-                print("data['form']['enable_filter']", data['form']['enable_filter'])
+
                 self.sheet.write_string(self.row_pos, 2, _('Balance'),
                                         self.format_header)
 
             for a in data['report_lines']:
+                name, code = mysplit(a.get('name'))
                 if a['level'] == 2:
                     self.row_pos += 1
                 self.row_pos += 1
@@ -223,10 +226,14 @@ class InsFinancialReportXlsx(models.AbstractModel):
                     tmp_style_str = self.line_header_string_bold
                     tmp_style_num = self.line_header_bold
 
-                self.sheet.write_string(self.row_pos, 0, '   ' * len(a.get('list_len', [])) + a.get('code'),
+                self.sheet.write_string(self.row_pos, 0, code,
                                         tmp_style_str)
-                self.sheet.write_string(self.row_pos, 1, '   ' * len(a.get('list_len', [])) + a.get('name'),
-                                        tmp_style_str)
+
+                self.sheet.write_string(self.row_pos, 1, name, tmp_style_str)
+                # self.sheet.write_string(self.row_pos, 0, '   ' * len(a.get('list_len', [])) + a.get('code'),
+                #                         tmp_style_str)
+                # self.sheet.write_string(self.row_pos, 1, '   ' * len(a.get('list_len', [])) + a.get('name'),
+                #                         tmp_style_str)
                 if data['form']['enable_filter']:
                     self.sheet.write_number(self.row_pos, 2, float(a.get('balance_cmp')), tmp_style_num)
                     self.sheet.write_number(self.row_pos, 3, float(a.get('balance')), tmp_style_num)
@@ -262,6 +269,7 @@ class InsFinancialReportXlsx(models.AbstractModel):
             return False
 
     def generate_xlsx_report(self, workbook, data, record):
+        print("in dynamic_xlsx")
 
         self._define_formats(workbook)
         self.row_pos = 0
