@@ -7,7 +7,7 @@ from dateutil.relativedelta import relativedelta
 from odoo.tools import DEFAULT_SERVER_DATE_FORMAT
 
 FETCH_RANGE = 2500
-
+# period_dict {0: {'bucket': 'As on', 'name': 'Not Due', 'start': '', 'stop': '2023-09-26'}, 1: {'bucket': 30, 'name': '0 - 30', 'start': '2023-09-25', 'stop': '2023-08-26'}, 2: {'bucket': 60, 'name': '31 - 60', 'start': '2023-08-25', 'stop': '2023-06-26'}, 3: {'bucket': 90, 'name': '61 - 90', 'start': '2023-06-25', 'stop': '2023-03-27'}, 4: {'bucket': 120, 'name': '91 - 120', 'start': '2023-03-26', 'stop': '2022-11-26'}, 5: {'bucket': 180, 'name': '121 - 180', 'start': '2022-11-25', 'stop': '2022-05-29'}, 6: {'bucket': 'Above', 'name': '180 +', 'start': '2022-05-28', 'stop': ''}}
 
 class InsPartnerAgeing(models.TransientModel):
     _name = "ins.partner.ageing"
@@ -120,6 +120,7 @@ class InsPartnerAgeing(models.TransientModel):
         ''' To show on report headers'''
 
         data = self.get_filters(default_filters={})
+        # print("data",data)
 
         filters = {}
 
@@ -173,7 +174,7 @@ class InsPartnerAgeing(models.TransientModel):
         language_id = self.env['res.lang'].search([('code', '=', lang)])[0]
 
         bucket_list = [self.bucket_1,self.bucket_2,self.bucket_3,self.bucket_4,self.bucket_5]
-
+        # print("bucket_list",bucket_list)
         start = False
         stop = date_from
         name = 'Not Due'
@@ -187,8 +188,16 @@ class InsPartnerAgeing(models.TransientModel):
         stop = date_from
         final_date = False
         for i in range(5):
+
             start = stop - relativedelta(days=1)
-            stop = start - relativedelta(days=bucket_list[i])
+            # print("start", start)
+            if i==0:
+                stop = start - relativedelta(days=bucket_list[i])
+            else:
+                stop = start - relativedelta(days = bucket_list[i]- bucket_list[i-1])
+
+            # print("stop",stop)
+            # print("bucket_list[i]",bucket_list[i])
             name = '0 - ' + str(bucket_list[0]) if i==0 else  str(str(bucket_list[i-1] + 1)) + ' - ' + str(bucket_list[i])
             final_date = stop
             periods[i+1] = {
@@ -403,6 +412,7 @@ class InsPartnerAgeing(models.TransientModel):
         2. Fetch partner_ids and loop through bucket range for values
         '''
         period_dict = self.prepare_bucket_list()
+        # print("period_dict",period_dict)
 
         domain = ['|',('company_id','=',self.env.company.id),('company_id','=',False)]
         if self.partner_type == 'customer':
@@ -540,6 +550,8 @@ class InsPartnerAgeing(models.TransientModel):
         return [i+1 for i in range(0, int(page_count))] or []
 
     def get_report_datas(self, default_filters={}):
+        # print("get_report_datas in partner aging")
+
         '''
         Main method for pdf, xlsx and js calls
         :param default_filters: Use this while calling from other methods. Just a dict
@@ -548,6 +560,8 @@ class InsPartnerAgeing(models.TransientModel):
         if self.validate_data():
             filters = self.process_filters()
             period_dict, ageing_lines = self.process_data()
+            # print("period_dict",period_dict)
+            # print("ageing_lines",ageing_lines)
             period_list = [period_dict[a]['name'] for a in period_dict]
             return filters, ageing_lines, period_dict, period_list
 
