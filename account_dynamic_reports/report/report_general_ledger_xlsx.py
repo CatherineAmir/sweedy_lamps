@@ -206,6 +206,7 @@ class InsGeneralLedgerXlsx(models.AbstractModel):
                                       self.content_header)
 
     def prepare_report_contents(self, data, acc_lines, filter):
+        print("in print prepare_report_contents")
         data = data[0]
         self.row_pos += 3
 

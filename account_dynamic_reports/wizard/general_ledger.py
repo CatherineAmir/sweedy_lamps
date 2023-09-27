@@ -524,6 +524,7 @@ class InsGeneralLedger(models.TransientModel):
         return count, offset_count, move_lines
 
     def process_data(self):
+
         '''
         It is the method for showing summary details of each accounts. Just basic details to show up
         Three sections,
@@ -742,6 +743,7 @@ class InsGeneralLedger(models.TransientModel):
         return filter_dict
 
     def get_report_datas(self, default_filters={}):
+        print("in report get_datats gl")
         '''
         Main method for pdf, xlsx and js calls
         :param default_filters: Use this while calling from other methods. Just a dict

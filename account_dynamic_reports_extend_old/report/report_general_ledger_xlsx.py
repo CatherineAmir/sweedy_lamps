@@ -8,7 +8,7 @@ class InsGeneralLedgerXlsx(models.AbstractModel):
     _inherit = 'report.dynamic_xlsx.ins_general_ledger_xlsx'
 
     def prepare_report_contents(self, data, acc_lines, filter):
-        print('dynamic_report  extends xlsx',data)
+        print(' in prepare_report_contents : dynamic_report  extends old xlsx',data)
         data = data[0]
         self.row_pos += 3
 
@@ -66,15 +66,17 @@ class InsGeneralLedgerXlsx(models.AbstractModel):
                                                                                      fetch_range=1000000)
 
                     for sub_line in sub_lines:
+                        # print("subline","subline")
                         if sub_line.get('move_name') == 'Initial Balance':
+                            # TODO
                             self.row_pos += 1
                             self.sheet.write_string(self.row_pos, 5, sub_line.get('move_name'),
                                                     self.line_header_light_initial)
-                            self.sheet.write_number(self.row_pos, 6, float(acc_lines[line].get('debit')),
+                            self.sheet.write_number(self.row_pos, 6, float(sub_line.get('debit')),
                                                     self.line_header_light_initial)
-                            self.sheet.write_number(self.row_pos, 7, float(acc_lines[line].get('credit')),
+                            self.sheet.write_number(self.row_pos, 7, float(sub_line.get('credit')),
                                                     self.line_header_light_initial)
-                            self.sheet.write_number(self.row_pos, 8, float(acc_lines[line].get('balance')),
+                            self.sheet.write_number(self.row_pos, 8, float(sub_line.get('balance')),
                                                     self.line_header_light_initial)
                         elif sub_line.get('move_name') not in ['Initial Balance', 'Ending Balance']:
                             self.row_pos += 1

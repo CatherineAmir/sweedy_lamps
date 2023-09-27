@@ -259,14 +259,18 @@ class InsGeneralLedgerXlsx(models.AbstractModel):
 
                     for sub_line in sub_lines:
                         if sub_line.get('move_name') == 'Initial Balance':
+                            print("move_name initial",sub_line.get('move_name'))
+                            print("move_name debit", float(sub_line[line].get('debit')))
+                            print("move_name credit", float(sub_line[line].get('credit')))
+                            print("move_name balance", float(sub_line[line].get('balance')))
                             self.row_pos += 1
                             self.sheet.write_string(self.row_pos, 4, sub_line.get('move_name'),
                                                     self.line_header_light_initial)
-                            self.sheet.write_number(self.row_pos, 5, float(acc_lines[line].get('debit')),
+                            self.sheet.write_number(self.row_pos, 5, float(sub_line[line].get('debit')),
                                                     self.line_header_light_initial)
-                            self.sheet.write_number(self.row_pos, 6, float(acc_lines[line].get('credit')),
+                            self.sheet.write_number(self.row_pos, 6, float(sub_line[line].get('credit')),
                                                     self.line_header_light_initial)
-                            self.sheet.write_number(self.row_pos, 7, float(acc_lines[line].get('balance')),
+                            self.sheet.write_number(self.row_pos, 7, float(sub_line[line].get('balance')),
                                                     self.line_header_light_initial)
                         elif sub_line.get('move_name') not in ['Initial Balance','Ending Balance']:
                             self.row_pos += 1
@@ -361,7 +365,7 @@ class InsGeneralLedgerXlsx(models.AbstractModel):
             self.sheet.merge_range(0, 0, 0, 8, 'General Ledger'+' - '+data[0]['company_id'][1], self.format_title)
             self.dateformat = self.env.user.lang
             filters, account_lines = record.get_report_datas()
-            # print('account_lines',account_lines)
+            print('account_lines dynamic xlsx',account_lines)
             # Filter section
             self.prepare_report_filters(filters)
             # Content section

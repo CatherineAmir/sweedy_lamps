@@ -204,6 +204,7 @@ class InsGeneralLedger(models.TransientModel):
         return count, offset_count, move_lines
 
     def process_data(self):
+        print("in process_data report extend  OLd GL")
         '''
         It is the method for showing summary details of each accounts. Just basic details to show up
         Three sections,
@@ -279,6 +280,8 @@ class InsGeneralLedger(models.TransientModel):
                     row['ending_bal'] = False
                     opening_balance += row['balance']
                     move_lines[account.code]['lines'].append(row)
+                    # print("row inital",row)
+                    # print(" move_lines[account.code]['lines'] inital ", move_lines[account.code]['lines'])
             WHERE_CURRENT = WHERE + " AND l.date >= '%s'" % data.get('date_from') + " AND l.date <= '%s'" % data.get(
                 'date_to')
             WHERE_CURRENT += " AND a.id = %s" % account.id
@@ -320,6 +323,10 @@ class InsGeneralLedger(models.TransientModel):
                 row['initial_bal'] = False
 
                 move_lines[account.code]['lines'].append(row)
+                # print("row current", row)
+                # print(" move_lines[account.code]['lines'] current ", move_lines[account.code]['lines'])
+
+
             if data.get('initial_balance'):
                 WHERE_FULL = WHERE + " AND l.date <= '%s'" % data.get('date_to')
             else:
@@ -360,4 +367,6 @@ class InsGeneralLedger(models.TransientModel):
                     move_lines[account.code]['count'] = len(current_lines)
                     move_lines[account.code]['pages'] = self.get_page_list(len(current_lines))
                     move_lines[account.code]['single_page'] = True if len(current_lines) <= FETCH_RANGE else False
+
+        # print("move_lines",move_lines)
         return move_lines

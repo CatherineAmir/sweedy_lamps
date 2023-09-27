@@ -8,6 +8,7 @@ class InsGeneralLedgerXlsx(models.AbstractModel):
     _inherit = 'report.dynamic_xlsx.ins_general_ledger_xlsx'
 
     def prepare_report_contents(self, data, acc_lines, filter):
+        # print("in prepare_report_contents account_dynamic_reports_extend gl")
         data = data[0]
         self.row_pos += 3
 

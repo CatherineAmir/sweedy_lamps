@@ -204,6 +204,7 @@ class InsGeneralLedger(models.TransientModel):
         return count, offset_count, move_lines
 
     def process_data(self):
+        print("in process_data report extend GL")
         '''
         It is the method for showing summary details of each accounts. Just basic details to show up
         Three sections,

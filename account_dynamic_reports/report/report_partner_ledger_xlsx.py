@@ -207,7 +207,7 @@ class InsPartnerLedgerXlsx(models.AbstractModel):
                                     self.format_header)
 
         if acc_lines:
-            print('acc_lines',acc_lines)
+            # print('acc_lines',acc_lines)
             for line in acc_lines:
                 self.row_pos += 1
                 self.sheet.merge_range(self.row_pos, 0, self.row_pos, 4, acc_lines[line].get('name'), self.line_header)
@@ -219,17 +219,17 @@ class InsPartnerLedgerXlsx(models.AbstractModel):
 
                     count, offset, sub_lines = self.record.build_detailed_move_lines(offset=0, partner=line,
                                                                                      fetch_range=1000000)
-                    print('sub_lines',sub_lines)
+                    # print('sub_lines',sub_lines)
                     for sub_line in sub_lines:
                         if sub_line.get('move_name') == 'Initial Balance':
                             self.row_pos += 1
                             self.sheet.write_string(self.row_pos, 4, sub_line.get('move_name'),
                                                     self.line_header_light_initial)
-                            self.sheet.write_number(self.row_pos, 5, float(acc_lines[line].get('debit')),
+                            self.sheet.write_number(self.row_pos, 5, float(sub_line.get('debit')),
                                                     self.line_header_light_initial)
-                            self.sheet.write_number(self.row_pos, 6, float(acc_lines[line].get('credit')),
+                            self.sheet.write_number(self.row_pos, 6, float(sub_line.get('credit')),
                                                     self.line_header_light_initial)
-                            self.sheet.write_number(self.row_pos, 7, float(acc_lines[line].get('balance')),
+                            self.sheet.write_number(self.row_pos, 7, float(sub_line.get('balance')),
                                                     self.line_header_light_initial)
                         elif sub_line.get('move_name') not in ['Initial Balance','Ending Balance']:
                             self.row_pos += 1
