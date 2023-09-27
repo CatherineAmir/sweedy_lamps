@@ -7,7 +7,7 @@ class StockCardReport(models.AbstractModel):
 
 
     def _get_ws_params(self, wb, data, product):
-        print("product in _get_ws_params ",product)
+
 
         filter_template = {
             "1_date_from": {
@@ -100,11 +100,7 @@ class StockCardReport(models.AbstractModel):
         return [ws_params]
 
     def _stock_card_report(self, wb, ws, ws_params, data, objects, product):
-        print("dataaaa",data)
-        print("ws_params",ws_params)
-        print("objects",objects)
-        print("objects_results",objects.results)
-        print("product",product)
+
 
         ws.set_portrait()
         ws.fit_to_pages(1, 0)
@@ -162,9 +158,9 @@ class StockCardReport(models.AbstractModel):
         product_lines = objects.results.filtered(
             lambda l: l.product_id == product and not l.is_initial
         )
-        print("product_lines",product_lines)
+
         for line in product_lines:
-            print("line",line)
+
             balance += line.product_in - line.product_out
             stock_valuation=self.env['stock.valuation.layer'].sudo().search([("stock_move_id","=",line.move_id.id),("product_id",'=',line.product_id.id)])
 
