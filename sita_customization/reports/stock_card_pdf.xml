@@ -15,9 +15,20 @@
 		<template id="sita_stock_card_pdf_inherit_lines" inherit_id="stock_card_report.report_stock_card_lines" name="sita_stock_card_pdf_inherit_lines">
 
 			<xpath expr="//div[hasclass('act_as_row')]" postion="inside">
-				<div class="act_as_cell right">
+				<t t-set="stock_valuation" t-value="request.env['stock.valuation.layer'].sudo().search([('stock_move_id','=',product_line.move_id.id),('product_id','=',product_line.product_id.id)])">
+
+				</t>
+				<t t-if="stock_valuation">
+					<div class="act_as_cell right">
+                <t t-esc="'{0:,.3f}'.format(stock_valuation.unit_cost)"/>
+            </div>
+				</t>
+				<t t-else="">
+						<div class="act_as_cell right">
                 <t t-esc="'{0:,.3f}'.format(product_line.product_id.standard_price)"/>
             </div>
+				</t>
+
             <div class="act_as_cell right">
                 <t t-esc="'{0:,.3f}'.format(product_line.product_id.list_price)"/>
             </div>

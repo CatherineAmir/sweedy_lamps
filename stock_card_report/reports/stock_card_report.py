@@ -8,7 +8,7 @@ class StockCardView(models.TransientModel):
     _name = "stock.card.view"
     _description = "Stock Card View"
     _order = "date"
-
+    move_id=fields.Many2one(comodel_name="stock.move")
     date = fields.Datetime()
     product_id = fields.Many2one(comodel_name="product.product")
     product_qty = fields.Float()
@@ -48,7 +48,7 @@ class StockCardReport(models.TransientModel):
         )
         self._cr.execute(
             """
-            SELECT move.date, move.product_id, move.product_qty,
+            SELECT move.id as move_id,move.date, move.product_id, move.product_qty,
                 move.product_uom_qty, move.product_uom, move.reference,
                 move.location_id, move.location_dest_id,
                 case when move.location_dest_id in %s
@@ -73,6 +73,7 @@ class StockCardReport(models.TransientModel):
             ),
         )
         stock_card_results = self._cr.dictfetchall()
+        print("stock_card_results",stock_card_results)
         ReportLine = self.env["stock.card.view"]
         self.results = [ReportLine.new(line).id for line in stock_card_results]
 
