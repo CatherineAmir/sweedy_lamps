@@ -163,8 +163,14 @@ class StockCardReport(models.AbstractModel):
 
             balance += line.product_in - line.product_out
             stock_valuation=self.env['stock.valuation.layer'].sudo().search([("stock_move_id","=",line.move_id.id),("product_id",'=',line.product_id.id)])
+            # print("stock_valuation",stock_valuation)
+            # print("stock_valuation",stock_valuation.mapped("unit_cost"))
+            # print("move_id",line.move_id)
+
 
             if stock_valuation:
+                stock_valuation=stock_valuation.filtered(lambda x: x.unit_cost > 0)[0]
+
                 cost=stock_valuation.unit_cost
             else:
                 cost=line.product_id.standard_price
