@@ -20,12 +20,12 @@
 				</t>
 				<t t-if="stock_valuation">
 					<div class="act_as_cell right">
-                <t t-esc="'{0:,.3f}'.format(stock_valuation.unit_cost)"/>
+                <t t-esc="'{0:,.3f}'.format(stock_valuation.filtered(lambda x: x.unit_cost&gt;0)[0].unit_cost)"/>
             </div>
 				</t>
 				<t t-else="">
 						<div class="act_as_cell right">
-                <t t-esc="'{0:,.3f}'.format(product_line.product_id.standard_price)"/>
+                <t t-esc="'{0:,.3f}'.format(0)"/>
             </div>
 				</t>
 

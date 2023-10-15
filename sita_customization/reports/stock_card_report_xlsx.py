@@ -100,8 +100,6 @@ class StockCardReport(models.AbstractModel):
         return [ws_params]
 
     def _stock_card_report(self, wb, ws, ws_params, data, objects, product):
-
-
         ws.set_portrait()
         ws.fit_to_pages(1, 0)
         ws.set_header(self.xls_headers["standard"])
@@ -160,20 +158,25 @@ class StockCardReport(models.AbstractModel):
         )
 
         for line in product_lines:
-
             balance += line.product_in - line.product_out
             stock_valuation=self.env['stock.valuation.layer'].sudo().search([("stock_move_id","=",line.move_id.id),("product_id",'=',line.product_id.id)])
+            # print("move_id", line.move_id.id)
             # print("stock_valuation",stock_valuation)
-            # print("stock_valuation",stock_valuation.mapped("unit_cost"))
-            # print("move_id",line.move_id)
-
+            # print("stock_valuation_ids",stock_valuation.mapped("id"))
+            # if len(stock_valuation)>1:
+            #     print("stock_valuation",stock_valuation)
+            #     print("stock_valuation_cost",stock_valuation.mapped("unit_cost"))
+            #     print("stock_valuation_read",stock_valuation.read())
+            #     print("move_id",line.move_id)
 
             if stock_valuation:
                 stock_valuation=stock_valuation.filtered(lambda x: x.unit_cost > 0)[0]
 
                 cost=stock_valuation.unit_cost
+                # print("cost",cost)
             else:
-                cost=line.product_id.standard_price
+                # print("in the else")
+                cost=0
             row_pos = self._write_line(
                 ws,
                 row_pos,

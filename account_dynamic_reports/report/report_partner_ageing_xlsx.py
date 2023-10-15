@@ -149,7 +149,9 @@ class InsPartnerAgeingXlsx(models.AbstractModel):
                                       self.content_header)
 
     def prepare_report_contents(self, data, period_dict, period_list, ageing_lines, filter):
+        print("in prepare_report_contents account_dynamic reports")
         data = data[0]
+        self.row_pos += 3
         self.row_pos += 3
 
         if self.record.include_details:

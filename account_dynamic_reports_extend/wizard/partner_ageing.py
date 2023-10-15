@@ -21,11 +21,14 @@ class InsPartnerAgeing(models.TransientModel):
         :param fetch_range: Global Variable. Can be altered from calling model
         :return: count(int-Total rows without offset), offset(integer), move_lines(list of dict)
         '''
+        print("account_dyn_rep_extend")
         as_on_date = self.as_on_date
         period_dict = self.prepare_bucket_list()
         period_list = [period_dict[a]['name'] for a in period_dict]
         company_id = self.env.company
-
+        print(partner,partner)
+        print("period_dict",period_dict)
+        print("as_on_date",as_on_date)
         type = ('receivable', 'payable')
         if self.type:
             type = tuple([self.type, 'none'])
@@ -57,6 +60,7 @@ class InsPartnerAgeing(models.TransientModel):
                 """ % (type, partner, as_on_date, company_id.id)
             self.env.cr.execute(sql)
             count = self.env.cr.fetchone()[0]
+            print("count",count)
 
             SELECT = """SELECT m.name AS move_name,
                                 p.ref AS partner_ref,
@@ -128,6 +132,7 @@ class InsPartnerAgeing(models.TransientModel):
                                     END AS %s,""" % (
                         period_dict[period].get('stop'), as_on_date, as_on_date, 'range_' + str(period))
                 else:
+                    print("in else no stop")
                     SELECT += """ CASE
                                     WHEN
                                         COALESCE(l.date_maturity,l.date) <= '%s' 
@@ -184,10 +189,12 @@ class InsPartnerAgeing(models.TransientModel):
                     FETCH FIRST %s ROWS ONLY
                 """ % (type, partner, as_on_date, company_id.id, offset, fetch_range)
             self.env.cr.execute(SELECT + sql)
+
             final_list = self.env.cr.dictfetchall() or 0.0
+            print("final_list",final_list)
             move_lines = []
             for m in final_list:
-                if (m['range_0'] or m['range_1'] or m['range_2'] or m['range_3'] or m['range_4'] or m['range_5']):
+                if (m['range_0'] or m['range_1'] or m['range_2'] or m['range_3'] or m['range_4'] or m['range_5'] or m["range_6"]):
                     move_lines.append(m)
 
             if move_lines:

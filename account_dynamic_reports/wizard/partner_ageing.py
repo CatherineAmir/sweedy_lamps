@@ -174,7 +174,7 @@ class InsPartnerAgeing(models.TransientModel):
         language_id = self.env['res.lang'].search([('code', '=', lang)])[0]
 
         bucket_list = [self.bucket_1,self.bucket_2,self.bucket_3,self.bucket_4,self.bucket_5]
-        # print("bucket_list",bucket_list)
+        print("bucket_list",bucket_list)
         start = False
         stop = date_from
         name = 'Not Due'
@@ -189,15 +189,16 @@ class InsPartnerAgeing(models.TransientModel):
         final_date = False
         for i in range(5):
 
-            start = stop - relativedelta(days=1)
-            # print("start", start)
+            start = stop #- relativedelta(days=1)
+
             if i==0:
                 stop = start - relativedelta(days=bucket_list[i])
             else:
+                print("bucket_list[i]- bucket_list[i-1]",bucket_list[i]- bucket_list[i-1])
                 stop = start - relativedelta(days = bucket_list[i]- bucket_list[i-1])
-
-            # print("stop",stop)
-            # print("bucket_list[i]",bucket_list[i])
+            print("start", start)
+            print("stop",stop)
+            print("bucket_list[i]",bucket_list[i])
             name = '0 - ' + str(bucket_list[0]) if i==0 else  str(str(bucket_list[i-1] + 1)) + ' - ' + str(bucket_list[i])
             final_date = stop
             periods[i+1] = {
@@ -228,10 +229,14 @@ class InsPartnerAgeing(models.TransientModel):
         :param fetch_range: Global Variable. Can be altered from calling model
         :return: count(int-Total rows without offset), offset(integer), move_lines(list of dict)
         '''
+        print("account_dyn_rep")
         as_on_date = self.as_on_date
         period_dict = self.prepare_bucket_list()
         period_list = [period_dict[a]['name'] for a in period_dict]
         company_id = self.env.company
+        print(partner, partner)
+        print("period_dict", period_dict)
+        print("as_on_date", as_on_date)
 
         type = ('receivable','payable')
         if self.type:
@@ -399,6 +404,7 @@ class InsPartnerAgeing(models.TransientModel):
                 return 0, 0, [], []
 
     def process_data(self):
+        print("in process data dynmaic report")
         ''' Query Start Here
         ['partner_id':
             {'0-30':0.0,
@@ -412,7 +418,7 @@ class InsPartnerAgeing(models.TransientModel):
         2. Fetch partner_ids and loop through bucket range for values
         '''
         period_dict = self.prepare_bucket_list()
-        # print("period_dict",period_dict)
+        print("period_dict",period_dict)
 
         domain = ['|',('company_id','=',self.env.company.id),('company_id','=',False)]
         if self.partner_type == 'customer':
@@ -560,8 +566,8 @@ class InsPartnerAgeing(models.TransientModel):
         if self.validate_data():
             filters = self.process_filters()
             period_dict, ageing_lines = self.process_data()
-            # print("period_dict",period_dict)
-            # print("ageing_lines",ageing_lines)
+            print("period_dict",period_dict)
+            print("ageing_lines",ageing_lines)
             period_list = [period_dict[a]['name'] for a in period_dict]
             return filters, ageing_lines, period_dict, period_list
 
