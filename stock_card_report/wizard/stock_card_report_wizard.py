@@ -13,6 +13,9 @@ class StockCardReportWizard(models.TransientModel):
     date_from = fields.Date(string="Start Date")
     date_to = fields.Date(string="End Date")
     location_id = fields.Many2one(
+        comodel_name="stock.location", string="Location", required=False
+    )
+    location_ids = fields.Many2many(
         comodel_name="stock.location", string="Location", required=True
     )
     product_ids = fields.Many2many(
@@ -55,6 +58,7 @@ class StockCardReportWizard(models.TransientModel):
             "date_to": self.date_to or fields.Date.context_today(self),
             "product_ids": [(6, 0, self.product_ids.ids)],
             "location_id": self.location_id.id,
+            "location_ids": self.location_ids.ids,
         }
 
     def _export(self, report_type):

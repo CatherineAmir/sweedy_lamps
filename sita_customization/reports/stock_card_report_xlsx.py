@@ -26,10 +26,15 @@ class StockCardReport(models.AbstractModel):
             },
             "3_location": {
                 "header": {"value": "Location"},
+                # "data": {
+                #     "value": self._render("location"),
+                #     "format": self.format_tcell_center,
+                # },
                 "data": {
-                    "value": self._render("location"),
+                    "value": self._render("locations"),
                     "format": self.format_tcell_center,
                 },
+                "width": 50,
             },
         }
         initial_template = {
@@ -127,6 +132,7 @@ class StockCardReport(models.AbstractModel):
                 "date_from": objects.date_from or "",
                 "date_to": objects.date_to or "",
                 "location": objects.location_id.display_name or "",
+                "locations": '\t'.join(objects.location_ids.mapped('display_name')) or "",
             },
             col_specs="col_specs_filter",
             wanted_list="wanted_list_filter",

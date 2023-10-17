@@ -16,6 +16,7 @@ class StockCardView(models.TransientModel):
     product_uom = fields.Many2one(comodel_name="uom.uom")
     reference = fields.Char()
     location_id = fields.Many2one(comodel_name="stock.location")
+    location_ids = fields.Many2many(comodel_name="stock.location")
     location_dest_id = fields.Many2one(comodel_name="stock.location")
     is_initial = fields.Boolean()
     product_in = fields.Float()
@@ -31,6 +32,7 @@ class StockCardReport(models.TransientModel):
     date_to = fields.Date()
     product_ids = fields.Many2many(comodel_name="product.product")
     location_id = fields.Many2one(comodel_name="stock.location")
+    location_ids = fields.Many2many(comodel_name = "stock.location")
 
     # Data fields, used to browse report data
     results = fields.Many2many(
@@ -43,9 +45,13 @@ class StockCardReport(models.TransientModel):
         self.ensure_one()
         date_from = self.date_from or "0001-01-01"
         self.date_to = self.date_to or fields.Date.context_today(self)
+        # locations = self.env["stock.location"].search(
+        #     [("id", "child_of", [self.location_id.id])]
+        # )
         locations = self.env["stock.location"].search(
-            [("id", "child_of", [self.location_id.id])]
+            [("id", "child_of", self.location_ids.ids)]
         )
+
         self._cr.execute(
             """
             SELECT move.id as move_id,move.date, move.product_id, move.product_qty,
@@ -73,7 +79,7 @@ class StockCardReport(models.TransientModel):
             ),
         )
         stock_card_results = self._cr.dictfetchall()
-        print("stock_card_results",stock_card_results)
+        # print("stock_card_results",stock_card_results)
         ReportLine = self.env["stock.card.view"]
         self.results = [ReportLine.new(line).id for line in stock_card_results]
 
