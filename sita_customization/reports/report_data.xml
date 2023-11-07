@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<data>
+		<report string="Inventory Report XLSX"
+		        id="action_inventory_report_xlsx"
+		        model="report.inventory.report"
+		        name="sita_customization.report_inventory_report_xlsx"
+		        file="All Inventory report"
+		        report_type="xlsx"
+		        attachment_use="False"/>
+
+
+		<report string="Inventory Report PDF"
+		        id="action_inventory_report_pdf"
+		        model="report.inventory.report"
+		         name="sita_customization.report_inventory_report_pdf"
+		        file="sita_customization.report_inventory_report_pdf"
+		        report_type="qweb-pdf"
+		        print_report_name="All Inventory Report"
+			/>
+
+
+	</data>
+</odoo>
