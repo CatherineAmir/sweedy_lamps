@@ -2,7 +2,7 @@
 <odoo>
 	<data>
 		<report string="Inventory Report XLSX"
-		        id="action_inventory_report_xlsx"
+		        id="inventory_report_xlsx"
 		        model="report.inventory.report"
 		        name="sita_customization.report_inventory_report_xlsx"
 		        file="All Inventory report"
@@ -11,7 +11,7 @@
 
 
 		<report string="Inventory Report PDF"
-		        id="action_inventory_report_pdf"
+		        id="inventory_report_pdf"
 		        model="report.inventory.report"
 		         name="sita_customization.report_inventory_report_pdf"
 		        file="sita_customization.report_inventory_report_pdf"

@@ -88,12 +88,18 @@ class InventoryReportsModel(models.TransientModel):
             SELECT 'header' as type ,'' as move_id,'' as move_date,product.id,p_temp.name as product_name,
             product.default_code as product_code,p_cat.name as product_category,
             uom.name as product_uom ,
+            '' as move_name,'' as move_reference,''
+             as move_display_name,
+             '' as picking_display_name,
+            '' as picking_type_id,
+            '' as picking_code,
+            
             True as is_initial,
           
             
             case 
             when move.state='done' and  CAST(move.date as date)  < %s 
-            then  COALESCE(sum( st_val.quantity ),0.0) 
+            then  COALESCE(sum(st_val.quantity ),0.0) 
             else 0.0 
             end  as opening_quantity, 
 
@@ -137,12 +143,13 @@ class InventoryReportsModel(models.TransientModel):
            FULL  join stock_move as move
            on product.id =move.product_id 
             
-          Full Join stock_valuation_layer as st_val
+          inner stock_valuation_layer as st_val
             on move.id=st_val.stock_move_id
            
             
             inner join product_template as p_temp
             on p_temp.id=product.product_tmpl_id
+          
             inner join product_category as p_cat
             on p_temp.categ_id=p_cat.id
             
@@ -253,13 +260,20 @@ class InventoryReportsModel(models.TransientModel):
              SELECT 'line' as type ,move.id as move_id ,move.date as move_date,move.product_id ,
              p_temp.name as product_name,product.default_code as product_code,p_cat.name as product_category,
              uom.name as product_uom ,
-            move.name,move.reference,stock_picking.origin||'/'||product.default_code || ': ' ||stock_location_source.name
+            move.name as move_name,move.reference as move_reference,stock_picking.origin||'/'||product.default_code || ': ' ||stock_location_source.name
             || '>' || stock_location_dest.name
              as move_display_name,
               case when picking_type.warehouse_id is not null then stock_warehouse.name || ': '|| picking_type.name else  picking_type.name end as picking_display_name,
             picking_type.id as picking_type_id,
             picking_type.code as picking_code,
             False  as is_initial,
+            0 as opening_quantity,
+            0 as opening_value,
+            0 as opening_weigthed_avg,
+            0 as ending_quantity,
+            0 as ending_value,
+            0 as ending_weigted_avg,
+            
               case when st_val.quantity<0 then ABS(st_val.quantity) else 0 end  as out_quantity,
              case when st_val.quantity<0 then ABS(st_val.value) else 0 end  as out_value,
                 case when st_val.quantity>0 then st_val.quantity else 0 end  as in_quantity,
@@ -275,23 +289,23 @@ class InventoryReportsModel(models.TransientModel):
     
             inner join uom_uom as uom
             on move.product_uom=uom.id
-              inner join stock_picking_type as picking_type
+              full outer join stock_picking_type as picking_type
             on move.picking_type_id=picking_type.id
             
-            inner join stock_picking
+            full outer join stock_picking
             on move.picking_id=stock_picking.id
             
-            inner join stock_warehouse
+            full outer join stock_warehouse
             on picking_type.warehouse_id=stock_warehouse.id
             
             
-            inner join stock_location as stock_location_source 
+            full outer join stock_location as stock_location_source 
             on stock_location_source.id= move.location_id
             
-            inner join stock_location as stock_location_dest 
+            full outer join stock_location as stock_location_dest 
             on stock_location_dest.id= move.location_dest_id
             
-            Inner Join stock_valuation_layer as st_val
+            full outer Join stock_valuation_layer as st_val
             on move.id=st_val.stock_move_id
             
              where move.state='done' and move.product_id=%s
@@ -301,7 +315,7 @@ class InventoryReportsModel(models.TransientModel):
              
         
             """
-            print((p,))
+            # print((p,))
             self._cr.execute(query2,(p,date_from,self.date_to))
 
             # self._cr.execute(query,(str(p),))
@@ -318,8 +332,8 @@ class InventoryReportsModel(models.TransientModel):
                     product_dicts[str(p)]['header']['in_quantity']=sum([ line ['in_quantity'] if line ['in_quantity']!=None else  0 for line in product_stock_moves_lines])
                 except Exception as e:
                     print(" error",e)
-                    print("product_dicts[str(p)]['header']['in_quantity']",product_dicts[str(p)]['header']['in_quantity'])
-                    print("[ line ['in_quantity'] if line ['in_quantity']!=None else  0 for line in product_stock_moves_lines]",[ line ['in_quantity'] if line ['in_quantity']!=None else  0 for line in product_stock_moves_lines])
+                    # print("product_dicts[str(p)]['header']['in_quantity']",product_dicts[str(p)]['header']['in_quantity'])
+                    # print("[ line ['in_quantity'] if line ['in_quantity']!=None else  0 for line in product_stock_moves_lines]",[ line ['in_quantity'] if line ['in_quantity']!=None else  0 for line in product_stock_moves_lines])
 
                 product_dicts[str(p)]['header']['in_value']=sum([ line ['in_value']  if  line ['in_value'] else 0 for line in product_stock_moves_lines])
                 product_dicts[str(p)]['header']['out_quantity']=sum([ line ['out_quantity'] if  line ['out_quantity'] else 0 for line in product_stock_moves_lines])
@@ -329,13 +343,14 @@ class InventoryReportsModel(models.TransientModel):
                 product_dicts[str(p)]['header']['ending_weigted_avg']= product_dicts[str(p)]['header']['ending_value']/product_dicts[str(p)]['header']['ending_quantity'] if product_dicts[str(p)]['header']['ending_quantity'] else 1
 
 
-                print('lines',product_stock_moves_lines)
+                # print('lines',product_stock_moves_lines)
             product_dicts[str(p)]['lines']=product_stock_moves_lines
             results.append( product_dicts[str(p)]['header'])
 
             results=results+product_stock_moves_lines
-            print('product_dicts[p]',product_dicts[str(p)])
-        print(results)
+        #     print('product_dicts[p]',product_dicts[str(p)])
+        # print(results)
+        return results
         # self.results=results
 
 
@@ -345,10 +360,11 @@ class InventoryReportsModel(models.TransientModel):
         self.ensure_one()
         action=(
             report_type=="xlsx"
-            and self.env.ref("sita_customization.action_inventory_report_xlsx")
-            or self.env.ref("sita_customization.action_inventory_report_pdf")
+            and self.env.ref("sita_customization.inventory_report_xlsx")
+            or self.env.ref("sita_customization.inventory_report_pdf")
 
         )
+        # print("action",action)
         return action.report_action(self,config = False)
 
 
