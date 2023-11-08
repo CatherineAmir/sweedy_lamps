@@ -456,8 +456,13 @@ class InventoryReportsModel(models.TransientModel):
             or self.env.ref("sita_customization.inventory_report_pdf")
 
         )
-        # print("action",action)
-        return action.report_action(self,config = False)
+        data=self._compute_results()
+        print("data",data)
+        data={
+            'lines':data
+        }
+        # todo one call for compute
+        return action.report_action(self,config = False,data=data)
 
 
     def _get_html(self):

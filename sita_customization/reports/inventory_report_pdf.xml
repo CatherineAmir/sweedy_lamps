@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<data>
+		<template id="report_inventory_report_pdf"  name="report_inventory_report_pdf_template">
+			 <t t-call="web.html_container">
+                <t t-call="web.external_layout">
+<!--               <link rel="stylesheet" type="text/css" href="/mbi/static/src/css/reports.css"/>-->
+             <div class="font">
+                        <div class="page">
+                            <div class="row mt24">
+                                <table class="table table-bordered sticky-header" style="border-size:2;">
+                                <thead class="text-center" scope="col"
+                                       style="background-color:#BDBDBD; font-size:14px; font-weight:600; color:#212121;
+                                        background: !important; padding-top:10px;">
+                                        <t t-set="headers" t-value='[
+            "Product Code",
+            "Product Description",
+            "Product Category",
+            "Product Unit of Measure",
+            "Stock Move Date",
+            "stock Move Type",
+            "stock Move Name",
+            "Stock Move Reference",
+            "Stock Move Operation type",
+            "Opening Quantity",
+            "Opening Value",
+            "Opening Weighed Average",
+            "In Quantity",
+            "In Value",
+            "Out Quantity",
+            "Out Value",
+            "Ending Quantity",
+            "Ending Value",
+            "Ending Weighed Average",
+            "Type",
+        ]'/>
+	                                      <tr>
+                                        <t t-foreach="headers" t-as="h">
+                                           <th><t t-esc="h"/></th>
+                                       </t>
+                                        </tr>
+
+                                </thead>
+	                                 <tbody class="text-center" style="font-size:12px;border: 1px solid black;
+                                        border-collapse: collapse;">
+		                                   <tr t-foreach="lines" t-as="line" style="background-color:#c8e6e1;font-size:14px; font-weight:600;border: 1px solid black;
+                                        border-collapse: collapse;">
+			                                    <t t-if="line['type']=='header'">
+                                                    <t t-set="style" t-value="'background-color:#ede9da'" />
+                                                </t>
+
+                                                <t t-else="">
+
+                                                    <t t-set="style" t-value="'background-color:#FFFFFF'" />
+
+                                                 </t>
+
+
+
+			                                   <td t-att-style="style" >
+
+                                             <span t-esc="line['product_code']" />
+                                             </td>
+			                                   <td t-att-style="style" >
+
+                                             <span t-esc="line['product_name']" />
+                                             </td>
+			                                   <td t-att-style="style" >
+
+                                             <span t-esc="line['product_category']" />
+                                             </td>
+			                                   <td t-att-style="style" >
+
+                                             <span t-esc="line['product_uom']" />
+                                             </td>
+
+			                                  <td t-att-style="style">
+				                                  <t t-if="line['type']=='header'">
+					                                  <span t-esc="''"></span>
+				                                  </t>
+				                                  <t t-else="">
+					                                   <span t-esc="line['move_date']" />
+				                                  </t>
+			                                  </td>
+
+			                                      <td t-att-style="style" >
+
+                                             <span t-esc="line['picking_code'] or ''"  />
+                                             </td>   <td t-att-style="style" >
+
+                                             <span t-esc="line['move_name'] or ''"  />
+                                             </td>
+
+			                                   <td t-att-style="style" >
+
+                                             <span t-esc="line['move_reference'] or ''"  />
+                                             </td>
+
+			                                   <td t-att-style="style" >
+
+                                             <span t-esc="line['picking_display_name'] or ''"  />
+                                             </td>
+			                                   <td t-att-style="style" >
+
+                                             <span t-esc="line['opening_value']" t-options='{"widget": "float", "precision": 2}'  />
+
+			                                   </td>
+			                                   <td t-att-style="style" >
+
+                                             <span t-esc="line['opening_weigthed_avg']" t-options='{"widget": "float", "precision": 2}'  />
+
+			                                   </td>
+			                                   <td t-att-style="style" >
+
+                                             <span t-esc="line['in_quantity']" t-options='{"widget": "float", "precision": 2}'  />
+
+			                                   </td>
+			                                   <td t-att-style="style" >
+
+                                             <span t-esc="line['in_value']" t-options='{"widget": "float", "precision": 2}'  />
+
+			                                   </td>
+			                                   <td t-att-style="style" >
+
+                                             <span t-esc="line['out_quantity']" t-options='{"widget": "float", "precision": 2}'  />
+
+			                                   </td>
+
+			                                   <td t-att-style="style" >
+
+                                             <span t-esc="line['out_quantity']" t-options='{"widget": "float", "precision": 2}'  />
+
+			                                   </td>
+			                                   <td t-att-style="style" >
+
+                                             <span t-esc="line['out_value']" t-options='{"widget": "float", "precision": 2}'  />
+
+			                                   </td>
+			                                   <td t-att-style="style" >
+
+                                             <span t-esc="line['ending_quantity']" t-options='{"widget": "float", "precision": 2}'  />
+
+			                                   </td>
+
+			                                   <td t-att-style="style" >
+
+                                             <span t-esc="line['ending_value']" t-options='{"widget": "float", "precision": 2}'  />
+
+			                                   </td>
+			                                   <td t-att-style="style" >
+
+                                             <span t-esc="line['ending_weigted_avg']" t-options='{"widget": "float", "precision": 2}'  />
+
+			                                   </td>
+
+
+
+		                                   </tr>
+
+	                                </tbody>
+
+
+
+
+                                </table>
+                            </div>
+                        </div>
+             </div>
+
+
+                </t>
+			 </t>
+
+		</template>
+
+
+	</data>
+</odoo>

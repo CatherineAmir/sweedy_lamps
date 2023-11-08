@@ -18,9 +18,9 @@
 				<t t-set="stock_valuation" t-value="request.env['stock.valuation.layer'].sudo().search([('stock_move_id','=',product_line.move_id.id),('product_id','=',product_line.product_id.id)])">
 
 				</t>
-				<t t-if="stock_valuation">
+				<t t-if="stock_valuation and stock_valuation.filtered(lambda x: abs(x.unit_cost)&gt;0) ">
 					<div class="act_as_cell right">
-                <t t-esc="'{0:,.3f}'.format(stock_valuation.filtered(lambda x: x.unit_cost&gt;0)[0].unit_cost)"/>
+                <t t-esc="'{0:,.3f}'.format(stock_valuation.filtered(lambda x: abs(x.unit_cost)&gt;0)[0].unit_cost)"/>
             </div>
 				</t>
 				<t t-else="">

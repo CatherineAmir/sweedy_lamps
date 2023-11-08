@@ -183,7 +183,7 @@ class InventoryReport(models.AbstractModel):
             "Ending Quantity",
             "Ending Value",
             "Ending Weighed Average",
-            "type",
+            "Type",
         ]
         for h in range(0,len(headers)):
             self.sheet.write_string(self.row_pos, h, headers[h],

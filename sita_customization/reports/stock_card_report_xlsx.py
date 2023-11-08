@@ -175,7 +175,7 @@ class StockCardReport(models.AbstractModel):
             #     print("stock_valuation_read",stock_valuation.read())
             #     print("move_id",line.move_id)
 
-            if stock_valuation:
+            if stock_valuation and stock_valuation.filtered(lambda x: x.unit_cost > 0):
                 stock_valuation=stock_valuation.filtered(lambda x: x.unit_cost > 0)[0]
 
                 cost=stock_valuation.unit_cost

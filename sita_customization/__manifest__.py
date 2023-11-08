@@ -26,8 +26,11 @@
         # 'security/ir.model.access.csv',
         'reports/stock_card_pdf.xml',
         'views/stock_quant_tree.xml',
+        'reports/inventory_report_pdf.xml',
         'reports/report_data.xml',
         'wizards/inventory_report_wizard.xml',
+        'data/inventory_report_paper_format.xml',
+
 
     ],
     # only loaded in demonstration mode
