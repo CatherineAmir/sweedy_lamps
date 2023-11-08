@@ -39,5 +39,5 @@ class InventoryReport(models.TransientModel):
         model = self.env["report.inventory.report"]
         report = model.create(self._prepare_inventory_report())
         # report._compute_results()
-        print('report',report)
+        # print('report',report)
         return report.print_report(report_type)

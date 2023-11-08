@@ -69,6 +69,7 @@ class InventoryReport(models.AbstractModel):
             'bottom': True,
             'bg_color': '#BDBDBD',
             'border': 1,
+            'text_wrap':True,
         })
         self.line_header_left = workbook.add_format({
             'bold': True,
@@ -77,6 +78,7 @@ class InventoryReport(models.AbstractModel):
             'top': True,
             'font': 'Arial',
             'bottom': True,
+            'text_wrap': True,
         })
         self.line_header_light = workbook.add_format({
             'bold': False,
@@ -123,7 +125,7 @@ class InventoryReport(models.AbstractModel):
         self.line_header_light_date.num_format = DATE_DICT.get(lang_id.date_format, 'dd/mm/yyyy')
         self.content_header_date.num_format = DATE_DICT.get(lang_id.date_format, 'dd/mm/yyyy')
     def generate_xlsx_report(self, workbook, data, record):
-        print('report inventory report xlsx', workbook, data, record)
+
         self._define_formats(workbook)
         self.row_pos = 0
 
@@ -132,7 +134,13 @@ class InventoryReport(models.AbstractModel):
 
         self.sheet = workbook.add_worksheet('Inventory Report')
         for i in range(0,20):
-            self.sheet.set_column(i, i, 30)
+            if i in [0,1,6]:
+                self.sheet.set_column(i, i, 40)
+            elif i in [x for x in range(9,18)]:
+                self.sheet.set_column(i, i, 10)
+
+            else:
+                self.sheet.set_column(i, i, 25)
         # todo check this
         self.sheet.freeze_panes(4, 0)
         self.sheet.screen_gridlines = True
@@ -144,7 +152,7 @@ class InventoryReport(models.AbstractModel):
             data = record._compute_results()
 
 
-            self.sheet.merge_range(0, 0, 0, 8, 'Total Inventory      ' + 'From {}   To {}'.format(str(record.date_from),str(record.date_to)), self.format_title)
+            self.sheet.merge_range(0, 0, 0, 8, 'Total Inventory      ' + 'From {}   To {}'.format(datetime.strptime(str(self.convert_to_date(record.date_from)),"%Y-%m-%d  %H:%M:%S").strftime("%d/%m/%Y"),datetime.strptime(str(self.convert_to_date(record.date_to)),"%Y-%m-%d  %H:%M:%S").strftime("%d/%m/%Y")), self.format_title)
             self.dateformat = self.env.user.lang
             self.prepare_report_contents(data)
     def convert_to_date(self, datestring=False):
@@ -175,6 +183,7 @@ class InventoryReport(models.AbstractModel):
             "Ending Quantity",
             "Ending Value",
             "Ending Weighed Average",
+            "type",
         ]
         for h in range(0,len(headers)):
             self.sheet.write_string(self.row_pos, h, headers[h],
@@ -196,10 +205,10 @@ class InventoryReport(models.AbstractModel):
 
 
 
-            self.sheet.write_string(self.row_pos, 5, line['picking_code'], format)
-            self.sheet.write_string(self.row_pos, 6, line['move_name'], format)
-            self.sheet.write_string(self.row_pos, 7, line['move_reference'], format)
-            self.sheet.write_string(self.row_pos, 8, line['picking_display_name'], format)
+            self.sheet.write_string(self.row_pos, 5, line['picking_code'] or '', format)
+            self.sheet.write_string(self.row_pos, 6, line['move_name'] or '', format)
+            self.sheet.write_string(self.row_pos, 7, line['move_reference'] or '', format)
+            self.sheet.write_string(self.row_pos, 8, line['picking_display_name'] or '', format)
             self.sheet.write_number(self.row_pos, 9, line['opening_quantity'], format)
             self.sheet.write_number(self.row_pos, 10, line['opening_value'], format)
             self.sheet.write_number(self.row_pos, 11, line['opening_weigthed_avg'] or 0, format)

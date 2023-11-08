@@ -74,7 +74,7 @@ class InventoryReportsModel(models.TransientModel):
         product_ids=self.env['product.product'].search([])
         results=[]
         for p in product_ids.ids:
-            print('p',p)
+            # print('p',p)
             product_dicts.update({
                 str(p):{
                     'header':{},
@@ -83,9 +83,103 @@ class InventoryReportsModel(models.TransientModel):
                 },
             })
             # inital
-            self._cr.execute(
-            """
-            SELECT 'header' as type ,'' as move_id,'' as move_date,product.id,p_temp.name as product_name,
+            # old
+        #     self._cr.execute(
+        #     """
+        #     SELECT 'header' as type ,'' as move_id,'' as move_date,product.id,p_temp.name as product_name,
+        #     product.default_code as product_code,p_cat.name as product_category,
+        #     uom.name as product_uom ,
+        #     '' as move_name,'' as move_reference,''
+        #      as move_display_name,
+        #      '' as picking_display_name,
+        #     '' as picking_type_id,
+        #     '' as picking_code,
+        #
+        #     True as is_initial,
+        #
+        #
+        #     case
+        #     when move.state='done' and  CAST(move.date as date)  < %s
+        #     then  COALESCE(sum(st_val.quantity ),0.0)
+        #     else 0.0
+        #     end  as opening_quantity,
+        #
+        #     case
+        #     when move.state='done' and  CAST(move.date as date)  < %s
+        #     then  COALESCE(sum( st_val.value ),0.0)
+        #     else 0.0
+        #     end  as opening_value,
+        #
+        #     case
+        #         when move.state='done' and  CAST(move.date as date)  < %s
+        #     then
+        #         sum(st_val.value::decimal )/
+        #         Case
+        #             when COALESCE(sum(st_val.quantity),0) >0
+        #                 then sum(st_val.quantity) else 1
+        #         end
+        #
+        #
+        #     else 0.0
+        #     end  as opening_weigthed_avg,
+        #    /*
+        #     0.0 as opening_quantity,
+        #     0.0 as opening_value,
+        #     0.0 as opening_weigthed_avg,
+        #     */
+        #     0.0 as in_quantity,
+        #     0.0 as in_value,
+        #     0.0 as out_quantity,
+        #     0.0 as out_value,
+        #     0.0 as ending_quantity,
+        #     0.0 as ending_value,
+        #     0.0 as ending_weigted_avg
+        #
+        #
+        #
+        #
+        #
+        #    From product_product product
+        #
+        #    FULL  join stock_move as move
+        #    on product.id =move.product_id
+        #
+        #   Full outer join stock_valuation_layer as st_val
+        #     on move.id=st_val.stock_move_id
+        #
+        #
+        #     inner join product_template as p_temp
+        #     on p_temp.id=product.product_tmpl_id
+        #
+        #     inner join product_category as p_cat
+        #     on p_temp.categ_id=p_cat.id
+        #
+        #     inner join uom_uom as uom
+        #     on p_temp.uom_id=uom.id
+        #     where product.id = %s
+        #
+        #
+        #      GROUP BY product.id,p_temp.name,p_cat.name, product.default_code,p_cat.name, uom.name,
+        #       move.state,move.date
+        #     ORDER BY product.id
+        #    /* move.date,move.Reference*/
+        #
+        #
+        #
+        #
+        #
+        # """,(
+        #         date_from,
+        #         date_from,
+        #         date_from,
+        #         p,
+        #
+        #
+        #     ),
+        # )
+
+            self._cr.execute("""
+            SELECT  Distinct 'header' as type , '' as move_id,''as move_date,product.id,p_temp.name as product_name,
             product.default_code as product_code,p_cat.name as product_category,
             uom.name as product_uom ,
             '' as move_name,'' as move_reference,''
@@ -96,36 +190,48 @@ class InventoryReportsModel(models.TransientModel):
             
             True as is_initial,
           
-            
+           
             case 
-            when move.state='done' and  CAST(move.date as date)  < %s 
-            then  COALESCE(sum(st_val.quantity ),0.0) 
+            when (select move.id from stock_move move where product_id=%s and move.state='done' and  CAST(move.date as date)  < %s limit 1) is not null 
+            then  (select COALESCE(sum(st_val.quantity ),0.0) from stock_valuation_layer as st_val 
+				   where (st_val.stock_move_id in
+						  (select move.id from stock_move move where product_id=%s and move.state='done' and  CAST(move.date as date) 
+												  < %s)))
             else 0.0 
             end  as opening_quantity, 
+			 case 
+            when (select move.id from stock_move move where product_id=%s and move.state='done' and  CAST(move.date as date)  < %s limit 1) is not null
+            then  (select COALESCE(sum(st_val.value ),0.0) from stock_valuation_layer as st_val 
+				   where (st_val.stock_move_id in(select move.id from stock_move move where product_id=%s and move.state='done' and  CAST(move.date as date) 
+												  < %s)))
+				
 
-            case 
-            when move.state='done' and  CAST(move.date as date)  < %s 
-            then  COALESCE(sum( st_val.value ),0.0) 
+			
             else 0.0 
-            end  as opening_value,
-
-            case 
-                when move.state='done' and  CAST(move.date as date)  < %s 
-            then
-                sum(st_val.value::decimal )/
-                Case  
-                    when COALESCE(sum(st_val.quantity),0) >0 
-                        then sum(st_val.quantity) else 1 
-                end   
-
-
-            else 0.0 
-            end  as opening_weigthed_avg,
-           /*
-            0.0 as opening_quantity,
-            0.0 as opening_value,
-            0.0 as opening_weigthed_avg,
-            */
+            end  as opening_value, 
+			
+			 case 
+            when (select move.id from stock_move move where product_id=%s and move.state='done' and  CAST(move.date as date)  < %s limit 1) is not null 
+																										  
+			then  ((select COALESCE(sum(st_val.value ),0.0) from stock_valuation_layer as st_val 
+				   where (st_val.stock_move_id in(select move.id from stock_move move where product_id=%s and move.state='done' and  CAST(move.date as date) 
+												  < %s)))::decimal)/
+				  (Case
+				  when (select COALESCE(sum(st_val.quantity ),0.0) from stock_valuation_layer as st_val 
+				   where (st_val.stock_move_id in(select move.id from stock_move move where product_id=%s and move.state='done' and  CAST(move.date as date) 
+												  < %s))) !=0
+				  then 
+				    (select COALESCE(sum(st_val.quantity ),0.0) from stock_valuation_layer as st_val 
+				   where (st_val.stock_move_id in(select move.id from stock_move move where product_id=%s and move.state='done' and  CAST(move.date as date) 
+												  < %s))) 
+				  else 1
+				  end)
+			
+			else 1
+			end as opening_weigthed_avg,
+				  
+--           
+--             
             0.0 as in_quantity,
             0.0 as in_value,
             0.0 as out_quantity,
@@ -139,14 +245,7 @@ class InventoryReportsModel(models.TransientModel):
             
             
            From product_product product
-         
-           FULL  join stock_move as move
-           on product.id =move.product_id 
-            
-          inner stock_valuation_layer as st_val
-            on move.id=st_val.stock_move_id
-           
-            
+     
             inner join product_template as p_temp
             on p_temp.id=product.product_tmpl_id
           
@@ -155,35 +254,29 @@ class InventoryReportsModel(models.TransientModel):
             
             inner join uom_uom as uom
             on p_temp.uom_id=uom.id
-            where product.id = %s 
+           
+		   where product.id = %s 
             
            
-             GROUP BY product.id,p_temp.name,p_cat.name, product.default_code,p_cat.name, uom.name,
-              move.state,move.date
+             GROUP BY product.id,p_temp.name,p_cat.name, product.default_code,p_cat.name, uom.name
+
             ORDER BY product.id 
-           /* move.date,move.Reference*/
-           
-            
-            
-        
-        
-        """,(
-                date_from,
-                date_from,
-                date_from,
-                p,
+            """,(
+                p,date_from,p,date_from,
+                p,date_from,p,date_from,
+                p,date_from,p,date_from,
+                p,date_from,p,date_from,
+                p
 
-
-            ),
-        )
+            ))
             initial_lines=self._cr.dictfetchall()
-            print("length of headers",len(initial_lines))
-            print('initial_line', initial_lines)
+            # print("length of headers",len(initial_lines))
+            # print('initial_line', initial_lines)
 
             # if len(initial_lines)
 
             product_dicts[str(p)]['header']=initial_lines[0]
-            print( 'initial_line',product_dicts)
+            # print( 'initial_line',product_dicts)
 
 
             # multilines
@@ -311,7 +404,7 @@ class InventoryReportsModel(models.TransientModel):
              where move.state='done' and move.product_id=%s
               and CAST(move.date as date)  >= %s
               and  CAST(move.date as date)<=%s
-              ORDER BY move.product_id
+              ORDER BY move.date
              
         
             """
@@ -323,7 +416,7 @@ class InventoryReportsModel(models.TransientModel):
 
 
             product_stock_moves_lines=self._cr.dictfetchall()
-            print('product_stock_moves_lines',product_stock_moves_lines)
+            # print('product_stock_moves_lines',product_stock_moves_lines)
 
             # print("[ line ['in_quantity'] if line ['in_quantity']!=None else  0 for line in product_stock_moves_lines]",[ line ['in_quantity'] if line ['in_quantity']!=None else  0 for line in product_stock_moves_lines])
             # print(product_dicts[str(p)]['header'])
@@ -348,10 +441,9 @@ class InventoryReportsModel(models.TransientModel):
             results.append( product_dicts[str(p)]['header'])
 
             results=results+product_stock_moves_lines
-        #     print('product_dicts[p]',product_dicts[str(p)])
-        # print(results)
+
         return results
-        # self.results=results
+
 
 
 
