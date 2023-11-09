@@ -1,4 +1,5 @@
 from odoo import fields, models, api
+from odoo.tools.safe_eval import safe_eval
 
 
 
@@ -9,8 +10,28 @@ class InventoryReport(models.TransientModel):
     date_to=fields.Date(string="Date To",required=0)
 
     def button_export_html(self):
-        # TODO
-        pass
+        """
+      This function will call the report action direct
+       """
+        self.ensure_one()
+        action=self.env.ref("sita_customization.action_all_inventory_report_html")
+        vals=action.read()[0]
+        # print("vals",vals)
+        context=vals.get("context",{})
+        if context:
+            context=safe_eval(context)
+        model = self.env["report.inventory.report"]
+        report = model.create(self._prepare_inventory_report())
+        context["active_id"]=report.id
+        context["active_ids"]=report.ids
+
+        print("vals after edit", vals)
+        context["results"]=report._compute_results()
+        vals["context"] = context
+        # print("context_url",context)
+
+        return vals
+
 
     def button_export_pdf(self):
         self.ensure_one()

@@ -17,7 +17,7 @@
 							</group>
 						</group>
 						<footer>
-<!--							<button name="button_export_html" string="VIEW" type="object" class="btn btn-primary"/>-->
+							<button name="button_export_html" string="VIEW" type="object" class="btn btn-primary"/>
 							<button name="button_export_pdf" string="PDF" type="object" class="btn btn-primary"/>
 							<button name="button_export_xlsx" string="EXCEL" type="object" class="btn btn-primary"/>
 							 <button string="Cancel" class="oe_link" special="cancel" />

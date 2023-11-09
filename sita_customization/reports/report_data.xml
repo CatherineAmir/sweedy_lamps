@@ -21,5 +21,15 @@
 		/>
 
 
+<!--		html report-->
+
+<!--		this is different as it is client action and like action not report-->
+
+		<record id="action_all_inventory_report_html" model="ir.actions.client">
+			<field name="name">ALL Inventory Report</field>
+			<field name="tag">all_inventory_report</field>
+			<field name="context" eval="{'active_model':'report.inventory.report'}"></field>
+		</record>
+
 	</data>
 </odoo>

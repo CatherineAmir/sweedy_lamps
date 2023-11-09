@@ -39,7 +39,7 @@ class InsPartnerAgeing(models.TransientModel):
             res.append((record.id, 'Ageing'))
         return res
 
-    as_on_date = fields.Date(string='As on date', required=True, default=fields.Date.today())
+    as_on_date = fields.Date(string='As on date', required=True, default=lambda self:fields.Date.today())
     bucket_1 = fields.Integer(string='Bucket 1', required=True, default=lambda self:self.env.company.bucket_1)
     bucket_2 = fields.Integer(string='Bucket 2', required=True, default=lambda self:self.env.company.bucket_2)
     bucket_3 = fields.Integer(string='Bucket 3', required=True, default=lambda self:self.env.company.bucket_3)

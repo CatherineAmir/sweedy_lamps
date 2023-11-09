@@ -466,9 +466,28 @@ class InventoryReportsModel(models.TransientModel):
 
 
     def _get_html(self):
-        pass
-    # TODO
+        """
+        this function will render html template
+
+        """
+        result={}
+        rcontext={}
+        report=self.browse(self._context.get("active_id"))
+        print(report)
+        if report:
+            rcontext["o"]=report
+            print("rcontext",rcontext)
+            result["html"]=self.env.ref("sita_customization.all_inventory_report_xml"
+                                        ).render(rcontext)#template_id
+            # todo
+
 
     @api.model
+
     def get_html(self,given_context=None):
+        """
+        this function is called by js
+
+        """
+        print("given context")
         return self.with_context(given_context)._get_html()

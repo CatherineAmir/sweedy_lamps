@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+	<template id="report_asset_backend" name="all_inventory_report assets"
+	          inherit_id="web.assets_backend">
+		<xpath expr="." position="inside">
+			<script type="text/javascript" src="/sita_customization/static/src/js/all_inventory_report_backend.js"/>
+		</xpath>
+	</template>
+
+	<template id="all_inventory_report_xml">
+		<h1>
+			ALl inventory Report
+		</h1>
+
+	</template>
+
+</odoo>
