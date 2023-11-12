@@ -480,6 +480,7 @@ class InventoryReportsModel(models.TransientModel):
             result["html"]=self.env.ref("sita_customization.all_inventory_report_xml"
                                         ).render(rcontext)#template_id
             # todo
+            return result
 
 
     @api.model
@@ -489,5 +490,5 @@ class InventoryReportsModel(models.TransientModel):
         this function is called by js
 
         """
-        print("given context")
+        print("given context in python get_html",given_context)
         return self.with_context(given_context)._get_html()

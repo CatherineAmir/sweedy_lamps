@@ -3,8 +3,9 @@ odoo.define("sita_customization.all_inventory_report",function (require){
     console.log("in the js file");
     // to load models
     var AbstractAction=require('web.AbstractAction');
-    var core=requrire('web.core');
-    var ReportWidget=requrie('web.Widget');
+    var core=require('web.core');
+    var ReportWidget=require('web.Widget');
+    console.log("loading required modules");
     // extend used for inheritance
     var report_backend=AbstractAction.extend({
         hasControlPanel:true,
@@ -12,6 +13,8 @@ odoo.define("sita_customization.all_inventory_report",function (require){
             'click .o_all_inventory_report_print':'print',
             'click .o_all_inventory_report_export':'export',
         },
+
+
 
         init: function (parent,action) {
             console.log("init  of action called");
@@ -32,17 +35,18 @@ odoo.define("sita_customization.all_inventory_report",function (require){
                 action.params.active_id;
 
             this.given_context.model=action.context.active_model ||false;
-            this.given_context.ttype=action.context,ttype ||false;
-
+            this.given_context.ttype=action.context.ttype ||false;
+            console.log("this in the end of init",this)
         },
 
         willStart: function(){
-            console.log("calling get_html in js decaled down");
+            console.log("calling get_html in js decaredled down in willStart");
             // promise.all return a promise when all promises success
             return Promise.all([this._super.apply(this,arguments),this.get_html()])
         },
 
         set_html:function(){
+            console.log("in set html");
             var self=this;
             // check what this mean todo
             var def=Promise.resolve();
@@ -67,6 +71,7 @@ odoo.define("sita_customization.all_inventory_report",function (require){
         // else create it
 
         get_html:function() {
+            console.log("in get_html_js");
             var self = this;
             var defs = [];
             return this._rpc({
@@ -136,11 +141,13 @@ odoo.define("sita_customization.all_inventory_report",function (require){
 
     });
 
+    console.log("report_backend extended")
 
     core.action_registry.add(
         "all_inventory_report",
         report_backend
     );
+    console.log("all_inventory_report_added to backend");
     return report_backend;
 
 

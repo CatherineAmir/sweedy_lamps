@@ -10,6 +10,7 @@ class InventoryReport(models.TransientModel):
     date_to=fields.Date(string="Date To",required=0)
 
     def button_export_html(self):
+        print("in button button_export_html")
         """
       This function will call the report action direct
        """
