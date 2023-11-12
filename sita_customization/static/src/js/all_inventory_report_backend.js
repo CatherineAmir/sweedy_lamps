@@ -40,7 +40,7 @@ odoo.define("sita_customization.all_inventory_report",function (require){
         },
 
         willStart: function(){
-            console.log("calling get_html in js decaredled down in willStart");
+            console.log("calling get_html in js declared down in willStart");
             // promise.all return a promise when all promises success
             return Promise.all([this._super.apply(this,arguments),this.get_html()])
         },
