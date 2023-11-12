@@ -8,10 +8,40 @@
              <div class="font">
                         <div class="page">
                             <div class="row mt24">
+
+                                <div style="width:50%;" class="text-center">
+
+                                    <b>Date From :</b>
+                                    <span t-esc="date_from"  t-options="{'widget':'date'}"/>
+
+                                </div>
+                                <div style="width:50%" class="text-center">
+
+                                    <b>Date To:</b>
+                                    <span t-esc="date_to" t-options="{'widget':'date'}"/>
+                                </div>
+</div>
+                            <br/>
+                            <br/> <br/>
+                            <br/>
+
+
                                 <table class="table table-bordered sticky-header" style="border-size:2;">
+
+
                                 <thead class="text-center" scope="col"
                                        style="background-color:#BDBDBD; font-size:14px; font-weight:600; color:#212121;
                                         background: !important; padding-top:10px;">
+<!--                                            <tr>-->
+<!--                                           <th>Date From</th>-->
+
+<!--                                           <th>Date To</th>-->
+<!--                                        </tr>-->
+<!--	                                <tr>-->
+<!--		                                  <td><t t-esc="date_from"/></td>-->
+<!--		                                <td><t t-esc="date_to"/></td>-->
+<!--	                                </tr>-->
+
                                         <t t-set="headers" t-value='[
             "Product Code",
             "Product Description",
@@ -32,7 +62,7 @@
             "Ending Quantity",
             "Ending Value",
             "Ending Weighed Average",
-            "Type",
+
         ]'/>
 	                                      <tr>
                                         <t t-foreach="headers" t-as="h">
@@ -165,7 +195,7 @@
                                 </table>
                             </div>
                         </div>
-             </div>
+
 
 
                 </t>

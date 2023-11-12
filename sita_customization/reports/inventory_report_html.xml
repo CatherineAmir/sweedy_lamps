@@ -4,14 +4,207 @@
 	<template id="report_asset_backend" name="all_inventory_report assets"
 	          inherit_id="web.assets_backend">
 		<xpath expr="." position="inside">
+			<link href="/sita_customization/static/src/css/report.css" rel="stylesheet"/>
 			<script type="text/javascript" src="/sita_customization/static/src/js/all_inventory_report_backend.js"/>
+
 		</xpath>
 	</template>
+	<template id="report_buttons">
+        <div class="button_row">
+<!--	        these class in js file "o_all_inventory_report_export"-->
+            <button class="o_all_inventory_report_print  btn btn-lg oe_button"><span class="fa fa-print"/>Print</button>
+            <button class="o_all_inventory_report_export btn btn-lg oe_button"><span class="fa fa-download"/>Export</button>
+        </div>
+    </template>
 
-	<template id="all_inventory_report_xml">
-		<h1>
-			ALl inventory Report
-		</h1>
+
+<!--	filters template-->
+	 <template id="sita_customization.all_inventory_report_filters">
+        <div class="act_as_table data_table" style="width: 100%;">
+            <div class="act_as_row labels">
+                <div class="act_as_cell">Date From</div>
+                <div class="act_as_cell">Date To</div>
+
+            </div>
+            <div class="act_as_row">
+                <div class="act_as_cell">
+                    <span t-field="o.date_from"/>
+                </div>
+                <div class="act_as_cell">
+                    <span t-field="o.date_to"/>
+                </div>
+
+            </div>
+        </div>
+    </template>
+	<template id="sita_customization.all_inventory_report_headers">
+	<div class="act_as_thead">
+		  <t t-set="headers" t-value='[
+            "Product Code",
+            "Product Description",
+            "Product Category",
+            "Product Unit of Measure",
+            "Stock Move Date",
+            "stock Move Type",
+            "stock Move Name",
+            "Stock Move Reference",
+            "Stock Move Operation type",
+            "Opening Quantity",
+            "Opening Value",
+            "Opening Weighed Average",
+            "In Quantity",
+            "In Value",
+            "Out Quantity",
+            "Out Value",
+            "Ending Quantity",
+            "Ending Value",
+            "Ending Weighed Average",
+
+        ]'/>
+		<div class="act_as_row labels">
+
+			 <t t-foreach="headers" t-as="h">
+
+				 <div class="act_as_cell"><t t-esc="h"/></div>
+
+                               </t>
+		</div>
+	</div>
+	</template>
+
+	 <template id="sita_customization.all_inventory_report_lines">
+       <tr t-foreach="results" t-as="line" style="background-color:#c8e6e1;font-size:14px; font-weight:600;border: 1px solid black;
+                                        border-collapse: collapse;">
+			                                    <t t-if="line['type']=='header'">
+                                                    <t t-set="style" t-value="'background-color:#ede9da'" />
+                                                </t>
+
+                                                <t t-else="">
+
+                                                    <t t-set="style" t-value="'background-color:#FFFFFF'" />
+
+                                                 </t>
+
+        <div class="act_as_row lines">
+            <div class="act_as_cell left" t-att-style="style">
+
+
+	        <span t-esc="line['product_code']" />
+
+            </div>
+
+	        <div class="act_as_cell left" t-att-style="style">
+               <span t-esc="line['product_name']" />
+            </div>
+
+	        <div class="act_as_cell left" t-att-style="style">
+               <span t-esc="line['product_category']" />
+            </div>
+	        <div class="act_as_cell left" t-att-style="style">
+                <span t-esc="line['product_uom']" />
+            </div>
+
+	        <div class="act_as_cell left" t-att-style="style">
+                   <t t-if="line['type']=='header'">
+			                                  <span t-esc="''"></span>
+		                                  </t>
+			                                  <t t-else="">
+		                                   <span t-esc="line['move_date']" />
+		                                  </t>
+            </div>
+
+	        <div class="act_as_cell left" t-att-style="style">
+                <span t-esc="line['picking_code'] or ''" />
+            </div> <div class="act_as_cell left" t-att-style="style">
+                <span t-esc="line['move_name'] or ''" />
+            </div>
+
+	        <div class="act_as_cell left" t-att-style="style">
+                <span t-esc="line['move_reference'] or ''" />
+            </div>
+
+	        <div class="act_as_cell left" t-att-style="style">
+                <span t-esc="line['picking_display_name'] or ''" />
+            </div>
+
+	        <div class="act_as_cell left" t-att-style="style">
+                <span t-esc="line['opening_value']" t-options='{"widget": "float", "precision": 2}' />
+            </div>
+	        <div class="act_as_cell left" t-att-style="style">
+                <span t-esc="line['opening_weigthed_avg']" t-options='{"widget": "float", "precision": 2}' />
+            </div>
+	        <div class="act_as_cell left" t-att-style="style">
+                <span t-esc="line['in_quantity']" t-options='{"widget": "float", "precision": 2}' />
+            </div>
+
+	        <div class="act_as_cell left" t-att-style="style">
+                <span t-esc="line['in_value']" t-options='{"widget": "float", "precision": 2}' />
+            </div>
+
+	        <div class="act_as_cell left" t-att-style="style">
+                <span t-esc="line['out_quantity']" t-options='{"widget": "float", "precision": 2}' />
+            </div>
+	        <div class="act_as_cell left" t-att-style="style">
+                <span t-esc="line['ending_quantity']" t-options='{"widget": "float", "precision": 2}' />
+            </div>
+
+	        <div class="act_as_cell left" t-att-style="style">
+                <span t-esc="line['ending_value']" t-options='{"widget": "float", "precision": 2}' />
+            </div>
+
+	        <div class="act_as_cell left" t-att-style="style">
+                <span t-esc="line['out_value']" t-options='{"widget": "float", "precision": 2}' />
+            </div>
+	        <div class="act_as_cell left" t-att-style="style">
+                <span t-esc="line['ending_weigted_avg']" t-options='{"widget": "float", "precision": 2}' />
+            </div>
+
+
+        </div>
+       </tr>
+   </template>
+
+<!--	report base-->
+	 <template id="sita_customization.all_inventory_report_base">
+
+                <!-- Display filters -->
+                <t t-call="sita_customization.all_inventory_report_filters"/>
+                <!-- Display All inventory table -->
+                <div class="act_as_table data_table mt4" style="width: 100%;">
+                    <!-- Display header line-->
+                    <t t-call="sita_customization.all_inventory_report_headers"/>
+                    <!-- Display initial lines -->
+<!--                    <t t-set="initial" t-value="o._get_initial(o.results.filtered(lambda l: l.product_id == product and l.is_initial))"/>-->
+<!--                    <div class="act_as_row lines">-->
+<!--                        <div class="act_as_cell"/>-->
+<!--                        <div class="act_as_cell">-->
+<!--                            Initial-->
+<!--                        </div>-->
+<!--                        <div class="act_as_cell"/>-->
+<!--                        <div class="act_as_cell"/>-->
+<!--                        <div class="act_as_cell right">-->
+<!--                            <t t-esc="'{0:,.3f}'.format(initial)"/>-->
+<!--                        </div>-->
+                    </div>
+		 <t t-call="sita_customization.all_inventory_report_lines"/>
+<!--                    &lt;!&ndash; Display each lines &ndash;&gt;-->
+<!--                    <t t-set="product_balance" t-value="initial"/>-->
+<!--                    <t t-foreach="o.results.filtered(lambda l: l.product_id == product and not l.is_initial)" t-as="product_line">-->
+<!--                        <t t-set="product_balance" t-value="product_balance + product_line.product_in - product_line.product_out"/>-->
+<!--                        <t t-call="stock_card_report.report_stock_card_lines"/>-->
+<!--                    </t>-->
+<!--                </div>-->
+<!--                <p style="page-break-before:always;"></p>-->
+
+
+    </template>
+
+	<template id="all_inventory_report_html">
+		<div class="o_stock_card_reports_page">
+			 <t t-call="sita_customization.report_buttons"/>
+			<t t-call="sita_customization.all_inventory_report_base"/>
+
+		</div>
 
 	</template>
 

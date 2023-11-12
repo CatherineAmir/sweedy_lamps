@@ -130,6 +130,8 @@ class InventoryReport(models.AbstractModel):
         self.row_pos = 0
 
 
+
+
         self.record = record  # Wizard object
 
         self.sheet = workbook.add_worksheet('Inventory Report')
@@ -149,7 +151,7 @@ class InventoryReport(models.AbstractModel):
         self._format_float_and_dates(self.env.user.company_id.currency_id, self.language_id)
 
         if record:
-            data = record._compute_results()
+            data = data["lines"]
 
 
             self.sheet.merge_range(0, 0, 0, 8, 'Total Inventory      ' + 'From {}   To {}'.format(datetime.strptime(str(self.convert_to_date(record.date_from)),"%Y-%m-%d  %H:%M:%S").strftime("%d/%m/%Y"),datetime.strptime(str(self.convert_to_date(record.date_to)),"%Y-%m-%d  %H:%M:%S").strftime("%d/%m/%Y")), self.format_title)

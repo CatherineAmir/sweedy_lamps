@@ -447,8 +447,8 @@ class InventoryReportsModel(models.TransientModel):
 
 
 
-    def print_report(self,report_type="qweb"):
-        # report_type=qweb this is a default
+    def print_report(self,report_type="qweb-pdf"):
+
         self.ensure_one()
         action=(
             report_type=="xlsx"
@@ -457,11 +457,18 @@ class InventoryReportsModel(models.TransientModel):
 
         )
         data=self._compute_results()
-        print("data",data)
+
         data={
-            'lines':data
+            'lines':data,
+             # 'o':self,
+            "date_from":self.date_from,
+            "date_to":self.date_to,
+
         }
-        # todo one call for compute
+        # print("o",data["o"])
+        # print("o_date_from",data["o"].date_from)
+        # print("o_date_to",data["o"].date_to)
+
         return action.report_action(self,config = False,data=data)
 
 
@@ -473,13 +480,14 @@ class InventoryReportsModel(models.TransientModel):
         result={}
         rcontext={}
         report=self.browse(self._context.get("active_id"))
-        print(report)
+
         if report:
             rcontext["o"]=report
-            print("rcontext",rcontext)
-            result["html"]=self.env.ref("sita_customization.all_inventory_report_xml"
+            rcontext["results"]=report._compute_results()
+
+            result["html"]=self.env.ref("sita_customization.all_inventory_report_html"
                                         ).render(rcontext)#template_id
-            # todo
+
             return result
 
 
@@ -490,5 +498,5 @@ class InventoryReportsModel(models.TransientModel):
         this function is called by js
 
         """
-        print("given context in python get_html",given_context)
+
         return self.with_context(given_context)._get_html()
