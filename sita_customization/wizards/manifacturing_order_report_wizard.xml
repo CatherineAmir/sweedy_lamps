@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<data>
+	<record id="mrp_order_form_view" model="ir.ui.view">
+			<field name="name">mrp_order.wizard.form</field>
+			<field name="model">sita_customization.mrp_order_report_wizard</field>
+			<field name="arch" type="xml">
+				<form string="Production Orders Report">
+					<sheet>
+
+						<group>
+							<group>
+								<field name="date_from"/>
+							</group>
+							<group>
+								<field name="date_to"/>
+							</group>
+						</group>
+						<footer>
+							<button name="button_export_html" string="VIEW" type="object" class="btn btn-primary"/>
+							<button name="button_export_pdf" string="PDF" type="object" class="btn btn-primary"/>
+							<button name="button_export_xlsx" string="EXCEL" type="object" class="btn btn-primary"/>
+							 <button string="Cancel" class="oe_link" special="cancel" />
+						</footer>
+					</sheet>
+				</form>
+			</field>
+		</record>
+
+
+
+		<record id="mrp_order_wizard_act_window" model="ir.actions.act_window">
+			<field name="name">Production Order Report Wizard </field>
+			<field name="type">ir.actions.act_window</field>
+			<field name="res_model">sita_customization.mrp_order_report_wizard</field>
+			<field name="view_mode">form</field>
+			  <field name="target">new</field>
+		</record>
+
+		<menuitem name="Production Order Report" id="mrp_dynamic_report"
+		          action="mrp_order_wizard_act_window"
+		 parent="mrp.menu_mrp_reporting"
+              sequence="1"/>
+
+
+	</data>
+</odoo>

@@ -31,6 +31,7 @@
         'wizards/inventory_report_wizard.xml',
         'data/inventory_report_paper_format.xml',
         'reports/inventory_report_html.xml',
+        'wizards/manifacturing_order_report_wizard.xml',
 
 
     ],
