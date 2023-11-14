@@ -15,381 +15,158 @@ class ProductionOrderReportsModel(models.TransientModel):
         self.ensure_one()
         date_from = self.date_from
         self.date_to=self.date_to or fields.Date.context_today(self)
-        product_dicts={}
-        product_ids=self.env['product.product'].search([])
+        order_dicts={}
+        order_ids=self.env['mrp.production'].search([('date_planned_finished','>=',date_from),
+                                                     ('date_planned_finished','<=',self.date_to)])
+        # check for date and check for order id
         results=[]
-        for p in product_ids.ids:
+        for o in order_ids.ids:
             # print('p',p)
-            product_dicts.update({
-                str(p):{
-                    'header':{},
-                    'lines':[],
+            order_dicts.update({
+                str(o):[],}
+            )
 
-                },
-            })
-            # inital
-            # old
-        #     self._cr.execute(
-        #     """
-        #     SELECT 'header' as type ,'' as move_id,'' as move_date,product.id,p_temp.name as product_name,
-        #     product.default_code as product_code,p_cat.name as product_category,
-        #     uom.name as product_uom ,
-        #     '' as move_name,'' as move_reference,''
-        #      as move_display_name,
-        #      '' as picking_display_name,
-        #     '' as picking_type_id,
-        #     '' as picking_code,
-        #
-        #     True as is_initial,
-        #
-        #
-        #     case
-        #     when move.state='done' and  CAST(move.date as date)  < %s
-        #     then  COALESCE(sum(st_val.quantity ),0.0)
-        #     else 0.0
-        #     end  as opening_quantity,
-        #
-        #     case
-        #     when move.state='done' and  CAST(move.date as date)  < %s
-        #     then  COALESCE(sum( st_val.value ),0.0)
-        #     else 0.0
-        #     end  as opening_value,
-        #
-        #     case
-        #         when move.state='done' and  CAST(move.date as date)  < %s
-        #     then
-        #         sum(st_val.value::decimal )/
-        #         Case
-        #             when COALESCE(sum(st_val.quantity),0) >0
-        #                 then sum(st_val.quantity) else 1
-        #         end
-        #
-        #
-        #     else 0.0
-        #     end  as opening_weigthed_avg,
-        #    /*
-        #     0.0 as opening_quantity,
-        #     0.0 as opening_value,
-        #     0.0 as opening_weigthed_avg,
-        #     */
-        #     0.0 as in_quantity,
-        #     0.0 as in_value,
-        #     0.0 as out_quantity,
-        #     0.0 as out_value,
-        #     0.0 as ending_quantity,
-        #     0.0 as ending_value,
-        #     0.0 as ending_weigted_avg
-        #
-        #
-        #
-        #
-        #
-        #    From product_product product
-        #
-        #    FULL  join stock_move as move
-        #    on product.id =move.product_id
-        #
-        #   Full outer join stock_valuation_layer as st_val
-        #     on move.id=st_val.stock_move_id
-        #
-        #
-        #     inner join product_template as p_temp
-        #     on p_temp.id=product.product_tmpl_id
-        #
-        #     inner join product_category as p_cat
-        #     on p_temp.categ_id=p_cat.id
-        #
-        #     inner join uom_uom as uom
-        #     on p_temp.uom_id=uom.id
-        #     where product.id = %s
-        #
-        #
-        #      GROUP BY product.id,p_temp.name,p_cat.name, product.default_code,p_cat.name, uom.name,
-        #       move.state,move.date
-        #     ORDER BY product.id
-        #    /* move.date,move.Reference*/
-        #
-        #
-        #
-        #
-        #
-        # """,(
-        #         date_from,
-        #         date_from,
-        #         date_from,
-        #         p,
-        #
-        #
-        #     ),
-        # )
-
-            self._cr.execute("""
-            SELECT  Distinct 'header' as type , '' as move_id,''as move_date,product.id,p_temp.name as product_name,
-            product.default_code as product_code,p_cat.name as product_category,
-            uom.name as product_uom ,
-            '' as move_name,'' as move_reference,''
-             as move_display_name,
-             '' as picking_display_name,
-            '' as picking_type_id,
-            '' as picking_code,
-            
-            True as is_initial,
-          
-           
-            case 
-            when (select move.id from stock_move move where product_id=%s and move.state='done' and  CAST(move.date as date)  < %s limit 1) is not null 
-            then  (select COALESCE(sum(st_val.quantity ),0.0) from stock_valuation_layer as st_val 
-				   where (st_val.stock_move_id in
-						  (select move.id from stock_move move where product_id=%s and move.state='done' and  CAST(move.date as date) 
-												  < %s)))
-            else 0.0 
-            end  as opening_quantity, 
-			 case 
-            when (select move.id from stock_move move where product_id=%s and move.state='done' and  CAST(move.date as date)  < %s limit 1) is not null
-            then  (select COALESCE(sum(st_val.value ),0.0) from stock_valuation_layer as st_val 
-				   where (st_val.stock_move_id in(select move.id from stock_move move where product_id=%s and move.state='done' and  CAST(move.date as date) 
-												  < %s)))
-				
-
-			
-            else 0.0 
-            end  as opening_value, 
-			
-			 case 
-            when (select move.id from stock_move move where product_id=%s and move.state='done' and  CAST(move.date as date)  < %s limit 1) is not null 
-																										  
-			then  ((select COALESCE(sum(st_val.value ),0.0) from stock_valuation_layer as st_val 
-				   where (st_val.stock_move_id in(select move.id from stock_move move where product_id=%s and move.state='done' and  CAST(move.date as date) 
-												  < %s)))::decimal)/
-				  (Case
-				  when (select COALESCE(sum(st_val.quantity ),0.0) from stock_valuation_layer as st_val 
-				   where (st_val.stock_move_id in(select move.id from stock_move move where product_id=%s and move.state='done' and  CAST(move.date as date) 
-												  < %s))) !=0
-				  then 
-				    (select COALESCE(sum(st_val.quantity ),0.0) from stock_valuation_layer as st_val 
-				   where (st_val.stock_move_id in(select move.id from stock_move move where product_id=%s and move.state='done' and  CAST(move.date as date) 
-												  < %s))) 
-				  else 1
-				  end)
-			
-			else 1
-			end as opening_weigthed_avg,
-				  
---           
---             
-            0.0 as in_quantity,
-            0.0 as in_value,
-            0.0 as out_quantity,
-            0.0 as out_value,
-            0.0 as ending_quantity,
-            0.0 as ending_value,
-            0.0 as ending_weigted_avg
-            
-            
-            
-            
-            
-           From product_product product
-     
+            query="""
+                    select 'header' as type,mrp_order.date_planned_finished,mrp_order.name,product.default_code as product_code ,
+            p_temp.name as product_name,'' as components_barcode,'' as components_name,
+            0 as components_qty_bom, product_qty as quantity_done, 0  as unit_cost, 0 as total_cost
+        
+            from mrp_production as mrp_order  
+        
+            inner join  product_product as product
+            on mrp_order.product_id=product.id
+        
             inner join product_template as p_temp
             on p_temp.id=product.product_tmpl_id
-          
-            inner join product_category as p_cat
-            on p_temp.categ_id=p_cat.id
-            
-            inner join uom_uom as uom
-            on p_temp.uom_id=uom.id
-           
-		   where product.id = %s 
-            
-           
-             GROUP BY product.id,p_temp.name,p_cat.name, product.default_code,p_cat.name, uom.name
-
-            ORDER BY product.id 
-            """,(
-                p,date_from,p,date_from,
-                p,date_from,p,date_from,
-                p,date_from,p,date_from,
-                p,date_from,p,date_from,
-                p
-
-            ))
-            initial_lines=self._cr.dictfetchall()
-            # print("length of headers",len(initial_lines))
-            # print('initial_line', initial_lines)
-
-            # if len(initial_lines)
-
-            product_dicts[str(p)]['header']=initial_lines[0]
-            # print( 'initial_line',product_dicts)
-
-
-            # multilines
-            # TOdo query parameters
-
-    #         query= """
-    #             SELECT 'line' as type ,move.id as move_id,
-    #
-    #             move.date as move_date,move.product_id,p_temp.name as product_name,
-    #             product.default_code as product_code,p_cat.name as product_category
-    #             /*
-    #             uom.name as product_uom,move.name,move.reference as move_reference,stock_picking.origin||'/'||product.default_code || ': ' ||stock_location_source.name
-    #             || '>' || stock_location_dest.name
-    #              as move_display_name
-    #             ,case when picking_type.warehouse_id is not null then stock_warehouse.name || ': '|| picking_type.name else  picking_type.name end as picking_display_name,
-    #             picking_type.id as picking_type_id,
-    #             picking_type.code as picking_code,
-    #             False as is_inial,
-    #             case when st_val.quantity<0 then ABS(st_val.quantity) else 0 end  as out_quantity,
-    #             case when st_val.quantity<0 then ABS(st_val.value) else 0 end  as out_value,
-    #             case when st_val.quantity>0 then st_val.quantity else 0 end  as in_quantity,
-    #             case when st_val.quantity>0 then st_val.value else 0 end as in_value
-    #
-    #             From stock_move move
-    #             /*
-    #             Inner Join stock_valuation_layer as st_val
-    #             on move.id=st_val.stock_move_id
-    #   */
-    #             Inner Join product_product as product
-    #             on move.product_id=product.id
-    #               */
-    #             inner join product_template as p_temp
-    #             on p_temp.id=product.product_tmpl_id
-    #             inner join product_category as p_cat
-    #             on p_temp.categ_id=p_cat.id
-    # /*
-    #             inner join uom_uom as uom
-    #             on move.product_uom=uom.id
-    #             inner join stock_picking_type as picking_type
-    #             on move.picking_type_id=picking_type.id
-    #
-    #             inner join stock_picking
-    #             on move.picking_id=stock_picking.id
-    #
-    #             inner join stock_warehouse
-    #             on picking_type.warehouse_id=stock_warehouse.id
-    #
-    #
-    #             inner join stock_location as stock_location_source
-    #             on stock_location_source.id= move.location_id
-    #
-    #             inner join stock_location as stock_location_dest
-    #             on stock_location_dest.id= move.location_dest_id
-    #             */
-    #             where move.product_id = %s
-    #
-    #
-    #            /*
-    #             move.state='done' and
-    #              and CAST(move.date as date)  >= %s;
-    #              and move.product_id = %s
-    #             >=%s and  CAST(move.date as date)<=%s and product.id=%s
-    #             ORDER By move.date limit 5
-    #         */
-    #
-    #
-    #
-    #
-    #
-    #
-    #            /* move.date,move.Reference*/
-    #        """
-            query2="""
-             SELECT 'line' as type ,move.id as move_id ,move.date as move_date,move.product_id ,
-             p_temp.name as product_name,product.default_code as product_code,p_cat.name as product_category,
-             uom.name as product_uom ,
-            move.name as move_name,move.reference as move_reference,stock_picking.origin||'/'||product.default_code || ': ' ||stock_location_source.name
-            || '>' || stock_location_dest.name
-             as move_display_name,
-              case when picking_type.warehouse_id is not null then stock_warehouse.name || ': '|| picking_type.name else  picking_type.name end as picking_display_name,
-            picking_type.id as picking_type_id,
-            picking_type.code as picking_code,
-            False  as is_initial,
-            0 as opening_quantity,
-            0 as opening_value,
-            0 as opening_weigthed_avg,
-            0 as ending_quantity,
-            0 as ending_value,
-            0 as ending_weigted_avg,
-            
-              case when st_val.quantity<0 then ABS(st_val.quantity) else 0 end  as out_quantity,
-             case when st_val.quantity<0 then ABS(st_val.value) else 0 end  as out_value,
-                case when st_val.quantity>0 then st_val.quantity else 0 end  as in_quantity,
-                case when st_val.quantity>0 then st_val.value else 0 end as in_value
-             
-             from stock_move as move
-             Inner Join product_product as product
-            on move.product_id=product.id
-            inner join product_template as p_temp
-            on p_temp.id=product.product_tmpl_id
-            inner join product_category as p_cat
-            on p_temp.categ_id=p_cat.id
-    
-            inner join uom_uom as uom
-            on move.product_uom=uom.id
-              full outer join stock_picking_type as picking_type
-            on move.picking_type_id=picking_type.id
-            
-            full outer join stock_picking
-            on move.picking_id=stock_picking.id
-            
-            full outer join stock_warehouse
-            on picking_type.warehouse_id=stock_warehouse.id
-            
-            
-            full outer join stock_location as stock_location_source 
-            on stock_location_source.id= move.location_id
-            
-            full outer join stock_location as stock_location_dest 
-            on stock_location_dest.id= move.location_dest_id
-            
-            full outer Join stock_valuation_layer as st_val
-            on move.id=st_val.stock_move_id
-            
-             where move.state='done' and move.product_id=%s
-              and CAST(move.date as date)  >= %s
-              and  CAST(move.date as date)<=%s
-              ORDER BY move.date
+            where mrp_order.id=%s
+            union all
+            select  'line' as type,st.date,st.name,'' as product_code,'' as product_name,product.default_code as components_barcode,p_temp.name as components_name,
              
         
+        
+         (select mrp_bom_line.product_qty from mrp_bom_line where st.product_id=mrp_bom_line.product_id and 
+          mrp_bom_line.bom_id=prod.bom_id limit 1) /(select bom.product_qty from mrp_bom as bom where prod.bom_id=bom.id)
+              as components_bom,
+              
+              
+         (select mrp_bom_line.product_qty from mrp_bom_line where st.product_id=mrp_bom_line.product_id and 
+          mrp_bom_line.bom_id=prod.bom_id limit 1) /(select bom.product_qty from mrp_bom as bom where prod.bom_id=bom.id) *prod.product_qty
+          as components_quantity_done,
+          
+          sv.unit_cost as unit_cost,
+          
+          sv.unit_cost*((select mrp_bom_line.product_qty from mrp_bom_line where st.product_id=mrp_bom_line.product_id and 
+          mrp_bom_line.bom_id=prod.bom_id limit 1) /(select bom.product_qty from mrp_bom as bom where prod.bom_id=bom.id) *prod.product_qty)  
+          as total_cost
+        from stock_move as st 
+        inner join  product_product as product
+        on st.product_id=product.id
+        inner join stock_valuation_layer as sv
+        on sv.stock_move_id=st.id
+        
+        
+        inner join product_template as p_temp
+        on p_temp.id=product.product_tmpl_id
+        
+        inner join mrp_production as prod
+        on prod.id=st.raw_material_production_id
+        
+        inner join mrp_bom as bom
+        on  prod.bom_id =bom.id
+        
+        inner join mrp_bom_line as bom_line
+        on bom.id=bom_line.bom_id
+        and bom_line.product_id=st.product_id
+        
+        where raw_material_production_id=%s
+        
+        union all
+        
+        
+        
+        select 'cost' as type,
+        mrp_order.date_planned_finished,
+        mrp_order.name,
+        
+        
+        '' as product_barcode,
+        '' as product_name,
+        'Operation To Consume/Labour Cost By Unit' as
+        components_barcode,
+        
+        
+         
+        mrp_workcenter.name as components_name,
+        
+        1 as components_bom,
+        
+        mrp_workorder.qty_produced,
+        mrp_workcenter.labour_cost_by_unit,
+        
+        
+        mrp_workcenter.labour_cost_by_unit * mrp_workorder.qty_produced as labour_cost
+        from mrp_workorder 
+        
+        right  join  mrp_routing_workcenter as mrp_workcenter
+        on mrp_workcenter.id=mrp_workorder.operation_id
+        
+        inner join mrp_production as mrp_order
+        on mrp_order.id=production_id
+        
+        where production_id =%s and mrp_workcenter.labour_cost_by_unit>0
+        
+        union all
+        select 
+        'cost' as type,
+        mrp_order.date_planned_finished,
+        mrp_order.name,
+        '' as product_barcode,
+        '' as product_name,
+        'Operation To Consume/Overhead Cost By Unit' as
+        components_barcode,
+        
+        
+         
+        mrp_workcenter.name as components_name,
+        
+        1 as components_bom,
+        mrp_workorder.qty_produced,
+        
+        mrp_workcenter.overhead_cost_by_unit,
+        
+        
+        
+        
+        mrp_workcenter.overhead_cost_by_unit * mrp_workorder.qty_produced as overhead_cost
+        from mrp_workorder 
+        
+        full outer join  mrp_routing_workcenter as mrp_workcenter
+        on mrp_workcenter.id=mrp_workorder.operation_id
+        inner join mrp_production as mrp_order
+        on mrp_order.id=production_id
+        
+        where production_id =%s and mrp_workcenter.overhead_cost_by_unit>0
+        -- order by type 
+        -- date_planned_finished 
+
+
+
             """
-            # print((p,))
-            self._cr.execute(query2,(p,date_from,self.date_to))
 
-            # self._cr.execute(query,(str(p),))
-
-
-
-            product_stock_moves_lines=self._cr.dictfetchall()
-            # print('product_stock_moves_lines',product_stock_moves_lines)
-
-            # print("[ line ['in_quantity'] if line ['in_quantity']!=None else  0 for line in product_stock_moves_lines]",[ line ['in_quantity'] if line ['in_quantity']!=None else  0 for line in product_stock_moves_lines])
-            # print(product_dicts[str(p)]['header'])
-            if len(product_stock_moves_lines):
-                try:
-                    product_dicts[str(p)]['header']['in_quantity']=sum([ line ['in_quantity'] if line ['in_quantity']!=None else  0 for line in product_stock_moves_lines])
-                except Exception as e:
-                    print(" error",e)
-                    # print("product_dicts[str(p)]['header']['in_quantity']",product_dicts[str(p)]['header']['in_quantity'])
-                    # print("[ line ['in_quantity'] if line ['in_quantity']!=None else  0 for line in product_stock_moves_lines]",[ line ['in_quantity'] if line ['in_quantity']!=None else  0 for line in product_stock_moves_lines])
-
-                product_dicts[str(p)]['header']['in_value']=sum([ line ['in_value']  if  line ['in_value'] else 0 for line in product_stock_moves_lines])
-                product_dicts[str(p)]['header']['out_quantity']=sum([ line ['out_quantity'] if  line ['out_quantity'] else 0 for line in product_stock_moves_lines])
-                product_dicts[str(p)]['header']['out_value']=sum([ line ['out_value']if line ['out_value'] else 0 for line in product_stock_moves_lines])
-                product_dicts[str(p)]['header']['ending_quantity']=product_dicts[str(p)]['header']['opening_quantity']+product_dicts[str(p)]['header']['in_quantity']- product_dicts[str(p)]['header']['out_quantity']
-                product_dicts[str(p)]['header']['ending_value']=product_dicts[str(p)]['header']['opening_value']+product_dicts[str(p)]['header']['in_value']- product_dicts[str(p)]['header']['out_value']
-                product_dicts[str(p)]['header']['ending_weigted_avg']= product_dicts[str(p)]['header']['ending_value']/product_dicts[str(p)]['header']['ending_quantity'] if product_dicts[str(p)]['header']['ending_quantity'] else 1
+            self._cr.execute(query, (o, o,o,o))
+            all_order_details = self._cr.dictfetchall()
+            order_dicts[str(o)] = all_order_details
 
 
-                # print('lines',product_stock_moves_lines)
-            product_dicts[str(p)]['lines']=product_stock_moves_lines
-            results.append( product_dicts[str(p)]['header'])
 
-            results=results+product_stock_moves_lines
+            order_dicts[str(o)][0]['unit_cost'] = sum(
+            [line['unit_cost'] if line['unit_cost'] else 0 for line in all_order_details[1:]])
+            order_dicts[str(o)][0]['total_cost'] = sum(
+            [line['total_cost'] if line['total_cost'] else 0 for line in all_order_details[1:]])
+            results.append(order_dicts)
 
+        # print("results",results)
         return results
-
-
 
 
     def print_report(self,report_type="qweb-pdf"):
@@ -397,7 +174,7 @@ class ProductionOrderReportsModel(models.TransientModel):
         self.ensure_one()
         action=(
             report_type=="xlsx"
-            and self.env.ref("sita_customization.inventory_report_xlsx")
+            and self.env.ref("sita_customization.production_orders_report_xlsx")
             or self.env.ref("sita_customization.inventory_report_pdf")
 
         )
@@ -410,16 +187,14 @@ class ProductionOrderReportsModel(models.TransientModel):
             "date_to":self.date_to,
 
         }
-        # print("o",data["o"])
-        # print("o_date_from",data["o"].date_from)
-        # print("o_date_to",data["o"].date_to)
+        print("data",data)
 
         return action.report_action(self,config = False,data=data)
 
 
     def _get_html(self):
         """
-        this function will render html template
+        # this function will render html template
 
         """
         result={}

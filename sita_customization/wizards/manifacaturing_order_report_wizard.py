@@ -56,7 +56,7 @@ class MrpOrderReport(models.TransientModel):
     def _export(self, report_type):
         # todo
         pass
-        # model = self.env["report.inventory.report"]
-        # report = model.create(self._prepare_inventory_report())
+        model = self.env["report.production_order.report"]
+        report = model.create(self._prepare_inventory_report())
         #
-        # return report.print_report(report_type)
+        return report.print_report(report_type)

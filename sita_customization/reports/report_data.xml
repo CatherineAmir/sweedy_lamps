@@ -9,6 +9,14 @@
 		        report_type="xlsx"
 		        attachment_use="False"/>
 
+		<report string="Production Order Report XLSX"
+		        id="production_orders_report_xlsx"
+		        model="report.production_order.report"
+		        name="sita_customization.production_orders_report_xlsx"
+		        file="Production Order Reports Inventory report"
+		        report_type="xlsx"
+		        attachment_use="False"/>
+
 
 		<report string="Inventory Report PDF"
 		        id="inventory_report_pdf"
