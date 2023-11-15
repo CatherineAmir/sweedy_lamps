@@ -16,7 +16,7 @@ class MrpOrderReport(models.TransientModel):
         ("to_close","To Close"),
         ("done","Done"),
         ("all","All"),
-    ])
+    ],required=1,default="all")
 
     def button_export_html(self):
         pass

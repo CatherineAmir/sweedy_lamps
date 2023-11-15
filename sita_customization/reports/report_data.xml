@@ -28,6 +28,16 @@
 				paperformat="sita_customization.paper_format_inventory_all"
 		/>
 
+		<report string="Production orders Report PDF"
+		        id="production_orders_report_pdf"
+		        model="report.production_order.report"
+		        name="sita_customization.production_orders_report_pdf_template"
+		        file="sita_customization.production_orders_report_pdf_template"
+		        report_type="qweb-pdf"
+		        print_report_name="'Production Orders Report'"/>
+<!--				paperformat="sita_customization.paper_format_inventory_all"-->
+<!--		/>-->
+
 
 <!--		html report-->
 

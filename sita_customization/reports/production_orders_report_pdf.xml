@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<data>
+		<template id="production_orders_report_pdf_template"  name="production_order_report_pdf_template">
+			 <t t-call="web.html_container">
+                <t t-call="web.external_layout">
+<!--               <link rel="stylesheet" type="text/css" href="/mbi/static/src/css/reports.css"/>-->
+             <div class="font">
+                        <div class="page">
+                            <div class="row mt24">
+
+                                <div style="width:30%;" class="text-center">
+
+                                    <b>Date From :</b>
+                                    <span t-esc="date_from"  t-options="{'widget':'date'}"/>
+
+                                </div>
+                                <div style="width:30%" class="text-center">
+
+                                    <b>Date To:</b>
+                                    <span t-esc="date_to" t-options="{'widget':'date'}"/>
+                                </div>
+	                            <div style="width:30%" class="text-center">
+
+                                    <b>State:</b>
+                                    <span t-esc="state"/>
+                                </div>
+</div>
+                            <br/>
+                            <br/> <br/>
+                            <br/>
+
+
+                                <table class="table table-bordered sticky-header" style="border-size:2;">
+
+
+                                <thead class="text-center" scope="col"
+                                       style="background-color:#BDBDBD; font-size:14px; font-weight:600; color:#212121;
+                                        background: !important; padding-top:10px;">
+
+                                        <t t-set="headers" t-value='[
+
+            "Production Order Date",
+            " Reference",
+            "State",
+            "Product Barcode",
+            "Product Name",
+            "Component Product Barcode",
+            "Component Product Name",
+            "Component Quantity BOM",
+            "Component Quantity Done",
+            "Unit Cost",
+            "Total Cost",
+            "Line Type"
+        ]'/>
+	                                      <tr>
+                                        <t t-foreach="headers" t-as="h">
+                                           <th><t t-esc="h"/></th>
+                                       </t>
+                                        </tr>
+
+                                </thead>
+	                                 <tbody class="text-center" style="font-size:12px;border: 1px solid black;
+                                        border-collapse: collapse;">
+		                                   <tr t-foreach="lines" t-as="line" style="background-color:#c8e6e1;font-size:14px; font-weight:600;border: 1px solid black;
+                                        border-collapse: collapse;">
+			                                    <t t-if="line['type']=='header'">
+                                                    <t t-set="style" t-value="'background-color:#ede9da'" />
+                                                </t>
+
+                                                <t t-else="">
+
+                                                    <t t-set="style" t-value="'background-color:#FFFFFF'" />
+
+                                                 </t>
+
+
+
+			                                   <td t-att-style="style" >
+
+                                             <span t-esc="line['date_planned_finished']" widget="" />
+                                             </td>
+			                                   <td t-att-style="style" >
+
+                                             <span t-esc="line['name']" />
+                                             </td>
+			                                   <td t-att-style="style" >
+
+                                             <span t-esc="line['state'].upper()" />
+                                             </td>
+			                                   <td t-att-style="style" >
+
+                                             <span t-esc="line['product_code']" />
+                                             </td>
+
+<!--			                                  <td t-att-style="style">-->
+<!--				                                  <t t-if="line['type']=='header'">-->
+<!--					                                  <span t-esc="''"></span>-->
+<!--				                                  </t>-->
+<!--				                                  <t t-else="">-->
+<!--					                                   <span t-esc="line['move_date']" />-->
+<!--				                                  </t>-->
+<!--			                                  </td>-->
+
+			                                      <td t-att-style="style" >
+
+                                             <span t-esc="line['product_name'] or ''"  />
+                                             </td>   <td t-att-style="style" >
+
+                                             <span t-esc="line['components_barcode'] or ''"  />
+                                             </td>
+
+			                                   <td t-att-style="style" >
+
+                                             <span t-esc="line['components_name'] or ''"  />
+                                             </td>
+
+			                                   <td t-att-style="style" >
+
+                                             <span t-esc="line['components_qty_bom']" t-options='{"widget": "float", "precision": 2}'  />
+                                             </td>
+			                                   <td t-att-style="style" >
+
+                                             <span t-esc="line['quantity_done']" t-options='{"widget": "float", "precision": 2}'  />
+
+			                                   </td>
+			                                   <td t-att-style="style" >
+
+                                             <span t-esc="line['unit_cost']" t-options='{"widget": "float", "precision": 2}'  />
+
+			                                   </td>
+			                                   <td t-att-style="style" >
+
+                                             <span t-esc="line['total_cost']" t-options='{"widget": "float", "precision": 2}'  />
+
+			                                   </td>
+			                                   <td t-att-style="style" >
+
+                                             <span t-esc="line['type']"  />
+
+			                                   </td>
+
+
+
+		                                   </tr>
+
+	                                </tbody>
+
+
+
+
+                                </table>
+                            </div>
+                        </div>
+
+
+
+                </t>
+			 </t>
+
+		</template>
+
+
+	</data>
+</odoo>

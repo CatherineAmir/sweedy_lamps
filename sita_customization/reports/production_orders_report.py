@@ -188,19 +188,20 @@ class ProductionOrderReportsModel(models.TransientModel):
         action=(
             report_type=="xlsx"
             and self.env.ref("sita_customization.production_orders_report_xlsx")
-            or self.env.ref("sita_customization.inventory_report_pdf")
+            or self.env.ref("sita_customization.production_orders_report_pdf")
 
         )
         data=self._compute_results()
 
         data={
             'lines':data,
-             # 'o':self,
+
             "date_from":self.date_from,
             "date_to":self.date_to,
+            "state":self.state.upper()
 
         }
-        # print("data",data)
+
 
         return action.report_action(self,config = False,data=data)
 
