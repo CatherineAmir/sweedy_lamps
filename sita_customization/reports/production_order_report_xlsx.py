@@ -84,8 +84,10 @@ class ProductionOrderReport(models.AbstractModel):
             'bold': False,
             'font_size': 10,
             'align': 'center',
-            #'top': True,
-            #'bottom': True,
+
+
+            # 'top': True,
+            # 'bottom': True,
             'font': 'Arial',
             'text_wrap': True,
             'valign': 'top'
@@ -93,6 +95,7 @@ class ProductionOrderReport(models.AbstractModel):
         self.line_header_light_date = workbook.add_format({
             'bold': False,
             'font_size': 10,
+            'bg_color': '#BDBDBD',
             #'top': True,
             #'bottom': True,
             'font': 'Arial',
@@ -128,21 +131,16 @@ class ProductionOrderReport(models.AbstractModel):
 
         self._define_formats(workbook)
         self.row_pos = 0
-
-
-
-
         self.record = record  # Wizard object
-
         self.sheet = workbook.add_worksheet('Production Orders')
         for i in range(0,20):
-            if i in [0,1,6]:
-                self.sheet.set_column(i, i, 40)
-            elif i in [x for x in range(9,18)]:
-                self.sheet.set_column(i, i, 10)
+            # if i in [0,1,6]:
+            #     self.sheet.set_column(i, i, 40)
+            if i in [x for x in range(3,7)]:
+                self.sheet.set_column(i, i, 45)
 
             else:
-                self.sheet.set_column(i, i, 25)
+                self.sheet.set_column(i, i, 20)
         # todo check this
         self.sheet.freeze_panes(4, 0)
         self.sheet.screen_gridlines = True
@@ -168,7 +166,7 @@ class ProductionOrderReport(models.AbstractModel):
         headers=[
             "Production Order Date",
             " Reference",
-            "State"
+            "State",
             "Product Barcode",
             "Product Name",
             "Component Product Barcode",
@@ -177,38 +175,41 @@ class ProductionOrderReport(models.AbstractModel):
             "Component Quantity Done",
             "Unit Cost",
             "Total Cost",
+            "Line Type"
         ]
         for h in range(0,len(headers)):
             self.sheet.write_string(self.row_pos, h, headers[h],
                                 self.format_header)
 
-        for order in data:
-            for lines in order.values():
-                  for line in lines:
-                    print("line",line)
-                    self.row_pos = self.row_pos + 1
-                    if line['type']=='header':
-                        format= self.line_header
-                        self.sheet.write_string(self.row_pos, 4,'', format)
-                    else:
-                        format=self.line_header_light
-                        self.sheet.write_datetime(self.row_pos, 0, self.convert_to_date(line['date_planned_finished']),
-                                                  self.line_header_light_date)
 
-                    self.sheet.write_string(self.row_pos,1,line['name']or '',format)
-                    # self.sheet.write_string(self.row_pos,2,line['name']or '',format)
-                    # todo state
-                    self.sheet.write_string(self.row_pos,3,line['product_code'] or '',format)
+        for line in data:
+            # print("line",line)
+            self.row_pos = self.row_pos + 1
+            if line['type']=='header':
+                format= self.line_header
+                self.sheet.write_datetime(self.row_pos, 0, self.convert_to_date(line['date_planned_finished']),
+                                          self.line_header_light_date)
 
-                    self.sheet.write_string(self.row_pos, 4, line['product_name'] or '', format)
+            else:
+                format=self.line_header_light
+                self.sheet.write_datetime(self.row_pos, 0, self.convert_to_date(line['date_planned_finished']),
+                                          self.content_header_date)
+
+            self.sheet.write_string(self.row_pos,1,line['name']or '',format)
+            self.sheet.write_string(self.row_pos,2,line['state'].upper() if line['state'] else '',format)
+            # todo state
+            self.sheet.write_string(self.row_pos,3,line['product_code'] or '',format)
+
+            self.sheet.write_string(self.row_pos, 4, line['product_name'] or '', format)
 
 
 
-                    self.sheet.write_string(self.row_pos, 5, line['components_barcode'] or '', format)
-                    self.sheet.write_string(self.row_pos, 6, line['components_name'] or '', format)
-                    self.sheet.write_number(self.row_pos, 7, line['components_qty_bom'] , format)
-                    self.sheet.write_number(self.row_pos, 8, line['quantity_done'] , format)
-                    self.sheet.write_number(self.row_pos, 9, line['unit_cost'], format)
-                    self.sheet.write_number(self.row_pos, 10, line['total_cost'], format)
+            self.sheet.write_string(self.row_pos, 5, line['components_barcode'] or '', format)
+            self.sheet.write_string(self.row_pos, 6, line['components_name'] or '', format)
+            self.sheet.write_number(self.row_pos, 7, line['components_qty_bom'] , format)
+            self.sheet.write_number(self.row_pos, 8, line['quantity_done'] , format)
+            self.sheet.write_number(self.row_pos, 9, line['unit_cost'], format)
+            self.sheet.write_number(self.row_pos, 10, line['total_cost'], format)
+            self.sheet.write_string(self.row_pos, 11, line['type'], format)
 
 

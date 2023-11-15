@@ -8,6 +8,15 @@ class MrpOrderReport(models.TransientModel):
 
     date_from=fields.Date(string="Date From",required=1)
     date_to=fields.Date(string="Date To",required=0)
+    state=fields.Selection([
+        ("draft","Draft"),
+        ("confirmed","Confirmed"),
+        ("planned","Planned"),
+        ("progress","In Progress"),
+        ("to_close","To Close"),
+        ("done","Done"),
+        ("all","All"),
+    ])
 
     def button_export_html(self):
         pass
@@ -51,6 +60,8 @@ class MrpOrderReport(models.TransientModel):
         return {
             "date_from": self.date_from,
             "date_to": self.date_to or fields.Date.context_today(self),
+            "state":self.state,
+
         }
 
     def _export(self, report_type):

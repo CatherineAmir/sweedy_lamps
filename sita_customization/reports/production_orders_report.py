@@ -6,6 +6,15 @@ class ProductionOrderReportsModel(models.TransientModel):
     _description = 'Production Order Inventory'
     date_from = fields.Date(string = "Date From", required = 1)
     date_to = fields.Date(string = "Date To", required = 0)
+    state = fields.Selection([
+        ("draft", "Draft"),
+        ("confirmed", "Confirmed"),
+        ("planned", "Planned"),
+        ("progress", "In Progress"),
+        ("to_close", "To Close"),
+        ("done", "Done"),
+        ("all", "All"),
+    ])
 
 
     results=[]
@@ -15,21 +24,22 @@ class ProductionOrderReportsModel(models.TransientModel):
         self.ensure_one()
         date_from = self.date_from
         self.date_to=self.date_to or fields.Date.context_today(self)
-        order_dicts={}
-        order_ids=self.env['mrp.production'].search([('date_planned_finished','>=',date_from),
-                                                     ('date_planned_finished','<=',self.date_to)])
+        domain=[('date_planned_finished','>=',date_from),
+                 ('date_planned_finished','<=',self.date_to)]
+        if self.state!='all':
+            domain+=[("state",'=',self.state)]
+
+        order_ids=self.env['mrp.production'].search(domain,order="date_planned_finished,name")
         # check for date and check for order id
+
         results=[]
         for o in order_ids.ids:
-            # print('p',p)
-            order_dicts.update({
-                str(o):[],}
-            )
 
             query="""
                     select 'header' as type,mrp_order.date_planned_finished,mrp_order.name,product.default_code as product_code ,
             p_temp.name as product_name,'' as components_barcode,'' as components_name,
-            0 as components_qty_bom, product_qty as quantity_done, 0  as unit_cost, 0 as total_cost
+            0 as components_qty_bom, product_qty as quantity_done, 0  as unit_cost, 0 as total_cost,
+            mrp_order.state
         
             from mrp_production as mrp_order  
         
@@ -40,7 +50,7 @@ class ProductionOrderReportsModel(models.TransientModel):
             on p_temp.id=product.product_tmpl_id
             where mrp_order.id=%s
             union all
-            select  'line' as type,st.date,st.name,'' as product_code,'' as product_name,product.default_code as components_barcode,p_temp.name as components_name,
+            select  'line' as type,st.date,prod.name,'' as product_code,'' as product_name,product.default_code as components_barcode,p_temp.name as components_name,
              
         
         
@@ -57,7 +67,9 @@ class ProductionOrderReportsModel(models.TransientModel):
           
           sv.unit_cost*((select mrp_bom_line.product_qty from mrp_bom_line where st.product_id=mrp_bom_line.product_id and 
           mrp_bom_line.bom_id=prod.bom_id limit 1) /(select bom.product_qty from mrp_bom as bom where prod.bom_id=bom.id) *prod.product_qty)  
-          as total_cost
+          as total_cost,
+          prod.state
+          
         from stock_move as st 
         inner join  product_product as product
         on st.product_id=product.id
@@ -104,7 +116,8 @@ class ProductionOrderReportsModel(models.TransientModel):
         mrp_workcenter.labour_cost_by_unit,
         
         
-        mrp_workcenter.labour_cost_by_unit * mrp_workorder.qty_produced as labour_cost
+        mrp_workcenter.labour_cost_by_unit * mrp_workorder.qty_produced as labour_cost,
+        mrp_order.state
         from mrp_workorder 
         
         right  join  mrp_routing_workcenter as mrp_workcenter
@@ -137,7 +150,9 @@ class ProductionOrderReportsModel(models.TransientModel):
         
         
         
-        mrp_workcenter.overhead_cost_by_unit * mrp_workorder.qty_produced as overhead_cost
+        mrp_workcenter.overhead_cost_by_unit * mrp_workorder.qty_produced as 
+        overhead_cost,mrp_order.state
+        
         from mrp_workorder 
         
         full outer join  mrp_routing_workcenter as mrp_workcenter
@@ -146,26 +161,24 @@ class ProductionOrderReportsModel(models.TransientModel):
         on mrp_order.id=production_id
         
         where production_id =%s and mrp_workcenter.overhead_cost_by_unit>0
-        -- order by type 
-        -- date_planned_finished 
-
+     
 
 
             """
 
             self._cr.execute(query, (o, o,o,o))
             all_order_details = self._cr.dictfetchall()
-            order_dicts[str(o)] = all_order_details
+
+            # print("order_dicts[0]",order_dicts[0])
+            all_order_details[0]['total_cost'] = sum(
+                [line['total_cost'] if line['total_cost'] else 0 for line in all_order_details[1:]])
+            all_order_details[0]['unit_cost'] = round(all_order_details[0]['total_cost']/all_order_details[0]['quantity_done'],3)
 
 
+            results=results+all_order_details
+            # results.append(order_dicts)
 
-            order_dicts[str(o)][0]['unit_cost'] = sum(
-            [line['unit_cost'] if line['unit_cost'] else 0 for line in all_order_details[1:]])
-            order_dicts[str(o)][0]['total_cost'] = sum(
-            [line['total_cost'] if line['total_cost'] else 0 for line in all_order_details[1:]])
-            results.append(order_dicts)
-
-        # print("results",results)
+        print("results",results)
         return results
 
 
@@ -187,7 +200,7 @@ class ProductionOrderReportsModel(models.TransientModel):
             "date_to":self.date_to,
 
         }
-        print("data",data)
+        # print("data",data)
 
         return action.report_action(self,config = False,data=data)
 
