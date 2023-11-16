@@ -34,7 +34,9 @@
         'data/inventory_report_paper_format.xml',
         'reports/inventory_report_html.xml',
         'wizards/manifacturing_order_report_wizard.xml',
-        'reports/production_orders_report_pdf.xml'
+        'reports/production_orders_report_pdf.xml',
+        'wizards/sales_account_report_wizard.xml',
+
 
 
     ],

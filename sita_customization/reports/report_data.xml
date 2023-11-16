@@ -17,6 +17,14 @@
 		        report_type="xlsx"
 		        attachment_use="False"/>
 
+		<report string="Sales Accounts  Report XLSX"
+		        id="sales_account_report_xlsx"
+		        model="report.sales_account.report"
+		        name="sita_customization.sales_account_report_xlsx"
+		        file="COGS and Profitability Analysis  report"
+		        report_type="xlsx"
+		        attachment_use="False"/>
+
 
 		<report string="Inventory Report PDF"
 		        id="inventory_report_pdf"

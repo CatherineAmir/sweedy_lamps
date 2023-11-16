@@ -1,3 +1,4 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_inventory_report,access_inventory_report,model_sita_customization_inventory_report_wizard,,1,1,1,1
+access_sales_account_report,access_sales_account_report,model_sita_customization_sales_report_wizard,,1,1,1,1
 access_mrp_order_report,access_mrp_orders_report,model_sita_customization_mrp_order_report_wizard,,1,1,1,1
