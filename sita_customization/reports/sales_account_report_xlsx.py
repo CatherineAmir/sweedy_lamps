@@ -193,7 +193,7 @@ class SalesAccountReport(models.AbstractModel):
 
 
         for line in data:
-            # print("line",line)
+
             self.row_pos = self.row_pos + 1
 
             format=self.line_header_light

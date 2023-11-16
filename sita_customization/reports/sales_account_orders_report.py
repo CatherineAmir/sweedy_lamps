@@ -101,10 +101,11 @@ order by line.date,line.move_id
         action=(
             report_type=="xlsx"
             and self.env.ref("sita_customization.sales_account_report_xlsx")
-            or self.env.ref("sita_customization.production_orders_report_pdf")
+            or self.env.ref("sita_customization.profitability_report_pdf")
 
         )
         data=self._compute_results()
+        print("dataa",data)
 
         data={
             'lines':data,

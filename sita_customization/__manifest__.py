@@ -28,6 +28,7 @@
         'views/stock_quant_tree.xml',
         'reports/inventory_report_pdf.xml',
         'reports/production_orders_report_pdf.xml',
+        'reports/sales_account_profitability_report_pdf.xml',
         'reports/report_data.xml',
         'wizards/inventory_report_wizard.xml',
 

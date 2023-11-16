@@ -26,6 +26,17 @@
 		        attachment_use="False"/>
 
 
+		<report string="COGS And Profitability Report PDF"
+		        id="profitability_report_pdf"
+		        model="report.sales_account.report"
+		         name="sita_customization.cogs_profitability_report_pdf"
+		        file="sita_customization.cogs_profitability_report_pdf"
+		        report_type="qweb-pdf"
+		        print_report_name="'COGS and Profitability Analysis Report'"
+				paperformat="sita_customization.paper_format_inventory_all"
+		/>
+
+
 		<report string="Inventory Report PDF"
 		        id="inventory_report_pdf"
 		        model="report.inventory.report"
