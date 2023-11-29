@@ -73,17 +73,10 @@ class InventoryReportsModel(models.TransientModel):
         product_dicts={}
         product_ids=self.env['product.product'].search([])
         results=[]
-        for p in product_ids.ids:
-            # print('p',p)
-            # product_dicts.update({
-            #     str(p):{
-            #         'header':{},
-            #         'lines':[],
-            #
-            #     },
-            # })
+        p=tuple(product_ids.ids)
+        # for p in product_ids.ids:
 
-            self._cr.execute("""
+        self._cr.execute("""
             SELECT  Distinct 'header' as type , null::integer as move_id,null::timestamp as move_date,product.id,p_temp.name as product_name,
             product.default_code as product_code,p_cat.name as product_category,
             uom.name as product_uom ,
@@ -97,17 +90,17 @@ class InventoryReportsModel(models.TransientModel):
           
            
             case 
-            when (select move.id from stock_move move where product_id=%s and move.state='done' and  CAST(move.date as date)  < %s limit 1) is not null 
+            when (select move.id from stock_move move where product_id =product.id and move.state='done' and  CAST(move.date as date)  < %s limit 1) is not null 
             then  (select COALESCE(sum(st_val.quantity ),0.0) from stock_valuation_layer as st_val 
 				   where (st_val.stock_move_id in
-						  (select move.id from stock_move move where product_id=%s and move.state='done' and  CAST(move.date as date) 
+						  (select move.id from stock_move move where product_id =product.id  and move.state='done' and  CAST(move.date as date) 
 												  < %s)))
             else 0.0 
             end  as opening_quantity, 
 			 case 
-            when (select move.id from stock_move move where product_id=%s and move.state='done' and  CAST(move.date as date)  < %s limit 1) is not null
+            when (select move.id from stock_move move where product_id =product.id and move.state='done' and  CAST(move.date as date)  < %s limit 1) is not null
             then  (select COALESCE(sum(st_val.value ),0.0) from stock_valuation_layer as st_val 
-				   where (st_val.stock_move_id in(select move.id from stock_move move where product_id=%s and move.state='done' and  CAST(move.date as date) 
+				   where (st_val.stock_move_id in(select move.id from stock_move move where product_id =product.id and move.state='done' and  CAST(move.date as date) 
 												  < %s)))
 				
 
@@ -116,18 +109,18 @@ class InventoryReportsModel(models.TransientModel):
             end  as opening_value, 
 			
 			 case 
-            when (select move.id from stock_move move where product_id=%s and move.state='done' and  CAST(move.date as date)  < %s limit 1) is not null 
+            when (select move.id from stock_move move where product_id  =product.id and move.state='done' and  CAST(move.date as date)  < %s limit 1) is not null 
 																										  
 			then  ((select COALESCE(sum(st_val.value ),0.0) from stock_valuation_layer as st_val 
-				   where (st_val.stock_move_id in(select move.id from stock_move move where product_id=%s and move.state='done' and  CAST(move.date as date) 
+				   where (st_val.stock_move_id in(select move.id from stock_move move where product_id  =product.id and move.state='done' and  CAST(move.date as date) 
 												  < %s)))::decimal)/
 				  (Case
 				  when (select COALESCE(sum(st_val.quantity ),0.0) from stock_valuation_layer as st_val 
-				   where (st_val.stock_move_id in(select move.id from stock_move move where product_id=%s and move.state='done' and  CAST(move.date as date) 
+				   where (st_val.stock_move_id in(select move.id from stock_move move where product_id =product.id and move.state='done' and  CAST(move.date as date) 
 												  < %s))) !=0
 				  then 
 				    (select COALESCE(sum(st_val.quantity ),0.0) from stock_valuation_layer as st_val 
-				   where (st_val.stock_move_id in(select move.id from stock_move move where product_id=%s and move.state='done' and  CAST(move.date as date) 
+				   where (st_val.stock_move_id in(select move.id from stock_move move where  product_id =product.id and move.state='done' and  CAST(move.date as date) 
 												  < %s))) 
 				  else 1
 				  end)
@@ -158,9 +151,9 @@ class InventoryReportsModel(models.TransientModel):
             on p_temp.categ_id=p_cat.id
             inner join uom_uom as uom
             on p_temp.uom_id=uom.id
-		   where product.id = %s 
+		   where product.id in %s 
             
-           
+        
              union all
               SELECT 'line' as type ,move.id as move_id ,move.date as move_date,move.product_id ,
              p_temp.name as product_name,product.default_code as product_code,p_cat.name as product_category,
@@ -213,87 +206,66 @@ class InventoryReportsModel(models.TransientModel):
             full outer Join stock_valuation_layer as st_val
             on move.id=st_val.stock_move_id
             
-             where move.state='done' and move.product_id=%s
+             where move.state='done' and move.product_id in %s
               and CAST(move.date as date)  >= %s
               and  CAST(move.date as date)<=%s
                
            GROUP BY product.id,p_temp.name,p_cat.name, product.default_code,p_cat.name, uom.name,move.id,stock_picking.origin,
            stock_location_source.name,stock_location_dest.name,picking_type.warehouse_id,stock_warehouse.name,picking_type.name,picking_type.id,st_val.quantity,
            st_val.value
+           order by id
+         
                
             
-            """,(
-                p,date_from,p,date_from,
-                p,date_from,p,date_from,
-                p,date_from,p,date_from,
-                p,date_from,p,date_from,
-                p,p,date_from,self.date_to,
+        """,(
+            date_from,date_from,
+            date_from,date_from,
+            date_from,date_from,
+            date_from,date_from,
+            p,
+            p,date_from,self.date_to,
 
-            ))
-            all_lines=self._cr.dictfetchall()
-            all_lines[0]['in_value'] = sum(
-                [line['in_value'] if line['in_value'] else 0 for line in all_lines[1:]])
-            all_lines[0]['out_quantity'] = sum(
-                [line['out_quantity'] if line['out_quantity'] else 0 for line in  all_lines[1:]])
-            all_lines[0]['out_value'] = sum(
-                [line['out_value'] if line['out_value'] else 0 for line in  all_lines[1:]])
-            all_lines[0]['ending_quantity'] = all_lines[0]['opening_quantity'] + \
-                                                                 all_lines[0]['in_quantity'] - \
-                                              all_lines[0]['out_quantity']
-            all_lines[0]['ending_value'] = all_lines[0]['opening_value'] + \
-                                                              all_lines[0]['in_value'] - \
-                                                              all_lines[0]['out_value']
-            all_lines[0]['ending_weigted_avg'] =  all_lines[0]['ending_value'] / \
-                                                  all_lines[0]['ending_quantity'] if all_lines[0]['ending_quantity'] else 1
+        ))
+        all_lines=self._cr.dictfetchall()
 
 
-            # print("length of headers",len(initial_lines))
-            # print('initial_line', initial_lines)
 
-            # if len(initial_lines)
+        for i in range(0, len(all_lines)):
+            if all_lines[i]['type'] == "header":
+                print("header")
+                id = all_lines[i]['id']
+                all_lines[i]['in_value'] =0
+                all_lines[i]['out_quantity'] =0
+                all_lines[i]['out_value'] = 0
+                all_lines[i]['ending_quantity'] = 0
+                all_lines[i]['ending_value'] =0
+                all_lines[i]['ending_weigted_avg'] = 0
 
-            # product_dicts[str(p)]['header']=initial_lines[0]
-            # print( 'initial_line',product_dicts)
+                j = i
+            else:
+                if all_lines[i]['id'] == id and all_lines[i]['type'] in ['line']:
+
+                    all_lines[j]['in_value'] += all_lines[i]['in_value']
+                    all_lines[j]['in_quantity'] += all_lines[i]['in_quantity']
+
+                    all_lines[j]['out_quantity']  += all_lines[i]['out_quantity']
+                    all_lines[j]['out_value']  += all_lines[i]['out_value']
+                    all_lines[j]['ending_quantity'] = all_lines[j]['opening_quantity'] + \
+                                                      all_lines[j]['in_quantity'] - \
+                                                      all_lines[j]['out_quantity']
+                    all_lines[j]['ending_value'] = all_lines[j]['opening_value'] + \
+                                                   all_lines[j]['in_value'] - \
+                                                   all_lines[j]['out_value']
+                    all_lines[j]['ending_weigted_avg'] = all_lines[j]['ending_value'] / \
+                                                         all_lines[j]['ending_quantity'] if all_lines[j][
+                        'ending_quantity'] else 1
+
 
 
             # multilines
             # TOdo query parameters
 
-
-            # query2="""
-            #
-            #
-            #
-            # """
-            # # print((p,))
-            # self._cr.execute(query2,(p,date_from,self.date_to))
-
-            # self._cr.execute(query,(str(p),))
-
-
-
-            # product_stock_moves_lines=self._cr.dictfetchall()
-            # print('product_stock_moves_lines',product_stock_moves_lines)
-
-            # print("[ line ['in_quantity'] if line ['in_quantity']!=None else  0 for line in product_stock_moves_lines]",[ line ['in_quantity'] if line ['in_quantity']!=None else  0 for line in product_stock_moves_lines])
-            # print(product_dicts[str(p)]['header'])
-            # if len(product_stock_moves_lines):
-                # try:
-                #     product_dicts[str(p)]['header']['in_quantity']=sum([ line ['in_quantity'] if line ['in_quantity']!=None else  0 for line in product_stock_moves_lines])
-                # except Exception as e:
-                #     print(" error",e)
-                    # print("product_dicts[str(p)]['header']['in_quantity']",product_dicts[str(p)]['header']['in_quantity'])
-                    # print("[ line ['in_quantity'] if line ['in_quantity']!=None else  0 for line in product_stock_moves_lines]",[ line ['in_quantity'] if line ['in_quantity']!=None else  0 for line in product_stock_moves_lines])
-
-
-
-                # print('lines',product_stock_moves_lines)
-            # product_dicts[str(p)]['lines']=product_stock_moves_lines
-            # results.append( product_dicts[str(p)]['header'])
-
-            results=results+all_lines
-
-        return results
+        return all_lines
 
 
 
