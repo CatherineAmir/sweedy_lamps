@@ -105,7 +105,7 @@ order by line.date,line.move_id
 
         )
         data=self._compute_results()
-        print("dataa",data)
+        # print("dataa",data)
 
         data={
             'lines':data,

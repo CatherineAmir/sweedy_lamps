@@ -23,23 +23,19 @@
     'depends': ['base','stock','stock_card_report','stock_account',"report_xlsx"],
     # always loaded
     'data': [
-        # 'security/ir.model.access.csv',
+        'security/ir.model.access.csv',
         'reports/stock_card_pdf.xml',
         'views/stock_quant_tree.xml',
+        'data/inventory_report_paper_format.xml',
         'reports/inventory_report_pdf.xml',
         'reports/production_orders_report_pdf.xml',
         'reports/sales_account_profitability_report_pdf.xml',
         'reports/report_data.xml',
         'wizards/inventory_report_wizard.xml',
-
-        'data/inventory_report_paper_format.xml',
         'reports/inventory_report_html.xml',
         'wizards/manifacturing_order_report_wizard.xml',
         'reports/production_orders_report_pdf.xml',
         'wizards/sales_account_report_wizard.xml',
-
-
-
     ],
     # only loaded in demonstration mode
     'demo': [

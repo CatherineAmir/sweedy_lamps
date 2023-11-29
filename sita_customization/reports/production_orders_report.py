@@ -30,15 +30,13 @@ class ProductionOrderReportsModel(models.TransientModel):
             domain+=[("state",'=',self.state)]
 
         order_ids=self.env['mrp.production'].search(domain,order="date_planned_finished,name")
-        # check for date and check for order id
-
-        results=[]
-        for o in order_ids.ids:
-
-            query="""
-                    select 'header' as type,mrp_order.date_planned_finished,mrp_order.name,product.default_code as product_code ,
+        o=tuple(order_ids.ids)
+        query="""
+        
+			select 'header' as type,mrp_order.date_planned_finished,mrp_order.name,product.default_code as product_code ,
             p_temp.name as product_name,'' as components_barcode,'' as components_name,
-            0 as components_qty_bom, product_qty as quantity_done, 0  as unit_cost, 0 as total_cost,
+            0 as components_qty_bom, product_qty as quantity_done, 
+            0  as unit_cost, 0 as total_cost,
             mrp_order.state
         
             from mrp_production as mrp_order  
@@ -48,7 +46,7 @@ class ProductionOrderReportsModel(models.TransientModel):
         
             inner join product_template as p_temp
             on p_temp.id=product.product_tmpl_id
-            where mrp_order.id=%s
+            where mrp_order.id in %s
             union all
             select  'line' as type,st.date,prod.name,'' as product_code,'' as product_name,product.default_code as components_barcode,p_temp.name as components_name,
              
@@ -90,13 +88,13 @@ class ProductionOrderReportsModel(models.TransientModel):
         on bom.id=bom_line.bom_id
         and bom_line.product_id=st.product_id
         
-        where raw_material_production_id=%s
+        where raw_material_production_id in  %s
+		
+		union 
         
-        union all
         
         
-        
-        select 'cost' as type,
+        select 'value_cost' as type,
         mrp_order.date_planned_finished,
         mrp_order.name,
         
@@ -126,11 +124,13 @@ class ProductionOrderReportsModel(models.TransientModel):
         inner join mrp_production as mrp_order
         on mrp_order.id=production_id
         
-        where production_id =%s and mrp_workcenter.labour_cost_by_unit>0
+        where production_id in %s
+		and mrp_workcenter.labour_cost_by_unit>0
+-- 		order by production_id
         
-        union all
+        union 
         select 
-        'cost' as type,
+        'value_cost' as type,
         mrp_order.date_planned_finished,
         mrp_order.name,
         '' as product_barcode,
@@ -160,26 +160,36 @@ class ProductionOrderReportsModel(models.TransientModel):
         inner join mrp_production as mrp_order
         on mrp_order.id=production_id
         
-        where production_id =%s and mrp_workcenter.overhead_cost_by_unit>0
+        where production_id in %s
+								and mrp_workcenter.overhead_cost_by_unit>0
+		
+								
      
-
+	 order by name, type
+	 
+    
+       
 
             """
 
-            self._cr.execute(query, (o, o,o,o))
-            all_order_details = self._cr.dictfetchall()
+        self._cr.execute(query, (o, o,o,o))
+        all_order_details = self._cr.dictfetchall()
 
-            # print("order_dicts[0]",order_dicts[0])
-            all_order_details[0]['total_cost'] = sum(
-                [line['total_cost'] if line['total_cost'] else 0 for line in all_order_details[1:]])
-            all_order_details[0]['unit_cost'] = round(all_order_details[0]['total_cost']/all_order_details[0]['quantity_done'],3)
+        # print("order_dicts",all_order_details[:21])
+        all_order_details[0]['total_cost'] = sum(
+            [line['total_cost'] if line['total_cost'] else 0 for line in all_order_details[1:]])
+        all_order_details[0]['unit_cost'] = round(all_order_details[0]['total_cost']/all_order_details[0]['quantity_done'],3)
+        for i in range(0,len(all_order_details)):
+            if all_order_details[i]['type']=="header":
+                name=all_order_details[i]['name']
+                all_order_details[i]['total_cost']=0
+                j=i
+            else:
+                if all_order_details[i]['name']==name and  all_order_details[i]['type'] in ['line','value_cost']:
+                    all_order_details[j]['total_cost']+=all_order_details[i]['total_cost']
+                    all_order_details[j]['unit_cost']=round(all_order_details[j]['total_cost']/all_order_details[j]['quantity_done'],3)
 
-
-            results=results+all_order_details
-            # results.append(order_dicts)
-
-        print("results",results)
-        return results
+        return all_order_details
 
 
     def print_report(self,report_type="qweb-pdf"):

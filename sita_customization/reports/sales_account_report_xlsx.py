@@ -150,7 +150,7 @@ class SalesAccountReport(models.AbstractModel):
 
         if record:
             data = data["lines"]
-            print("in report dataaa",data)
+            # print("in report dataaa",data)
 
 
             self.sheet.merge_range(0, 0, 0, 8, 'COGS & Profitability Analysis      ' + 'From {}   To {}'.format(datetime.strptime(str(self.convert_to_date(record.date_from)),"%Y-%m-%d  %H:%M:%S").strftime("%d/%m/%Y"),datetime.strptime(str(self.convert_to_date(record.date_to)),"%Y-%m-%d  %H:%M:%S").strftime("%d/%m/%Y")), self.format_title)
