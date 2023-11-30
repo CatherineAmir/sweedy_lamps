@@ -1,5 +1,7 @@
 from odoo import fields, models, api
-
+import logging
+_logger=logging.getLogger(__name__)
+import time
 
 class SalesAccountReportsModel(models.TransientModel):
     _name = 'report.sales_account.report'
@@ -86,9 +88,12 @@ where line.account_id=8097 and line.quantity!=0 and line.date>=%s and line.date<
 order by line.date,line.move_id
         
         """
+        start=time.time()
         self._cr.execute(query, (date_from,self.date_to))
         results = self._cr.dictfetchall()
-        # print("results[0]",results)
+        end_query = time.time() - start
+        _logger.info("query_done number of rows %s", len(results))
+        _logger.info("query_done in %s sec", end_query)
 
         return results
 
@@ -104,17 +109,14 @@ order by line.date,line.move_id
             or self.env.ref("sita_customization.profitability_report_pdf")
 
         )
-        data=self._compute_results()
-        # print("dataa",data)
 
         data={
-            'lines':data,
+            'report': self.id,
             "date_from":self.date_from,
             "date_to":self.date_to,
-
-
         }
-
+        if report_type == "qweb-pdf":
+            data["lines"] = self._compute_results()
 
         return action.report_action(self,config = False,data=data)
 

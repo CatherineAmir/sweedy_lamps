@@ -149,7 +149,11 @@ class SalesAccountReport(models.AbstractModel):
         self._format_float_and_dates(self.env.user.company_id.currency_id, self.language_id)
 
         if record:
-            data = data["lines"]
+            report_id = data["report"]
+            report = self.env['report.sales_account.report'].browse(int(report_id))
+
+            data = report._compute_results()
+
             # print("in report dataaa",data)
 
 

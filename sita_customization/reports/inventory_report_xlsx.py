@@ -1,5 +1,8 @@
 from odoo import fields, models, api
 from datetime import datetime
+import logging
+import time
+_logger=logging.getLogger(__name__)
 DATE_DICT = {
     '%m/%d/%Y' : 'mm/dd/yyyy',
     '%Y/%m/%d' : 'yyyy/mm/dd',
@@ -130,9 +133,8 @@ class InventoryReport(models.AbstractModel):
         self.row_pos = 0
 
 
-
-
         self.record = record  # Wizard object
+
 
         self.sheet = workbook.add_worksheet('Inventory Report')
         for i in range(0,20):
@@ -151,12 +153,21 @@ class InventoryReport(models.AbstractModel):
         self._format_float_and_dates(self.env.user.company_id.currency_id, self.language_id)
 
         if record:
-            data = data["lines"]
+            report_id=data["report"]
+            report=self.env['report.inventory.report'].browse(int(report_id))
+
+            data=report._compute_results()
+            # data = data["lines"]
 
 
             self.sheet.merge_range(0, 0, 0, 8, 'Total Inventory      ' + 'From {}   To {}'.format(datetime.strptime(str(self.convert_to_date(record.date_from)),"%Y-%m-%d  %H:%M:%S").strftime("%d/%m/%Y"),datetime.strptime(str(self.convert_to_date(record.date_to)),"%Y-%m-%d  %H:%M:%S").strftime("%d/%m/%Y")), self.format_title)
             self.dateformat = self.env.user.lang
+            _logger.info("perpare content start")
+            start=time.time()
             self.prepare_report_contents(data)
+            end=time.time()
+            _logger.info("perpare content end  in %s sec", end-start)
+
     def convert_to_date(self, datestring=False):
         if datestring:
             datestring = fields.Date.from_string(datestring).strftime(self.language_id.date_format)
@@ -164,6 +175,7 @@ class InventoryReport(models.AbstractModel):
         else:
             return False
     def prepare_report_contents(self,data):
+
         self.row_pos += 3
         headers=[
             "Product Code",
@@ -222,6 +234,6 @@ class InventoryReport(models.AbstractModel):
             self.sheet.write_number(self.row_pos, 16, line['ending_quantity'], format)
             self.sheet.write_number(self.row_pos, 17, line['ending_value'], format)
             self.sheet.write_number(self.row_pos, 18, line['ending_weigted_avg'], format)
-            self.sheet.write_string(self.row_pos, 19, line['type'], format)
+            self.sheet.write_string(self.row_pos, 19, line['type'].replace("_"," ").title(), format)
 
 

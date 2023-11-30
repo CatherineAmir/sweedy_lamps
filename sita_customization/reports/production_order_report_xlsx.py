@@ -149,7 +149,9 @@ class ProductionOrderReport(models.AbstractModel):
         self._format_float_and_dates(self.env.user.company_id.currency_id, self.language_id)
 
         if record:
-            data = data["lines"]
+            report_id = data["report"]
+            report = self.env['report.production_order.report'].browse(int(report_id))
+            data = report._compute_results()
 
 
             self.sheet.merge_range(0, 0, 0, 8, 'Production Report      ' + 'From {}   To {}'.format(datetime.strptime(str(self.convert_to_date(record.date_from)),"%Y-%m-%d  %H:%M:%S").strftime("%d/%m/%Y"),datetime.strptime(str(self.convert_to_date(record.date_to)),"%Y-%m-%d  %H:%M:%S").strftime("%d/%m/%Y")), self.format_title)
@@ -210,6 +212,6 @@ class ProductionOrderReport(models.AbstractModel):
             self.sheet.write_number(self.row_pos, 8, line['quantity_done'] , format)
             self.sheet.write_number(self.row_pos, 9, line['unit_cost'], format)
             self.sheet.write_number(self.row_pos, 10, line['total_cost'], format)
-            self.sheet.write_string(self.row_pos, 11, line['type'], format)
+            self.sheet.write_string(self.row_pos, 11, line['type'].replace("_"," ").title(), format)
 
 

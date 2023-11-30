@@ -136,7 +136,7 @@
 			                                   </td>
 			                                   <td t-att-style="style" >
 
-                                             <span t-esc="line['type']"  />
+                                             <span t-esc="line['type'].replace('_',' ').title()"  />
 
 			                                   </td>
 

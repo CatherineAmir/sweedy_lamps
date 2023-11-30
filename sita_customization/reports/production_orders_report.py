@@ -1,5 +1,7 @@
 from odoo import fields, models, api
-
+import logging
+_logger=logging.getLogger(__name__)
+import time
 
 class ProductionOrderReportsModel(models.TransientModel):
     _name = 'report.production_order.report'
@@ -171,10 +173,13 @@ class ProductionOrderReportsModel(models.TransientModel):
        
 
             """
-
+        start = time.time()
         self._cr.execute(query, (o, o,o,o))
         all_order_details = self._cr.dictfetchall()
-
+        end_query = time.time() - start
+        _logger.info("query_done number of rows %s", len(all_order_details))
+        _logger.info("query_done in %s sec", end_query)
+        start_handling = time.time()
         # print("order_dicts",all_order_details[:21])
         all_order_details[0]['total_cost'] = sum(
             [line['total_cost'] if line['total_cost'] else 0 for line in all_order_details[1:]])
@@ -201,17 +206,16 @@ class ProductionOrderReportsModel(models.TransientModel):
             or self.env.ref("sita_customization.production_orders_report_pdf")
 
         )
-        data=self._compute_results()
+
 
         data={
-            'lines':data,
-
+            'report': self.id,
             "date_from":self.date_from,
             "date_to":self.date_to,
             "state":self.state.upper()
-
         }
-
+        if report_type == "qweb-pdf":
+            data["lines"] = self._compute_results()
 
         return action.report_action(self,config = False,data=data)
 

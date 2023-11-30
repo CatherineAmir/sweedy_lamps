@@ -1,6 +1,7 @@
 from odoo import fields, models, api
-
-
+import logging
+_logger=logging.getLogger(__name__)
+import time
 class InventoryReportView(models.TransientModel):
     _name='inventory.report.view'
     _description = "Inventory Report View"
@@ -66,14 +67,15 @@ class InventoryReportsModel(models.TransientModel):
     results=[]
 
     def _compute_results(self   ):
+        start=time.time()
 
         self.ensure_one()
         date_from = self.date_from
         self.date_to=self.date_to or fields.Date.context_today(self)
         product_dicts={}
-        product_ids=self.env['product.product'].search([])
-        results=[]
-        p=tuple(product_ids.ids)
+        # product_ids=self.env['product.product'].search([])
+        # results=[]
+        # p=tuple(product_ids.ids)
         # for p in product_ids.ids:
 
         self._cr.execute("""
@@ -151,7 +153,7 @@ class InventoryReportsModel(models.TransientModel):
             on p_temp.categ_id=p_cat.id
             inner join uom_uom as uom
             on p_temp.uom_id=uom.id
-		   where product.id in %s 
+		   where product.id in (select id from product_product) 
             
         
              union all
@@ -206,7 +208,7 @@ class InventoryReportsModel(models.TransientModel):
             full outer Join stock_valuation_layer as st_val
             on move.id=st_val.stock_move_id
             
-             where move.state='done' and move.product_id in %s
+             where move.state='done' and move.product_id in  (select id from product_product) 
               and CAST(move.date as date)  >= %s
               and  CAST(move.date as date)<=%s
                
@@ -222,17 +224,21 @@ class InventoryReportsModel(models.TransientModel):
             date_from,date_from,
             date_from,date_from,
             date_from,date_from,
-            p,
-            p,date_from,self.date_to,
+
+            date_from,self.date_to,
 
         ))
         all_lines=self._cr.dictfetchall()
+        end_query=time.time()-start
+        _logger.info("query_done number of rows %s",len(all_lines))
+        _logger.info("query_done in %s sec",end_query)
+        start_handling=time.time()
 
 
 
         for i in range(0, len(all_lines)):
             if all_lines[i]['type'] == "header":
-                print("header")
+
                 id = all_lines[i]['id']
                 all_lines[i]['in_value'] =0
                 all_lines[i]['out_quantity'] =0
@@ -260,10 +266,9 @@ class InventoryReportsModel(models.TransientModel):
                                                          all_lines[j]['ending_quantity'] if all_lines[j][
                         'ending_quantity'] else 1
 
+        end_handling = time.time() - start_handling
+        _logger.info("handling done in %s", end_handling)
 
-
-            # multilines
-            # TOdo query parameters
 
         return all_lines
 
@@ -279,18 +284,17 @@ class InventoryReportsModel(models.TransientModel):
             or self.env.ref("sita_customization.inventory_report_pdf")
 
         )
-        data=self._compute_results()
+        # data=self._compute_results()
 
         data={
-            'lines':data,
-             # 'o':self,
+            'report':self.id,
             "date_from":self.date_from,
             "date_to":self.date_to,
 
         }
-        # print("o",data["o"])
-        # print("o_date_from",data["o"].date_from)
-        # print("o_date_to",data["o"].date_to)
+        if report_type=="qweb-pdf":
+            data["lines"]=self._compute_results()
+
 
         return action.report_action(self,config = False,data=data)
 
