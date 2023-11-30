@@ -132,7 +132,7 @@ class SalesAccountReport(models.AbstractModel):
         self._define_formats(workbook)
         self.row_pos = 0
         self.record = record  # Wizard object
-        self.sheet = workbook.add_worksheet('Production Orders')
+        self.sheet = workbook.add_worksheet('Cogs and Profitability Analysis')
         for i in range(0,20):
             # if i in [0,1,6]:
             #     self.sheet.set_column(i, i, 40)
@@ -217,7 +217,7 @@ class SalesAccountReport(models.AbstractModel):
 
             self.sheet.write_string(self.row_pos, 8, line['partner_tax_id'] or '', format)
             self.sheet.write_string(self.row_pos, 9, line['sales_person'] or '', format)
-            self.sheet.write_string(self.row_pos, 10, line['customer_price_list'] or 0, format)
+            self.sheet.write_string(self.row_pos, 10, line['customer_price_list'] or '', format)
             self.sheet.write_number(self.row_pos, 11, line['product_cost'] or 0, format)
             self.sheet.write_number(self.row_pos, 12, line['cogs_unit_price'] or 0, format)
             self.sheet.write_number(self.row_pos, 13, line['invoice_line_unit_price'] or 0, format)

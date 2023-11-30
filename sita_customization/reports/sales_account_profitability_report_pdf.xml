@@ -128,8 +128,13 @@
 
 			                                   </td>
 			                                   <td t-att-style="style" >
+				                                   <t t-if="line['product_cost']">
+					                                   <span t-esc="line['product_cost']" t-options='{"widget": "float", "precision": 2}'  />
+				                                   </t>
+				                                   <t t-else="">
+					                                   <span t-esc="''"  />
+				                                   </t>
 
-                                             <span t-esc="line['product_cost']" t-options='{"widget": "float", "precision": 2}'  />
 
 			                                   </td>
 			                                   <td t-att-style="style" >

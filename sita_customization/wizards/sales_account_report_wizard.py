@@ -8,6 +8,9 @@ class SalesAccountReport(models.TransientModel):
 
     date_from=fields.Date(string="Date From",required=1)
     date_to=fields.Date(string="Date To",required=0)
+    income_account=fields.Many2many("account.account",string="Accounts",required=1,
+                                    domain=[('internal_group','=','income')],
+                                    default=lambda x:x.id==8279)
 
     # def button_export_html(self):
     #
@@ -50,6 +53,7 @@ class SalesAccountReport(models.TransientModel):
         return {
             "date_from": self.date_from,
             "date_to": self.date_to or fields.Date.context_today(self),
+            'income_account':self.income_account
 
 
         }

@@ -8,6 +8,9 @@ class SalesAccountReportsModel(models.TransientModel):
     _description = 'Sales Account Inventory'
     date_from = fields.Date(string = "Date From", required = 1)
     date_to = fields.Date(string = "Date To", required = 0)
+    income_account = fields.Many2many("account.account", string = "Accounts", required = 1,
+                                      domain = [('internal_group', '=', 'income')],
+                                      default = lambda x: x.id == 8279)
 
 
 
@@ -35,7 +38,6 @@ line.price_subtotal - journal_items.debit as profitability,
 move.state 
 
 from account_move_line as line
-
 inner join account_account as account
 on account.id=line.account_id
 
@@ -47,7 +49,7 @@ inner join  product_template as p_temp
 on 
 product.product_tmpl_id=p_temp.id
 
-inner join res_partner as partner
+right join res_partner as partner
 on partner.id=line.partner_id
 inner join account_move as move
 on line.move_id=move.id
@@ -57,39 +59,41 @@ on move.invoice_user_id=user_id.id
 inner join res_partner as user_partner
 on user_id.partner_id=user_partner.id
 
-inner join sale_order_line_invoice_rel 
-on sale_order_line_invoice_rel.invoice_line_id=line.id
+full outer  join sale_order_line_invoice_rel 
+on line.id=sale_order_line_invoice_rel.invoice_line_id
 
-inner join sale_order_line
+full outer join sale_order_line
 on sale_order_line.id=sale_order_line_invoice_rel.order_line_id
 
 
-inner join sale_order 
+full outer join sale_order 
 on sale_order_line.order_id=sale_order.id
 
 
-inner join account_move_line as journal_items
-on journal_items.move_id=line.move_id and journal_items.account_id=8279 and journal_items.product_id=line.product_id
+full outer join account_move_line as journal_items
+on journal_items.move_id=line.move_id and journal_items.account_id in
+ (select id from  account_account where id in %s) and journal_items.product_id=line.product_id
 
 
 
-inner join product_pricelist
+full outer join  product_pricelist
 
 on 
 sale_order.pricelist_id=product_pricelist.id
 
-inner join res_currency as list_currency
+full outer join res_currency as list_currency
 on product_pricelist.currency_id =list_currency.id
 
-inner JOIN ir_property prop on 
+full outer join ir_property prop on 
 prop.res_id = 'product.product,' || product.id and prop.name='standard_price'
+
  
-where line.account_id=8097 and line.quantity!=0 and line.date>=%s and line.date<=%s
-order by line.date,line.move_id
+where line.account_id=8097 and line.quantity!=0 and line.date>=%s and line.date<=%s and move.state='posted'
+order by line.date,line.move_name
         
         """
         start=time.time()
-        self._cr.execute(query, (date_from,self.date_to))
+        self._cr.execute(query, (tuple(self.income_account.ids),date_from,self.date_to))
         results = self._cr.dictfetchall()
         end_query = time.time() - start
         _logger.info("query_done number of rows %s", len(results))
