@@ -4,13 +4,16 @@ from odoo.tools.safe_eval import safe_eval
 
 
 class SalesAccountReport(models.TransientModel):
+    def _get_user_default_accounts(self):
+
+        return  (8279,)
     _name = 'sita_customization.sales_report_wizard'
 
     date_from=fields.Date(string="Date From",required=1)
     date_to=fields.Date(string="Date To",required=0)
     income_account=fields.Many2many("account.account",string="Accounts",required=1,
                                     domain=[('internal_group','=','income')],
-                                    default=lambda x:x.id==8279)
+                                    default=_get_user_default_accounts)
 
     # def button_export_html(self):
     #
