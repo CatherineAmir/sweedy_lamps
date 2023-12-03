@@ -36,6 +36,7 @@
         'wizards/manifacturing_order_report_wizard.xml',
         'reports/production_orders_report_pdf.xml',
         'wizards/sales_account_report_wizard.xml',
+        'views/account_move_line.xml',
     ],
     # only loaded in demonstration mode
     'demo': [
