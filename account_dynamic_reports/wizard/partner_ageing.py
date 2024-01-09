@@ -189,7 +189,7 @@ class InsPartnerAgeing(models.TransientModel):
         final_date = False
         for i in range(5):
 
-            start = stop #- relativedelta(days=1)
+            start = stop - relativedelta(days=1)
 
             if i==0:
                 stop = start - relativedelta(days=bucket_list[i])

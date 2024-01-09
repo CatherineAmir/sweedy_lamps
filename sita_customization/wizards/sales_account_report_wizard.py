@@ -6,7 +6,7 @@ from odoo.tools.safe_eval import safe_eval
 class SalesAccountReport(models.TransientModel):
     def _get_user_default_accounts(self):
 
-        return  (8279,)
+        return  (8097,)
     _name = 'sita_customization.sales_report_wizard'
 
     date_from=fields.Date(string="Date From",required=1)
