@@ -102,8 +102,9 @@ on sale_order_line.order_id=sale_order.id
 
 full outer join account_move_line as journal_items
 on journal_items.move_id=line.move_id and journal_items.account_id in
- (select id from  account_account where id in %s) and journal_items.product_id=line.product_id
-
+ (select id from  account_account where id in %s) 
+ and journal_items.product_id=line.product_id
+and journal_items.quantity=line.quantity
 
 
 full outer join  product_pricelist
@@ -118,18 +119,18 @@ full outer join ir_property prop on
 prop.res_id = 'product.product,' || product.id and prop.name='standard_price'
 
  
-where line.account_id=8097 and line.quantity!=0 and line.date>=%s and line.date<=%s and move.state='posted'
+where line.account_id in %s and line.quantity!=0 and line.date>=%s and line.date<=%s and move.state='posted'
 order by line.date,line.move_name
         
         """
         start=time.time()
-        self._cr.execute(query, (tuple(self.income_account.ids),date_from,self.date_to))
+        self._cr.execute(query, (tuple(self.income_account.ids),tuple(self.income_account.ids),date_from,self.date_to))
         lines = self._cr.dictfetchall()
         end_query = time.time() - start
         _logger.info("query_done number of rows %s", len(lines))
         _logger.info("query_done in %s sec", end_query)
         ReportLine=self.env['cogs.report.view']
-        print('lines[0]', lines[0])
+
         self.results=[ReportLine.new(line).id for line in lines]
 
 
