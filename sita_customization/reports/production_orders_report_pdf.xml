@@ -62,7 +62,8 @@
                                 </thead>
 	                                 <tbody class="text-center" style="font-size:12px;border: 1px solid black;
                                         border-collapse: collapse;">
-		                                   <tr t-foreach="lines" t-as="line" style="background-color:#c8e6e1;font-size:14px; font-weight:600;border: 1px solid black;
+		                                 <t t-set="datas" t-value="request.env['report.production_order.report'].browse(int(report)).results"/>
+		                                   <tr t-foreach="datas" t-as="line" style="background-color:#c8e6e1;font-size:14px; font-weight:600;border: 1px solid black;
                                         border-collapse: collapse;">
 			                                    <t t-if="line['type']=='header'">
                                                     <t t-set="style" t-value="'background-color:#ede9da'" />

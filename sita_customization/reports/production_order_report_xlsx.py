@@ -151,7 +151,7 @@ class ProductionOrderReport(models.AbstractModel):
         if record:
             report_id = data["report"]
             report = self.env['report.production_order.report'].browse(int(report_id))
-            data = report._compute_results()
+            data = report.results
 
 
             self.sheet.merge_range(0, 0, 0, 8, 'Production Report      ' + 'From {}   To {}'.format(datetime.strptime(str(self.convert_to_date(record.date_from)),"%Y-%m-%d  %H:%M:%S").strftime("%d/%m/%Y"),datetime.strptime(str(self.convert_to_date(record.date_to)),"%Y-%m-%d  %H:%M:%S").strftime("%d/%m/%Y")), self.format_title)

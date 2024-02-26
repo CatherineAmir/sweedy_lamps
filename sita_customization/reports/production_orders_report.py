@@ -2,6 +2,29 @@ from odoo import fields, models, api
 import logging
 _logger=logging.getLogger(__name__)
 import time
+class StockCardView(models.TransientModel):
+    _name = "production.report.view"
+    _description = "Stock Card View"
+    _order = "date"
+    type = fields.Selection(selection = [
+        ('header', "header"),
+        ('line', 'line')
+    ], default = 'line')
+    date_planned_finished=fields.Datetime()
+    name=fields.Char(string="Name")
+    product_code=fields.Char(string="Product Code")
+    product_name=fields.Char(string="Product Name")
+    components_barcode=fields.Char()
+    components_name=fields.Char()
+    components_qty_bom=fields.Float()
+    quantity_done=fields.Float()
+    unit_cost=fields.Float()
+    total_cost=fields.Float()
+    state=fields.Char()
+
+
+
+
 
 class ProductionOrderReportsModel(models.TransientModel):
     _name = 'report.production_order.report'
@@ -19,7 +42,7 @@ class ProductionOrderReportsModel(models.TransientModel):
     ])
 
 
-    results=[]
+    results=fields.Many2many('production.report.view', compute='_compute_results',help="use compute field so nothing stored in database")
 
     def _compute_results(self   ):
 
@@ -193,8 +216,11 @@ class ProductionOrderReportsModel(models.TransientModel):
                 if all_order_details[i]['name']==name and  all_order_details[i]['type'] in ['line','value_cost']:
                     all_order_details[j]['total_cost']+=all_order_details[i]['total_cost']
                     all_order_details[j]['unit_cost']=round(all_order_details[j]['total_cost']/all_order_details[j]['quantity_done'],3)
+        print('all_order_details[0]', all_order_details[0])
+        ReportLine=self.env["production.report.view"]
+        self.results=[ReportLine.new(line).id for line in all_order_details]
 
-        return all_order_details
+        # return all_order_details
 
 
     def print_report(self,report_type="qweb-pdf"):
@@ -214,8 +240,8 @@ class ProductionOrderReportsModel(models.TransientModel):
             "date_to":self.date_to,
             "state":self.state.upper()
         }
-        if report_type == "qweb-pdf":
-            data["lines"] = self._compute_results()
+        # if report_type == "qweb-pdf":
+        #     data["lines"] = self._compute_results()
 
         return action.report_action(self,config = False,data=data)
 
