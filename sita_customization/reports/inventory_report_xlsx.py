@@ -156,7 +156,7 @@ class InventoryReport(models.AbstractModel):
             report_id=data["report"]
             report=self.env['report.inventory.report'].browse(int(report_id))
 
-            data=report._compute_results()
+            data=report.results
             # data = data["lines"]
 
 

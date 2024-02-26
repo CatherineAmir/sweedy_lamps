@@ -7,19 +7,22 @@ class InventoryReportView(models.TransientModel):
     _description = "Inventory Report View"
     _order='date'
     #TODO all moves must be done
-    line_type=fields.Selection(selection=[
+    type=fields.Selection(selection=[
         ('header',"header"),
         ('line','line')
     ],default='line')
     product_id=fields.Many2one(comodel_name = 'product.product')
     product_code=fields.Char()
     product_name=fields.Char()
-    product_category=fields.Many2one(comodel_name = 'product.category',related='product_id.categ_id')
+    # product_category=fields.Many2one(comodel_name = 'product.category',related='product_id.categ_id')
+    product_category=fields.Char()
+    product_uom=fields.Char()
 
     move_id=fields.Many2one(comodel_name = 'stock.move')
     move_date = fields.Date()
     move_reference=fields.Char()
     move_display_name=fields.Char()
+    move_name = fields.Char()
     picking_display_name=fields.Char()
     picking_type_id=fields.Many2one(comodel_name = 'stock.picking.type')
     picking_code=fields.Selection([
@@ -28,22 +31,21 @@ class InventoryReportView(models.TransientModel):
         ('internal','Internal Transfer'),
         ('mrp_operation','Manufacturing')
     ])
-    account_move_id=fields.Many2one(comodel_name = 'account.move')
-    account_move_ref=fields.Char()
-    product_uom=fields.Many2one(comodel_name='uom.uom')
+
+    # product_uom=fields.Many2one(comodel_name='uom.uom')
 
     # stock_valuation_value sum of values and sum of
-    opening_weighted_average=fields.Float()
+    opening_weigthed_avg=fields.Float()
     opening_quantity=fields.Float()
     opening_value=fields.Float()
-
+    is_initial=fields.Boolean()
     in_quantity=fields.Float()
     in_value=fields.Float()
     out_quantity=fields.Float()
     out_value=fields.Float()
 
 
-    ending_weighted_average = fields.Float()
+    ending_weigted_avg = fields.Float()
     ending_quantity = fields.Float()
     ending_value = fields.Float()
 
@@ -59,12 +61,12 @@ class InventoryReportsModel(models.TransientModel):
     date_from = fields.Date(string = "Date From", required = 1)
     date_to = fields.Date(string = "Date To", required = 0)
 
-    # results = fields.Many2many(
-    #     comodel_name="inventory.report.view",
-    #     compute="_compute_results",
-    #     help="Use compute fields, so there is nothing store in database",
-    # )
-    results=[]
+    results = fields.Many2many(
+        comodel_name="inventory.report.view",
+        compute="_compute_results",
+        help="Use compute fields, so there is nothing store in database",
+    )
+    # results=[]
 
     def _compute_results(self   ):
         start=time.time()
@@ -215,7 +217,7 @@ class InventoryReportsModel(models.TransientModel):
            GROUP BY product.id,p_temp.name,p_cat.name, product.default_code,p_cat.name, uom.name,move.id,stock_picking.origin,
            stock_location_source.name,stock_location_dest.name,picking_type.warehouse_id,stock_warehouse.name,picking_type.name,picking_type.id,st_val.quantity,
            st_val.value
-           order by id
+           order by id,is_initial desc
          
                
             
@@ -233,6 +235,7 @@ class InventoryReportsModel(models.TransientModel):
         _logger.info("query_done number of rows %s",len(all_lines))
         _logger.info("query_done in %s sec",end_query)
         start_handling=time.time()
+        print('all_lines[0]',all_lines[0])
 
 
 
@@ -269,8 +272,10 @@ class InventoryReportsModel(models.TransientModel):
         end_handling = time.time() - start_handling
         _logger.info("handling done in %s", end_handling)
 
-
-        return all_lines
+        ReportLine = self.env["inventory.report.view"]
+        self.results = [ReportLine.new(line).id for line in all_lines]
+        # print("results",self.results)
+        # return all_lines
 
 
 

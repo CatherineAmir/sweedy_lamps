@@ -49,19 +49,19 @@
             "Product Unit of Measure",
             "Stock Move Date",
             "stock Move Type",
-            "stock Move Name",
+
             "Stock Move Reference",
             "Stock Move Operation type",
             "Opening Quantity",
             "Opening Value",
-            "Opening Weighed Average",
+            "Op. Weighed Avg",
             "In Quantity",
             "In Value",
             "Out Quantity",
             "Out Value",
             "Ending Quantity",
             "Ending Value",
-            "Ending Weighed Average",
+            "End. Weighed Avg",
 
         ]'/>
 	                                      <tr>
@@ -73,8 +73,8 @@
                                 </thead>
 	                                 <tbody class="text-center" style="font-size:12px;border: 1px solid black;
                                         border-collapse: collapse;">
-		                                 <t t-set="datas" t-value="request.env['report.inventory.report'].browse(int(report))._compute_results()"/>
-		                                 <t t-esc="datas"/>
+		                                 <t t-set="datas" t-value="request.env['report.inventory.report'].browse(int(report)).results"/>
+<!--		                                 <t t-esc="datas"/>-->
 		                                 <tr t-foreach="datas" t-as="line" style="background-color:#c8e6e1;font-size:14px; font-weight:600;border: 1px solid black;
                                         border-collapse: collapse;">
 			                                    <t t-if="line['type']=='header'">
@@ -118,10 +118,12 @@
 			                                      <td t-att-style="style" >
 
                                              <span t-esc="line['picking_code'] or ''"  />
-                                             </td>   <td t-att-style="style" >
+                                           </td>
+<!-- <td t-att-style="style" >&ndash;&gt;-->
 
-                                             <span t-esc="line['move_name'] or ''"  />
-                                             </td>
+
+<!--                                             <span t-esc="line['move_name'] or ''"  />-->
+<!--                                             </td>-->
 
 			                                   <td t-att-style="style" >
 
@@ -132,6 +134,12 @@
 
                                              <span t-esc="line['picking_display_name'] or ''"  />
                                              </td>
+			                                  <td t-att-style="style" >
+
+                                             <span t-esc="line['opening_quantity']" t-options='{"widget": "float", "precision": 2}'  />
+
+			                                   </td>
+
 			                                   <td t-att-style="style" >
 
                                              <span t-esc="line['opening_value']" t-options='{"widget": "float", "precision": 2}'  />
