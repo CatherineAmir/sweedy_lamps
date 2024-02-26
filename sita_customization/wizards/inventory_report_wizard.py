@@ -8,6 +8,8 @@ class InventoryReport(models.TransientModel):
 
     date_from=fields.Date(string="Date From",required=1)
     date_to=fields.Date(string="Date To",required=0)
+    product_ids=fields.Many2many('product.product')
+    category_ids=fields.Many2many('product.category')
 
     def button_export_html(self):
 
@@ -50,6 +52,8 @@ class InventoryReport(models.TransientModel):
         return {
             "date_from": self.date_from,
             "date_to": self.date_to or fields.Date.context_today(self),
+            "product_ids":self.product_ids,
+            'category_ids':self.category_ids,
 
 
         }

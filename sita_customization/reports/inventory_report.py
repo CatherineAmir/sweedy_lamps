@@ -60,6 +60,8 @@ class InventoryReportsModel(models.TransientModel):
     _description = 'Report Inventory'
     date_from = fields.Date(string = "Date From", required = 1)
     date_to = fields.Date(string = "Date To", required = 0)
+    product_ids = fields.Many2many('product.product')
+    category_ids = fields.Many2many('product.category')
 
     results = fields.Many2many(
         comodel_name="inventory.report.view",
@@ -74,11 +76,19 @@ class InventoryReportsModel(models.TransientModel):
         self.ensure_one()
         date_from = self.date_from
         self.date_to=self.date_to or fields.Date.context_today(self)
-        product_dicts={}
-        # product_ids=self.env['product.product'].search([])
-        # results=[]
-        # p=tuple(product_ids.ids)
-        # for p in product_ids.ids:
+        product_ids=self.product_ids
+        categ_ids=self.category_ids
+        if product_ids and not categ_ids:
+            p_ids=product_ids
+
+        elif  categ_ids and not product_ids:
+            p_ids =self.env['product.product'].search([('categ_id','in',categ_ids.ids)])
+        elif product_ids and categ_ids :
+            p_ids=self.env['product.product'].search(['|',('categ_id','in',categ_ids.ids),('id','in',product_ids.ids)])
+        else:
+            p_ids=self.env['product.product'].search([])
+
+
 
         self._cr.execute("""
             SELECT  Distinct 'header' as type , null::integer as move_id,null::timestamp as move_date,product.id,p_temp.name as product_name,
@@ -146,7 +156,7 @@ class InventoryReportsModel(models.TransientModel):
             
             
             
-           From product_product product
+           From product_product product 
      
             inner join product_template as p_temp
             on p_temp.id=product.product_tmpl_id
@@ -155,7 +165,7 @@ class InventoryReportsModel(models.TransientModel):
             on p_temp.categ_id=p_cat.id
             inner join uom_uom as uom
             on p_temp.uom_id=uom.id
-		   where product.id in (select id from product_product) 
+		   where product.id in (select id from product_product where id in %s)  
             
         
              union all
@@ -210,7 +220,7 @@ class InventoryReportsModel(models.TransientModel):
             full outer Join stock_valuation_layer as st_val
             on move.id=st_val.stock_move_id
             
-             where move.state='done' and move.product_id in  (select id from product_product) 
+             where move.state='done' and move.product_id in  (select id from product_product where id in %s) 
               and CAST(move.date as date)  >= %s
               and  CAST(move.date as date)<=%s
                
@@ -225,8 +235,10 @@ class InventoryReportsModel(models.TransientModel):
             date_from,date_from,
             date_from,date_from,
             date_from,date_from,
-            date_from,date_from,
 
+            date_from,date_from,
+            tuple(p_ids.ids),
+            tuple(p_ids.ids),
             date_from,self.date_to,
 
         ))
