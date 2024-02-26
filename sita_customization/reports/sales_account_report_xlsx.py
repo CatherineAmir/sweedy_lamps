@@ -152,7 +152,7 @@ class SalesAccountReport(models.AbstractModel):
             report_id = data["report"]
             report = self.env['report.sales_account.report'].browse(int(report_id))
 
-            data = report._compute_results()
+            data = report.results
 
             # print("in report dataaa",data)
 

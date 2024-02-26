@@ -299,7 +299,7 @@ class InventoryReportsModel(models.TransientModel):
         }
         # if report_type=="qweb-pdf":
         #     data["lines"]=self._compute_results()
-        print("data",data)
+        # print("data",data)
 
         return action.report_action(self,config = False,data=data)
 

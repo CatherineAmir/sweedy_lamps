@@ -65,6 +65,7 @@
                                 </thead>
 	                                 <tbody class="text-center" style="font-size:12px;border: 1px solid black;
                                         border-collapse: collapse;">
+		                                 <t t-set="lines" t-value="request.env['report.sales_account.report'].browse(int(report)).results"/>
 		                                   <tr t-foreach="lines" t-as="line" style="background-color:#c8e6e1;font-size:14px; font-weight:600;border: 1px solid black;
                                         border-collapse: collapse;">
 

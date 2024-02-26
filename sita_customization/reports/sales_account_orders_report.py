@@ -2,6 +2,36 @@ from odoo import fields, models, api
 import logging
 _logger=logging.getLogger(__name__)
 import time
+class salesOrderAccpuntView(models.TransientModel):
+    _name='cogs.report.view'
+    _description = "Cogs Report View"
+    _order='date'
+
+    move_name=fields.Char()
+    date=fields.Datetime()
+    code=fields.Char()
+    name=fields.Char()
+    default_code=fields.Char()
+    product_name=fields.Char()
+    partner_name=fields.Char()
+    partner_tax_id=fields.Char()
+    sales_person=fields.Char()
+    customer_price_list=fields.Char()
+    product_cost=fields.Float()
+    cogs_unit_price=fields.Float()
+    invoice_line_unit_price=fields.Float()
+    invoice_line_quantity=fields.Float()
+    invoice_line_subtotal=fields.Float()
+    invoice_line_discount=fields.Float()
+    invoice_line_total=fields.Float()
+    cogs_total_amount=fields.Float()
+    profitability=fields.Float()
+    state=fields.Selection([('draft','Draft'),('posted','Posted'),('cancelled','cancelled')],'State')
+
+
+
+
+
 
 class SalesAccountReportsModel(models.TransientModel):
     _name = 'report.sales_account.report'
@@ -14,7 +44,7 @@ class SalesAccountReportsModel(models.TransientModel):
 
 
 
-    results=[]
+    results=fields.Many2many(comodel_name = 'cogs.report.view',compute='_compute_results', string="Results",help="USe Compute fields in order that nothing is stored in database")
 
     def _compute_results(self   ):
 
@@ -94,12 +124,15 @@ order by line.date,line.move_name
         """
         start=time.time()
         self._cr.execute(query, (tuple(self.income_account.ids),date_from,self.date_to))
-        results = self._cr.dictfetchall()
+        lines = self._cr.dictfetchall()
         end_query = time.time() - start
-        _logger.info("query_done number of rows %s", len(results))
+        _logger.info("query_done number of rows %s", len(lines))
         _logger.info("query_done in %s sec", end_query)
+        ReportLine=self.env['cogs.report.view']
+        print('lines[0]', lines[0])
+        self.results=[ReportLine.new(line).id for line in lines]
 
-        return results
+
 
 
 
@@ -119,8 +152,8 @@ order by line.date,line.move_name
             "date_from":self.date_from,
             "date_to":self.date_to,
         }
-        if report_type == "qweb-pdf":
-            data["lines"] = self._compute_results()
+        # if report_type == "qweb-pdf":
+            # data["lines"] = self._compute_results()
 
         return action.report_action(self,config = False,data=data)
 
