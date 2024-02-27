@@ -160,11 +160,11 @@
                                              <span t-esc="line['in_value']" t-options='{"widget": "float", "precision": 2}'  />
 
 			                                   </td>
-			                                   <td t-att-style="style" >
+<!--			                                   <td t-att-style="style" >-->
 
-                                             <span t-esc="line['out_quantity']" t-options='{"widget": "float", "precision": 2}'  />
+<!--                                             <span t-esc="line['out_quantity']" t-options='{"widget": "float", "precision": 2}'  />-->
 
-			                                   </td>
+<!--			                                   </td>-->
 
 			                                   <td t-att-style="style" >
 
