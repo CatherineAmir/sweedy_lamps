@@ -45,7 +45,11 @@ class SalesAccountReportsModel(models.TransientModel):
 
 
     results=fields.Many2many(comodel_name = 'cogs.report.view',compute='_compute_results', string="Results",help="USe Compute fields in order that nothing is stored in database")
-
+    # left join account_move_line as journal_items
+    # on journal_items.move_id=line.move_id and journal_items.account_id in
+    #  (select id from  account_account where id in %s)
+    #  and journal_items.product_id=line.product_id
+    # and journal_items.quantity=line.quantity
     def _compute_results(self   ):
 
         self.ensure_one()
@@ -53,17 +57,34 @@ class SalesAccountReportsModel(models.TransientModel):
         self.date_to=self.date_to or fields.Date.context_today(self)
 
         query="""
-        select line.move_name,line.date,account.code,account.name,product.default_code,p_temp.name as product_name,
+        select  line.move_name,line.date,account.code,account.name,product.default_code,p_temp.name as product_name,
 partner.name as partner_name,partner.vat as partner_tax_id,
 user_partner.name as sales_person, product_pricelist.name || '(' || list_currency.name || ')' as customer_price_list,
 
 prop.value_float as product_cost,
-journal_items.debit/line.quantity as cogs_unit_price,
+(select cASE  WHEN journal_items.DEBIT >0 THEN journal_items.debit ELSE journal_items.CREDIT END/line.quantity  as cogs_unit_price
+ from account_move_line  journal_items  where journal_items.move_id=line.move_id and journal_items.account_id =8279
+
+     and journal_items.product_id=line.product_id
+     and journal_items.quantity=line.quantity  limit 1 ),
+
 line.price_unit as invoice_line_unit_price,line.quantity as invoice_line_quantity,line.price_subtotal as invoice_line_subtotal,
 line.discount as invoice_line_discount,
 line.price_total as invoice_line_total ,
-journal_items.debit as Cogs_total_amount,
-line.price_subtotal - journal_items.debit as profitability,
+(select CASE  WHEN journal_items.DEBIT >0 THEN journal_items.debit ELSE journal_items.CREDIT END  as Cogs_total_amount
+ from account_move_line  journal_items  where journal_items.move_id=line.move_id and journal_items.account_id =8279
+ 
+     and journal_items.product_id=line.product_id
+     and journal_items.quantity=line.quantity  limit 1 ),
+
+
+(line.price_subtotal - (select CASE  WHEN journal_items.debit >0 THEN journal_items.debit ELSE journal_items.CREDIT END  
+ from account_move_line  journal_items   where journal_items.move_id=line.move_id and journal_items.account_id =8279
+
+     and journal_items.product_id=line.product_id
+     and journal_items.quantity=line.quantity  limit 1 )
+ )as profitabilitY,
+
 
 move.state 
 
@@ -100,11 +121,7 @@ full outer join sale_order
 on sale_order_line.order_id=sale_order.id
 
 
-full outer join account_move_line as journal_items
-on journal_items.move_id=line.move_id and journal_items.account_id in
- (select id from  account_account where id in %s) 
- and journal_items.product_id=line.product_id
-and journal_items.quantity=line.quantity
+
 
 
 full outer join  product_pricelist
@@ -124,7 +141,7 @@ order by line.date,line.move_name
         
         """
         start=time.time()
-        self._cr.execute(query, (tuple(self.income_account.ids),tuple(self.income_account.ids),date_from,self.date_to))
+        self._cr.execute(query,(tuple(self.income_account.ids),date_from,self.date_to))
         lines = self._cr.dictfetchall()
         end_query = time.time() - start
         _logger.info("query_done number of rows %s", len(lines))
