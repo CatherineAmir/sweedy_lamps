@@ -182,11 +182,12 @@ class InventoryReportsModel(models.TransientModel):
             0 as opening_quantity,
             0 as opening_value,
             0 as opening_weigthed_avg,
-             case when st_val.quantity<0 then ABS(st_val.quantity) else 0 end  as out_quantity,
-             case when st_val.quantity<0 then ABS(st_val.value) else 0 end  as out_value,
-                case when st_val.quantity>0 then st_val.quantity else 0 end  as in_quantity,
+              case when st_val.quantity>0 then st_val.quantity else 0 end  as in_quantity,
                 case when st_val.quantity>0 then st_val.value else 0 end as in_value,
             
+             case when st_val.quantity<0 then ABS(st_val.quantity) else 0 end  as out_quantity,
+             case when st_val.quantity<0 then ABS(st_val.value) else 0 end  as out_value,
+              
             0 as ending_quantity,
             0 as ending_value,
             0 as ending_weigted_avg
