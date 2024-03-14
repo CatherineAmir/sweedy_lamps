@@ -182,11 +182,11 @@ class InventoryReportsModel(models.TransientModel):
             0 as opening_quantity,
             0 as opening_value,
             0 as opening_weigthed_avg,
-              case when st_val.quantity>0 then st_val.quantity else 0 end  as in_quantity,
-                case when st_val.quantity>0 then st_val.value else 0 end as in_value,
+              case when st_val.value>0 then st_val.quantity else 0 end  as in_quantity,
+                case when st_val.value>0 then st_val.value else 0 end as in_value,
             
-             case when st_val.quantity<0 then ABS(st_val.quantity) else 0 end  as out_quantity,
-             case when st_val.quantity<0 then ABS(st_val.value) else 0 end  as out_value,
+             case when st_val.value<0 then ABS(st_val.quantity) else 0 end  as out_quantity,
+             case when st_val.value<0 then ABS(st_val.value) else 0 end  as out_value,
               
             0 as ending_quantity,
             0 as ending_value,
@@ -220,16 +220,58 @@ class InventoryReportsModel(models.TransientModel):
             full outer join stock_location as stock_location_dest 
             on stock_location_dest.id= move.location_dest_id
             
-            full outer Join stock_valuation_layer as st_val
+             inner Join stock_valuation_layer as st_val
             on move.id=st_val.stock_move_id
             
              where move.state='done' and move.product_id in  (select id from product_product where id in %s) 
               and CAST(move.date as date)  >= %s
               and  CAST(move.date as date)<=%s
+          
+          union all
+              SELECT 'line' as type ,null as move_id ,stock_val.create_date as move_date,stock_val.product_id ,
+             p_temp.name as product_name,product.default_code as product_code,p_cat.name as product_category,
+             uom.name as product_uom ,
+            stock_val.description as move_name,'' as move_reference,''
+             as move_display_name,
+              '' as picking_display_name,
+            null as picking_type_id,
+            '' as picking_code,
+            False  as is_initial,
+            0 as opening_quantity,
+            0 as opening_value,
+            0 as opening_weigthed_avg,
+              case when stock_val.value>0 then stock_val.quantity else 0 end  as in_quantity,
+                case when stock_val.value>0 then stock_val.value else 0 end as in_value,
+            
+             case when stock_val.value<0 then ABS(stock_val.quantity) else 0 end  as out_quantity,
+             case when stock_val.value<0 then ABS(stock_val.value) else 0 end  as out_value,
+              
+            0 as ending_quantity,
+            0 as ending_value,
+            0 as ending_weigted_avg
+            
+             
+             
+             from stock_valuation_layer as stock_val 
+             Inner Join product_product as product
+            on stock_val.product_id=product.id
+            inner join product_template as p_temp
+            on p_temp.id=product.product_tmpl_id
+            inner join product_category as p_cat
+            on p_temp.categ_id=p_cat.id
+    
+            inner join uom_uom as uom
+            on p_temp.uom_id=uom.id
+			
+
+            
+             where   stock_val.product_id in  (select id from product_product where id in %s)
+              and CAST(stock_val.create_date as date)  >= %s
+              and  CAST(stock_val.create_date as date)<=%s and stock_move_id is null		  
+			  
                
-           GROUP BY product.id,p_temp.name,p_cat.name, product.default_code,p_cat.name, uom.name,move.id,stock_picking.origin,
-           stock_location_source.name,stock_location_dest.name,picking_type.warehouse_id,stock_warehouse.name,picking_type.name,picking_type.id,st_val.quantity,
-           st_val.value
+           GROUP BY product.id,p_temp.name,p_cat.name, product.default_code,p_cat.name, uom.name,stock_val.create_date,stock_val.product_id,stock_val.description,stock_val.value,stock_val.quantity
+
            order by id,is_initial desc
          
                
@@ -243,6 +285,8 @@ class InventoryReportsModel(models.TransientModel):
             tuple(p_ids.ids),
             tuple(p_ids.ids),
             date_from,self.date_to,
+            tuple(p_ids.ids),
+            date_from, self.date_to,
 
         ))
         all_lines=self._cr.dictfetchall()
@@ -250,7 +294,7 @@ class InventoryReportsModel(models.TransientModel):
         _logger.info("query_done number of rows %s",len(all_lines))
         _logger.info("query_done in %s sec",end_query)
         start_handling=time.time()
-        print('all_lines[0]',all_lines[0])
+        # print('all_lines[0]',all_lines[0])
 
 
 
