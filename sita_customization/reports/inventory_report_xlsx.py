@@ -182,7 +182,7 @@ class InventoryReport(models.AbstractModel):
             "Product Description",
             "Product Category",
             "Product Unit of Measure",
-            "Stock Move Date",
+            "Stock Valuation Date",
             "stock Move Type",
             "stock Move Name",
             "Stock Move Reference",

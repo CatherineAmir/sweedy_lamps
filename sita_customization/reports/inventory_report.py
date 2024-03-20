@@ -91,7 +91,7 @@ class InventoryReportsModel(models.TransientModel):
 
 
         self._cr.execute("""
-            SELECT  Distinct 'header' as type , null::integer as move_id,null::timestamp as move_date,product.id,p_temp.name as product_name,
+           SELECT  Distinct 'header' as type , null::integer as move_id,null::timestamp as move_date,product.id,p_temp.name as product_name,
             product.default_code as product_code,p_cat.name as product_category,
             uom.name as product_uom ,
             '' as move_name,'' as move_reference,''
@@ -103,44 +103,19 @@ class InventoryReportsModel(models.TransientModel):
             True as is_initial,
           
            
-            case 
-            when (select move.id from stock_move move where product_id =product.id and move.state='done' and  CAST(move.date as date)  < %s limit 1) is not null 
-            then  (select COALESCE(sum(st_val.quantity ),0.0) from stock_valuation_layer as st_val 
-				   where (st_val.stock_move_id in
-						  (select move.id from stock_move move where product_id =product.id  and move.state='done' and  CAST(move.date as date) 
-												  < %s)))
-            else 0.0 
-            end  as opening_quantity, 
-			 case 
-            when (select move.id from stock_move move where product_id =product.id and move.state='done' and  CAST(move.date as date)  < %s limit 1) is not null
-            then  (select COALESCE(sum(st_val.value ),0.0) from stock_valuation_layer as st_val 
-				   where (st_val.stock_move_id in(select move.id from stock_move move where product_id =product.id and move.state='done' and  CAST(move.date as date) 
-												  < %s)))
+          
+				(select COALESCE(sum(st_val.quantity ),0.0) as opening_quantity from stock_valuation_layer st_val where product_id =product.id  and  CAST(st_val.create_date as date)  < %s ),
+				(select COALESCE(sum(st_val.value ),0.0) as opening_value from stock_valuation_layer st_val where product_id =product.id  and  CAST(st_val.create_date as date)  < %s ), 
 				
+				
+				case when((select COALESCE(sum(st_val.quantity ),0.0)  from stock_valuation_layer st_val where product_id =product.id  and  CAST(st_val.create_date as date)  < %s)!=0)
+						 
+						 then ((select COALESCE(sum(st_val.value ),0.0)  from stock_valuation_layer st_val where product_id =product.id  and  CAST(st_val.create_date as date)  < %s )::decimal/
+						  (select COALESCE(sum(st_val.quantity ),0.0)  from stock_valuation_layer st_val where product_id =product.id  and  CAST(st_val.create_date as date)  < %s ))
+						else 1 
+						
+						end as opening_weigthed_avg,
 
-			
-            else 0.0 
-            end  as opening_value, 
-			
-			 case 
-            when (select move.id from stock_move move where product_id  =product.id and move.state='done' and  CAST(move.date as date)  < %s limit 1) is not null 
-																										  
-			then  ((select COALESCE(sum(st_val.value ),0.0) from stock_valuation_layer as st_val 
-				   where (st_val.stock_move_id in(select move.id from stock_move move where product_id  =product.id and move.state='done' and  CAST(move.date as date) 
-												  < %s)))::decimal)/
-				  (Case
-				  when (select COALESCE(sum(st_val.quantity ),0.0) from stock_valuation_layer as st_val 
-				   where (st_val.stock_move_id in(select move.id from stock_move move where product_id =product.id and move.state='done' and  CAST(move.date as date) 
-												  < %s))) !=0
-				  then 
-				    (select COALESCE(sum(st_val.quantity ),0.0) from stock_valuation_layer as st_val 
-				   where (st_val.stock_move_id in(select move.id from stock_move move where  product_id =product.id and move.state='done' and  CAST(move.date as date) 
-												  < %s))) 
-				  else 1
-				  end)
-			
-			else 1
-			end as opening_weigthed_avg,
 				  
 --           
 --             
@@ -169,7 +144,7 @@ class InventoryReportsModel(models.TransientModel):
             
         
              union all
-              SELECT 'line' as type ,move.id as move_id ,move.date as move_date,move.product_id ,
+              SELECT 'line' as type ,move.id as move_id ,st_val.create_date as move_date,move.product_id ,
              p_temp.name as product_name,product.default_code as product_code,p_cat.name as product_category,
              uom.name as product_uom ,
             move.name as move_name,move.reference as move_reference,stock_picking.origin||'/'||product.default_code || ': ' ||stock_location_source.name
@@ -182,19 +157,21 @@ class InventoryReportsModel(models.TransientModel):
             0 as opening_quantity,
             0 as opening_value,
             0 as opening_weigthed_avg,
-              case when st_val.value>0 then st_val.quantity else 0 end  as in_quantity,
-                case when st_val.value>0 then st_val.value else 0 end as in_value,
+              case when (st_val.value>0 or st_val.quantity>0) then st_val.quantity else 0 end  as in_quantity,
+                case when st_val.value>0 or st_val.quantity>0 then st_val.value else 0 end as in_value,
             
-             case when st_val.value<0 then ABS(st_val.quantity) else 0 end  as out_quantity,
-             case when st_val.value<0 then ABS(st_val.value) else 0 end  as out_value,
+             case when st_val.value<0 or st_val.quantity<0 then ABS(st_val.quantity) else 0 end  as out_quantity,
+             case when st_val.value<0  or st_val.quantity<0 then ABS(st_val.value) else 0 end  as out_value,
               
             0 as ending_quantity,
             0 as ending_value,
             0 as ending_weigted_avg
             
+             from stock_valuation_layer as st_val
+			 full outer Join stock_move as move
+            on move.id=st_val.stock_move_id
              
-             
-             from stock_move as move
+
              Inner Join product_product as product
             on move.product_id=product.id
             inner join product_template as p_temp
@@ -220,14 +197,15 @@ class InventoryReportsModel(models.TransientModel):
             full outer join stock_location as stock_location_dest 
             on stock_location_dest.id= move.location_dest_id
             
-             inner Join stock_valuation_layer as st_val
-            on move.id=st_val.stock_move_id
-            
-             where move.state='done' and move.product_id in  (select id from product_product where id in %s) 
-              and CAST(move.date as date)  >= %s
-              and  CAST(move.date as date)<=%s
-          
-          union all
+
+		   where st_val.product_id in  (select id from product_product where id in %s)
+              and CAST(st_val.create_date as date)  >= %s
+              and  CAST(st_val.create_date as date)<=%s
+			  
+			  
+			  
+-- 			  newww
+union all
               SELECT 'line' as type ,null as move_id ,stock_val.create_date as move_date,stock_val.product_id ,
              p_temp.name as product_name,product.default_code as product_code,p_cat.name as product_category,
              uom.name as product_uom ,
@@ -240,8 +218,8 @@ class InventoryReportsModel(models.TransientModel):
             0 as opening_quantity,
             0 as opening_value,
             0 as opening_weigthed_avg,
-              case when stock_val.value>0 then stock_val.quantity else 0 end  as in_quantity,
-                case when stock_val.value>0 then stock_val.value else 0 end as in_value,
+              case when stock_val.value>=0 then stock_val.quantity else 0 end  as in_quantity,
+                case when stock_val.value>=0 then stock_val.value else 0 end as in_value,
             
              case when stock_val.value<0 then ABS(stock_val.quantity) else 0 end  as out_quantity,
              case when stock_val.value<0 then ABS(stock_val.value) else 0 end  as out_value,
@@ -262,7 +240,6 @@ class InventoryReportsModel(models.TransientModel):
     
             inner join uom_uom as uom
             on p_temp.uom_id=uom.id
-			
 
             
              where   stock_val.product_id in  (select id from product_product where id in %s)
@@ -272,21 +249,24 @@ class InventoryReportsModel(models.TransientModel):
                
            GROUP BY product.id,p_temp.name,p_cat.name, product.default_code,p_cat.name, uom.name,stock_val.create_date,stock_val.product_id,stock_val.description,stock_val.value,stock_val.quantity
 
-           order by id,is_initial desc
+           order by id,is_initial desc, move_date
          
                
             
         """,(
             date_from,date_from,
             date_from,date_from,
-            date_from,date_from,
+            date_from,
+            # date_from,
 
-            date_from,date_from,
+            # date_from,date_from,
+            tuple(p_ids.ids), # for header
+
             tuple(p_ids.ids),
+            date_from,self.date_to, #for line
+
             tuple(p_ids.ids),
-            date_from,self.date_to,
-            tuple(p_ids.ids),
-            date_from, self.date_to,
+            date_from, self.date_to, # for the last line
 
         ))
         all_lines=self._cr.dictfetchall()

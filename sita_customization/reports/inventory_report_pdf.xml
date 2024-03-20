@@ -47,9 +47,8 @@
             "Product Description",
             "Product Category",
             "Product Unit of Measure",
-            "Stock Move Date",
+            "Stock Valuation Date",
             "stock Move Type",
-
             "Stock Move Reference",
             "Stock Move Operation type",
             "Opening Quantity",
