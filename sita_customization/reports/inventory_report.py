@@ -86,7 +86,7 @@ class InventoryReportsModel(models.TransientModel):
         elif product_ids and categ_ids :
             p_ids=self.env['product.product'].search(['|',('categ_id','in',categ_ids.ids),('id','in',product_ids.ids)])
         else:
-            p_ids=self.env['product.product'].search([])
+            p_ids=self.env['product.product'].search([('categ_id','in',[4,5,6,7])])
 
 
 
@@ -285,9 +285,9 @@ union all
                 all_lines[i]['in_value'] =0
                 all_lines[i]['out_quantity'] =0
                 all_lines[i]['out_value'] = 0
-                all_lines[i]['ending_quantity'] = 0
-                all_lines[i]['ending_value'] =0
-                all_lines[i]['ending_weigted_avg'] = 0
+                all_lines[i]['ending_quantity'] = all_lines[i]['opening_quantity']
+                all_lines[i]['ending_value'] =all_lines[i]['opening_value']
+                all_lines[i]['ending_weigted_avg'] = all_lines[i]['opening_weigthed_avg']
 
                 j = i
             else:
