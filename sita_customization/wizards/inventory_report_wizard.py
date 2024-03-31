@@ -8,7 +8,7 @@ class InventoryReport(models.TransientModel):
 
     date_from=fields.Date(string="Date From",required=1)
     date_to=fields.Date(string="Date To",required=0)
-    product_ids=fields.Many2many('product.product')
+    product_ids=fields.Many2many('product.product',domain=[("type", "=", "product")])
     category_ids=fields.Many2many('product.category')
 
     def button_export_html(self):

@@ -82,11 +82,11 @@ class InventoryReportsModel(models.TransientModel):
             p_ids=product_ids
 
         elif  categ_ids and not product_ids:
-            p_ids =self.env['product.product'].search([('categ_id','in',categ_ids.ids)])
+            p_ids =self.env['product.product'].search([('categ_id','in',categ_ids.ids),("type", "=", "product")])
         elif product_ids and categ_ids :
             p_ids=self.env['product.product'].search(['|',('categ_id','in',categ_ids.ids),('id','in',product_ids.ids)])
         else:
-            p_ids=self.env['product.product'].search([('categ_id','in',[4,5,6,7])])
+            p_ids=self.env['product.product'].search([('categ_id','in',[4,5,6,7]),("type", "=", "product")])
 
 
 
